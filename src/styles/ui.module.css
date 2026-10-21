@@ -1,0 +1,262 @@
+/* 共通UIパーツ（カード・チップ・セグメント・ボタンなど） */
+
+.card {
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+}
+
+.cardPad {
+  padding: 16px;
+}
+
+.sectionTitle {
+  font-size: 1.0625rem;
+  margin: 8px 0 4px;
+}
+
+.lead {
+  color: var(--color-secondary-label);
+  font-size: 0.9375rem;
+}
+
+.mono {
+  font-family: var(--font-mono);
+}
+
+/* --- チップ（分野・状態表示） --- */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.4;
+  padding: 2px 10px;
+  border-radius: var(--radius-chip);
+  color: var(--color-label);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+}
+
+/* --- セグメントボタン --- */
+.segmented {
+  display: flex;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  padding: 3px;
+  gap: 3px;
+  width: 100%;
+}
+
+.segmentedItem {
+  flex: 1;
+  min-height: 36px;
+  padding: 4px 8px;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-secondary-label);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.segmentedActive {
+  background: var(--color-card);
+  color: var(--color-label);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+
+/* --- ボタン --- */
+.primaryBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: var(--tap-min);
+  padding: 10px 20px;
+  border-radius: 12px;
+  background: var(--color-accent);
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: opacity 0.15s ease;
+}
+
+.primaryBtn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.subtleBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: var(--tap-min);
+  padding: 10px 16px;
+  border-radius: 12px;
+  border: 1px solid var(--color-border);
+  background: var(--color-card);
+  color: var(--color-label);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.subtleBtn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.dangerBtn {
+  composes: subtleBtn;
+  color: var(--color-error-ink);
+  border-color: var(--color-error);
+}
+
+/* --- 行リンク --- */
+.rowLink {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: var(--tap-min);
+  padding: 12px 14px;
+  text-decoration: none;
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  transition: background 0.15s ease;
+}
+
+.rowLink:active {
+  background: var(--color-surface);
+}
+
+.rowMain {
+  flex: 1;
+  min-width: 0;
+}
+
+.rowTitle {
+  font-weight: 600;
+  font-size: 0.9375rem;
+}
+
+.rowSub {
+  color: var(--color-secondary-label);
+  font-size: 0.8125rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+/* --- 進捗リング --- */
+.ring {
+  display: block;
+}
+
+/* --- 空状態 --- */
+.empty {
+  color: var(--color-secondary-label);
+  font-size: 0.9375rem;
+  text-align: center;
+  padding: 24px 12px;
+}
+
+/* --- 注記 --- */
+.note {
+  background: var(--color-warning-tint);
+  color: var(--color-label);
+  border: 1px solid var(--color-warning);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 0.875rem;
+}
+
+.info {
+  background: var(--color-accent-tint);
+  border: 1px solid var(--color-accent);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 0.875rem;
+}
+
+/* --- ページ共通 --- */
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-top: 8px;
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.chipRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* --- 固定ボタンの下バー --- */
+.bottomBar {
+  position: sticky;
+  bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom));
+  z-index: 5;
+  margin-top: 16px;
+  padding: 8px 0;
+  background: linear-gradient(to top, var(--color-bg) 70%, transparent);
+}
+
+@media (min-width: 768px) {
+  .bottomBar {
+    bottom: 0;
+  }
+}
+
+.fullWidth {
+  width: 100%;
+}
+
+/* --- 見出しの行 --- */
+.titleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+/* --- 星評価 --- */
+.stars {
+  color: var(--color-warning-ink);
+  display: inline-flex;
+  gap: 1px;
+  vertical-align: -2px;
+}
+
+/* --- 後で解くボタン --- */
+.laterBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--tap-min);
+  height: var(--tap-min);
+  border-radius: 50%;
+  color: var(--color-secondary-label);
+}
+
+.laterOn {
+  color: var(--color-warning-ink);
+}

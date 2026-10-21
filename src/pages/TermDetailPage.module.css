@@ -1,0 +1,77 @@
+.page {
+  padding-top: 4px;
+}
+
+.short {
+  font-size: 1.0625rem;
+  font-weight: 700;
+  color: var(--color-secondary-label);
+}
+
+.figureCard {
+  display: flex;
+  justify-content: center;
+  padding: 8px;
+}
+
+.figure {
+  width: 100%;
+  max-width: 420px;
+}
+
+.figure svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.desc {
+  font-size: 0.9375rem;
+  margin-bottom: 10px;
+  white-space: pre-line;
+}
+
+.review {
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.reviewBtns {
+  display: flex;
+  gap: 8px;
+}
+
+.reviewBtn {
+  flex: 1;
+  min-height: var(--tap-min);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  background: var(--color-card);
+  font-weight: 700;
+  font-size: 0.9375rem;
+}
+
+.reviewKnownOn {
+  border-color: var(--color-success);
+  background: var(--color-success-tint);
+  color: var(--color-success-ink);
+}
+
+.reviewUnsureOn {
+  border-color: var(--color-warning);
+  background: var(--color-warning-tint);
+  color: var(--color-warning-ink);
+}
+
+.demoLink {
+  color: var(--color-accent);
+  font-weight: 700;
+  text-decoration: none;
+  font-size: 0.9375rem;
+}

@@ -1,0 +1,123 @@
+/*
+ * デザイントークン（仕様書 §6）
+ * - セマンティックな意味で命名する
+ * - 分野識別色は状態色（成功/誤答/注意/アクセント）と別の色相にする
+ * - ダークモード・reduced motion に対応
+ */
+:root {
+  color-scheme: light dark;
+
+  /* タップ領域: HIG 44pt / Material 48dp */
+  --tap-min: 44px;
+
+  /* タイポグラフィ: rem で OS の文字サイズ設定に追従 */
+  --font-stack: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Noto Sans JP", sans-serif;
+  --font-body: 1rem;
+  --line-height-body: 1.75;
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+
+  /* 色（ライト） */
+  --color-bg: #ffffff;
+  --color-surface: #f2f2f7;
+  --color-card: #ffffff;
+  --color-border: #d1d1d6;
+  --color-label: #1c1c1e;
+  --color-secondary-label: #48484a;
+  --color-accent: #007aff;
+  --color-accent-tint: rgba(0, 122, 255, 0.12);
+  --color-bar: rgba(255, 255, 255, 0.94);
+
+  /* 状態色: 塗り用と文字用(ink)を分ける。文字はコントラスト比4.5:1以上を維持 */
+  --color-success: #34c759;
+  --color-success-ink: #157c37;
+  --color-success-tint: rgba(52, 199, 89, 0.16);
+  --color-error: #ff3b30;
+  --color-error-ink: #d70015;
+  --color-error-tint: rgba(255, 59, 48, 0.12);
+  --color-warning: #ff9500;
+  --color-warning-ink: #9a5b00;
+  --color-warning-tint: rgba(255, 149, 0, 0.14);
+
+  /* 分野識別色（状態色と別の色相: 紫 / テール / 藍 / 桃） */
+  --field-society: #af52de;
+  --field-society-tint: rgba(175, 82, 222, 0.14);
+  --field-network: #00a2b8;
+  --field-network-tint: rgba(0, 162, 184, 0.14);
+  --field-programming: #5856d6;
+  --field-programming-tint: rgba(88, 86, 214, 0.13);
+  --field-data: #d63a8f;
+  --field-data-tint: rgba(214, 58, 143, 0.13);
+
+  /* レイアウト */
+  --tabbar-h: 54px;
+  --radius-card: 12px;
+  --radius-chip: 999px;
+}
+
+/* システム設定のダークモード（明示的にライト指定されていない場合） */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --color-bg: #1c1c1e;
+    --color-surface: #2c2c2e;
+    --color-card: #2c2c2e;
+    --color-border: #48484a;
+    --color-label: #f2f2f7;
+    --color-secondary-label: #aeaeb2;
+    --color-accent: #0a84ff;
+    --color-accent-tint: rgba(10, 132, 255, 0.2);
+    --color-bar: rgba(28, 28, 30, 0.94);
+
+    --color-success: #30d158;
+    --color-success-ink: #63e57f;
+    --color-success-tint: rgba(48, 209, 88, 0.2);
+    --color-error: #ff453a;
+    --color-error-ink: #ff7a72;
+    --color-error-tint: rgba(255, 69, 58, 0.2);
+    --color-warning: #ffb340;
+    --color-warning-ink: #ffca7a;
+    --color-warning-tint: rgba(255, 179, 64, 0.2);
+
+    --field-society: #d18df0;
+    --field-society-tint: rgba(209, 141, 240, 0.2);
+    --field-network: #4cc4d6;
+    --field-network-tint: rgba(76, 196, 214, 0.2);
+    --field-programming: #8b89ff;
+    --field-programming-tint: rgba(139, 137, 255, 0.2);
+    --field-data: #f277b8;
+    --field-data-tint: rgba(242, 119, 184, 0.2);
+  }
+}
+
+/* 設定画面での明示的なダーク指定 */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --color-bg: #1c1c1e;
+  --color-surface: #2c2c2e;
+  --color-card: #2c2c2e;
+  --color-border: #48484a;
+  --color-label: #f2f2f7;
+  --color-secondary-label: #aeaeb2;
+  --color-accent: #0a84ff;
+  --color-accent-tint: rgba(10, 132, 255, 0.2);
+  --color-bar: rgba(28, 28, 30, 0.94);
+
+  --color-success: #30d158;
+  --color-success-ink: #63e57f;
+  --color-success-tint: rgba(48, 209, 88, 0.2);
+  --color-error: #ff453a;
+  --color-error-ink: #ff7a72;
+  --color-error-tint: rgba(255, 69, 58, 0.2);
+  --color-warning: #ffb340;
+  --color-warning-ink: #ffca7a;
+  --color-warning-tint: rgba(255, 179, 64, 0.2);
+
+  --field-society: #d18df0;
+  --field-society-tint: rgba(209, 141, 240, 0.2);
+  --field-network: #4cc4d6;
+  --field-network-tint: rgba(76, 196, 214, 0.2);
+  --field-programming: #8b89ff;
+  --field-programming-tint: rgba(139, 137, 255, 0.2);
+  --field-data: #f277b8;
+  --field-data-tint: rgba(242, 119, 184, 0.2);
+}

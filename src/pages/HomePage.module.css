@@ -1,0 +1,48 @@
+.page {
+  padding-top: 12px;
+}
+
+.gear {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--tap-min);
+  height: var(--tap-min);
+  border-radius: 50%;
+  color: var(--color-label);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(158px, 1fr));
+  gap: 12px;
+  flex-direction: row;
+}
+
+.todayCard {
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+}
+
+.todayLink {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 14px;
+  text-decoration: none;
+}
+
+.todayText {
+  font-weight: 600;
+  font-size: 0.9375rem;
+  white-space: pre-line;
+}
+
+.todayCta {
+  color: var(--color-accent);
+  font-size: 0.875rem;
+  font-weight: 700;
+  align-self: flex-end;
+}

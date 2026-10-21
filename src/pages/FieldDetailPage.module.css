@@ -1,0 +1,9 @@
+.page {
+  padding-top: 4px;
+}
+
+.arrow {
+  color: var(--color-accent);
+  font-weight: 700;
+  flex-shrink: 0;
+}

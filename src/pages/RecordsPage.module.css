@@ -1,0 +1,130 @@
+.page {
+  padding-top: 12px;
+}
+
+/* --- ヒートマップ --- */
+.heatmapWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.heatmap {
+  width: 100%;
+  max-width: 420px;
+  height: auto;
+  display: block;
+}
+
+.h0 {
+  fill: var(--color-surface);
+  stroke: var(--color-border);
+  stroke-width: 1;
+}
+
+.h1 {
+  fill: rgba(52, 199, 89, 0.35);
+}
+
+.h2 {
+  fill: rgba(52, 199, 89, 0.65);
+}
+
+.h3 {
+  fill: var(--color-success);
+}
+
+:global([data-theme='dark']) .h1 {
+  fill: rgba(48, 209, 88, 0.35);
+}
+
+:global([data-theme='dark']) .h2 {
+  fill: rgba(48, 209, 88, 0.65);
+}
+
+:global([data-theme='dark']) .h3 {
+  fill: var(--color-success);
+}
+
+@media (prefers-color-scheme: dark) {
+  :global(:root:not([data-theme='light'])) .h1 {
+    fill: rgba(48, 209, 88, 0.35);
+  }
+  :global(:root:not([data-theme='light'])) .h2 {
+    fill: rgba(48, 209, 88, 0.65);
+  }
+  :global(:root:not([data-theme='light'])) .h3 {
+    fill: var(--color-success);
+  }
+}
+
+.legend {
+  display: flex;
+  gap: 10px;
+  font-size: 0.75rem;
+  color: var(--color-secondary-label);
+  flex-wrap: wrap;
+}
+
+.legendItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.sw {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  display: inline-block;
+}
+
+.sw.h0 {
+  border: 1px solid var(--color-border);
+}
+
+/* --- 棒グラフ --- */
+.barRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.barLabel {
+  width: 7.5em;
+  font-size: 0.875rem;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.track {
+  flex: 1;
+  height: 14px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 7px;
+  overflow: hidden;
+}
+
+.fill {
+  display: block;
+  height: 100%;
+  border-radius: 7px;
+  transition: width 0.3s ease;
+}
+
+.barValue {
+  width: 3.5em;
+  font-size: 0.8125rem;
+  color: var(--color-secondary-label);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
+
+/* --- 苦手用語 --- */
+.unsureChip {
+  background: var(--color-warning-tint);
+  color: var(--color-warning-ink);
+  text-decoration: none;
+}

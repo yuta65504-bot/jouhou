@@ -1,0 +1,110 @@
+.page {
+  padding-top: 4px;
+}
+
+.meta {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.text {
+  font-weight: 600;
+  white-space: pre-line;
+}
+
+/* --- 選択肢 --- */
+.choice {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: var(--tap-min);
+  padding: 10px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  background: var(--color-card);
+  text-align: left;
+  font-size: 0.9375rem;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.choice:disabled {
+  cursor: default;
+}
+
+.choiceSelected {
+  border-color: var(--color-accent);
+  background: var(--color-accent-tint);
+}
+
+.choiceCorrect {
+  border-color: var(--color-success);
+  background: var(--color-success-tint);
+}
+
+.choiceWrong {
+  border-color: var(--color-error);
+  background: var(--color-error-tint);
+}
+
+.choiceMark {
+  color: var(--color-secondary-label);
+  display: inline-flex;
+  flex-shrink: 0;
+}
+
+.choiceCorrect .choiceMark {
+  color: var(--color-success-ink);
+}
+
+.choiceWrong .choiceMark {
+  color: var(--color-error-ink);
+}
+
+.choiceText {
+  flex: 1;
+}
+
+/* --- 正誤フィードバック --- */
+.feedback {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-weight: 700;
+}
+
+.feedbackOk {
+  background: var(--color-success-tint);
+  color: var(--color-success-ink);
+}
+
+.feedbackNg {
+  background: var(--color-error-tint);
+  color: var(--color-error-ink);
+}
+
+.feedbackIcon {
+  display: inline-flex;
+}
+
+/* --- 解説 --- */
+.expPara {
+  font-size: 0.9375rem;
+  margin-bottom: 10px;
+  white-space: pre-line;
+}
+
+.demoLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: var(--tap-min);
+  color: var(--color-accent);
+  font-weight: 700;
+  font-size: 0.9375rem;
+  text-decoration: none;
+}

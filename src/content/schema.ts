@@ -1,0 +1,58 @@
+/** コンテンツの zod スキーマ（仕様書 §11: ビルド時検証） */
+import { z } from 'zod'
+import { FIELD_IDS } from '../lib/fields'
+
+export const fieldIdSchema = z.enum(FIELD_IDS)
+
+export const demoMetaSchema = z.object({
+  id: z.string().min(1),
+  fieldId: fieldIdSchema,
+  title: z.string().min(1),
+  summary: z.string().min(1),
+  /** L1: パラメータ切替型 / L2: 状態管理あり */
+  level: z.enum(['L1', 'L2']),
+  /** 下部固定の「ミニ問題へ」ボタンの遷移先 */
+  quizId: z.string().min(1),
+})
+
+export const termSchema = z.object({
+  id: z.string().min(1),
+  fieldId: fieldIdSchema,
+  name: z.string().min(1),
+  short: z.string().min(1),
+  description: z.string().min(1),
+  /** 図解ID（figures レジストリに存在すること） */
+  figure: z.string().min(1),
+  related: z.array(z.string()),
+  demoId: z.string().min(1).optional(),
+})
+
+export const questionSchema = z.object({
+  id: z.string().min(1),
+  fieldId: fieldIdSchema,
+  difficulty: z.union([z.literal(1), z.literal(2), z.literal(3)]),
+  text: z.string().min(1),
+  choices: z.array(z.string()).length(4),
+  answerIndex: z.number().int().min(0).max(3),
+  explanation: z.string().min(1),
+  /** 解説から該当デモへの逆リンク */
+  demoId: z.string().min(1).optional(),
+})
+
+export const dnclProgramSchema = z.object({
+  id: z.string().min(1),
+  title: z.string().min(1),
+  note: z.string().min(1),
+  /** DNCL風サブセットの行リスト */
+  lines: z.array(z.string()),
+})
+
+export type DemoMeta = z.infer<typeof demoMetaSchema>
+export type Term = z.infer<typeof termSchema>
+export type Question = z.infer<typeof questionSchema>
+export type DnclProgram = z.infer<typeof dnclProgramSchema>
+
+export const demosSchema = z.array(demoMetaSchema)
+export const termsSchema = z.array(termSchema)
+export const questionsSchema = z.array(questionSchema)
+export const dnclProgramsSchema = z.array(dnclProgramSchema)

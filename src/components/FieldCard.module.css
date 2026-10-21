@@ -1,0 +1,87 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-height: 88px;
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  padding: 14px;
+  text-decoration: none;
+  color: var(--color-label);
+  transition: background 0.15s ease;
+}
+
+.card:active {
+  background: var(--color-surface);
+}
+
+.iconWrap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  margin-bottom: 6px;
+}
+
+.bar {
+  width: 22px;
+  height: 6px;
+  border-radius: 3px;
+}
+
+.name {
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.short {
+  font-size: 0.7813rem;
+  color: var(--color-secondary-label);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+}
+
+.footer {
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.state {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: var(--radius-chip);
+}
+
+.stateIdle {
+  background: var(--color-surface);
+  color: var(--color-secondary-label);
+}
+
+.stateActive {
+  background: var(--color-accent-tint);
+  color: var(--color-label);
+}
+
+.stateDone {
+  background: var(--color-success-tint);
+  color: var(--color-success-ink);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 12px;
+}

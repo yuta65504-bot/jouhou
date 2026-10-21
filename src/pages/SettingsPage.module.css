@@ -1,0 +1,38 @@
+.page {
+  padding-top: 4px;
+}
+
+.stats {
+  font-size: 0.875rem;
+  color: var(--color-secondary-label);
+}
+
+.btnCol {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.fileInput {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+
+.danger {
+  color: var(--color-error-ink);
+  border-color: var(--color-error);
+}
+
+.message {
+  font-size: 0.875rem;
+  color: var(--color-accent);
+  min-height: 1.75em;
+}
+
+.version {
+  font-size: 0.7813rem;
+  color: var(--color-secondary-label);
+}
