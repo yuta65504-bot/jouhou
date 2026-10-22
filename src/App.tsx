@@ -10,6 +10,7 @@ import TermsPage from './pages/TermsPage'
 import TermDetailPage from './pages/TermDetailPage'
 import RecordsPage from './pages/RecordsPage'
 import SettingsPage from './pages/SettingsPage'
+import AdminPage from './pages/AdminPage'
 
 /** デモ画面はルート単位で遅延読込（仕様書 §4） */
 const DemoPage = lazy(() => import('./pages/DemoPage'))
@@ -18,6 +19,8 @@ export default function App() {
   return (
     <Suspense fallback={<p style={{ padding: 24 }}>読み込み中…</p>}>
       <Routes>
+        {/* 管理者ページは共通レイアウトの外。URLでの直接アクセスのみ（README「問題・演習の仕様」） */}
+        <Route path="/admin" element={<AdminPage />} />
         <Route element={<AppLayout />}>
           <Route path="/" element={<HomePage />} />
           <Route path="/fields" element={<FieldsPage />} />

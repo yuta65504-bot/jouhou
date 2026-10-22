@@ -1,8 +1,10 @@
 import { useRef, useState } from 'react'
 import { Link, Navigate, useParams } from 'react-router-dom'
 import { TopAppBar } from '@/components/TopAppBar'
-import { CheckIcon, CrossIcon, CircleIcon, StarIcon } from '@/components/Icons'
+import { CheckIcon, CrossIcon, CircleIcon, StarIcon, FlagIcon } from '@/components/Icons'
+import { ReportDialog } from '@/components/ReportDialog'
 import { FIELDS } from '@/lib/fields'
+import { nextQuestionId } from '@/lib/nextQuestion'
 import { useStore } from '@/lib/store'
 import { questionById } from '@/content/questions'
 import { getDemo } from '@/content/demos'
@@ -26,6 +28,7 @@ export default function QuizQuestionPage() {
   const [selected, setSelected] = useState<number | null>(null)
   const [result, setResult] = useState<boolean | null>(null)
   const [showExp, setShowExp] = useState(false)
+  const [reportOpen, setReportOpen] = useState(false)
   const expRef = useRef<HTMLDivElement>(null)
 
   if (!q) return <Navigate to="/quiz" replace />
@@ -54,6 +57,10 @@ export default function QuizQuestionPage() {
     setShowExp(true)
     requestAnimationFrame(() => scrollToRef(expRef.current))
   }
+  const hideExplanation = () => setShowExp(false)
+
+  /* 「すぐに次の問題を解く」用: コンテンツ登録順の次の問題（最後の次は先頭に戻る） */
+  const nextId = nextQuestionId(q.id)
 
   return (
     <>
@@ -61,15 +68,25 @@ export default function QuizQuestionPage() {
         title="問題"
         backTo="/quiz"
         right={
-          <button
-            type="button"
-            className={`${ui.laterBtn} ${isLater ? ui.laterOn : ''}`}
-            aria-pressed={isLater}
-            aria-label={isLater ? '「後で解く」を解除' : 'あとで解く'}
-            onClick={() => toggleLater(q.id)}
-          >
-            <StarIcon filled={isLater} />
-          </button>
+          <>
+            <button
+              type="button"
+              className={`${ui.laterBtn} ${isLater ? ui.laterOn : ''}`}
+              aria-pressed={isLater}
+              aria-label={isLater ? '「後で解く」を解除' : 'あとで解く'}
+              onClick={() => toggleLater(q.id)}
+            >
+              <StarIcon filled={isLater} />
+            </button>
+            <button
+              type="button"
+              className={ui.laterBtn}
+              aria-label="この問題を報告"
+              onClick={() => setReportOpen(true)}
+            >
+              <FlagIcon />
+            </button>
+          </>
         }
       />
       <div className={`${ui.page} ${s.page}`}>
@@ -154,7 +171,7 @@ export default function QuizQuestionPage() {
           </section>
         )}
 
-        {/* 下部固定ボタン */}
+        {/* 下部固定ボタン: 回答後は「すぐに次の問題を解く」で連続解答できる（README「問題・演習の仕様」） */}
         <div className={ui.bottomBar}>
           {!answered ? (
             <button
@@ -165,19 +182,25 @@ export default function QuizQuestionPage() {
             >
               解答する
             </button>
-          ) : !showExp ? (
-            <button type="button" className={`${ui.subtleBtn} ${ui.fullWidth}`} onClick={showExplanation}>
-              解説を見る
-            </button>
           ) : (
-            <Link
-              to={q.demoId ? `/fields/${field.id}/demo/${q.demoId}` : '/quiz'}
-              className={`${ui.primaryBtn} ${ui.fullWidth}`}
-            >
-              {demo ? 'デモで確かめる' : '問題一覧へ'}
-            </Link>
+            <div className={s.barCol}>
+              <Link
+                to={nextId ? `/quiz/${nextId}` : '/quiz'}
+                className={`${ui.primaryBtn} ${ui.fullWidth}`}
+              >
+                {nextId ? 'すぐに次の問題を解く' : '問題一覧へ'}
+              </Link>
+              <button
+                type="button"
+                className={`${ui.subtleBtn} ${ui.fullWidth}`}
+                onClick={showExp ? hideExplanation : showExplanation}
+              >
+                {showExp ? '解説を隠す' : '解説を見る'}
+              </button>
+            </div>
           )}
         </div>
+        <ReportDialog questionId={q.id} open={reportOpen} onClose={() => setReportOpen(false)} />
       </div>
     </>
   )

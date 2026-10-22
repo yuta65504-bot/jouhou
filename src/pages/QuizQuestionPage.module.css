@@ -108,3 +108,9 @@
   font-size: 0.9375rem;
   text-decoration: none;
 }
+
+.barCol {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}

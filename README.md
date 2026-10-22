@@ -10,6 +10,7 @@
 - スタイルは **CSS カスタムプロパティ + CSS Modules**、図解は **SVG + DOM**（Canvas不使用）
 - コンテンツは zod でスキーマ検証（`npm test` / CI で必須項目の欠落を検出）
 - ホスティングは **Cloudflare Pages**（PRごとのプレビューURLを監修に利用）。PWA は `manifest.json` のみ、Service Worker は未導入
+- 報告機能は **Pages Functions + D1**（ボット対策に **hCaptcha**。詳細は「報告APIの仕様」）
 
 ## セットアップ
 
@@ -39,11 +40,13 @@ src/
     bit-ops/      ネットワーク L1: ビット演算（AND/OR/XOR＋ビットグリッド）
     dncl/         プログラミング L2: DNCLステップ実行（Idle→Running→Paused→Finished/Error）
     graph/        データ活用 L1: グラフ操作（種類切替＋縦軸範囲Slider）
-  pages/          画面（ホーム／分野／デモ／演習／用語／記録／設定）
+  pages/          画面（ホーム／分野／デモ／演習／用語／記録／設定／管理者）
   styles/
     tokens.css    デザイントークン（セマンティック・カラー、ダークモード、タップ領域44px）
     global.css    リセット・フォーカス表示・reduced motion 対応
     ui.module.css 共通パーツ
+functions/
+  api/reports.ts  報告API（hCaptcha検証・D1への保存、一覧取得・ステータス更新）
 ```
 
 ## URL 設計
@@ -57,6 +60,25 @@ src/
 | `/terms` `/terms/:termId` | 用語一覧（検索）／詳細（覚えた・あいまい） |
 | `/records` | 学習記録（カレンダー・正答率・苦手用語） |
 | `/settings` | テーマ・エクスポート／インポート |
+| `/admin` | 管理者用（問題・解答の一覧と報告の一覧） |
+
+## 問題・演習の仕様
+
+- プログラミング分野の問題はDNCLメインではなく、共通テストの過去問を参考にした形式で作成する（DNCLのステップ実行デモは補助教材として位置づける）
+- 問題画面では回答後に「すぐに次の問題を解く」ボタンを表示し、余分な画面遷移を挟まず連続で解答できるようにして、効率的な学習を支援する
+- 問題と解答を表示するユーザー画面（`/quiz/:id`）に「報告」ボタンを設置する。送信された報告は管理者ページ（`/admin`）に追加される
+- 問題と解答の一覧を表示する管理者ページ（`/admin`）を用意する。メインページなどからの遷移ボタンは必要としない（URL入力で直接アクセスする）
+
+## 報告APIの仕様（Pages Functions + D1 + hCaptcha）
+
+- 報告の保存先は **D1** に決定する（KVは使用しない）。一覧取得・対応状況の更新をSQLで行え、書き込みは低頻度でD1の無料枠に収まる
+- Pages Function は D1 バインディング（`DB`）を介してD1にアクセスする
+- 報告の送信は `POST /api/reports`（Pages Function）。報告フォームに hCaptcha ウィジェットを表示し、トークンを合わせて送信、Function 内で hCaptcha の siteverify API を呼び出して検証する。検証に失敗した送信は保存しない
+  - `HCAPTCHA_SECRET` は Secrets で管理し、クライアントには参照させない
+  - CAPTCHA は hCaptcha で固定。Turnstile などへの差し替えは siteverify 部分のみの変更で済む構成にする
+- `reports` テーブル: `id`（UUID）、`questionId`、`category`（誤字・脱字 ／ 解答・解説の誤り ／ 表示崩れ ／ その他）、`message`、`status`（`open` / `resolved`）、`createdAt`
+- 管理者ページ（`/admin`）は `GET /api/reports`（管理トークン `ADMIN_TOKEN` を Secrets で管理し、Bearer 認証で要求する）で報告一覧を取得し、問題・解答と並べて表示する。対応済みの報告は `PATCH /api/reports/:id` で `status` を `resolved` に更新する
+- 報告は localStorage には保存せず、D1 のみに保存する
 
 ## アクセシビリティ
 
@@ -74,6 +96,8 @@ src/
 - 「後で解く」フラグ・デモ閲覧回数・テーマは別キーで保存。設定画面からJSONでエクスポート／インポート可能
 
 ## コンテンツの執筆・監修フロー
+
+問題の監修はオーナー本人が行う。
 
 1. `src/content/` にデータを追加（スキーマ検証は `npm test`）
 2. PRごとに Cloudflare Pages のプレビューURLで確認

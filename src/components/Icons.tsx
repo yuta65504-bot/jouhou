@@ -117,6 +117,13 @@ export const ResetIcon = ({ size = 18 }: IconProps) => (
   </svg>
 )
 
+export const FlagIcon = ({ size = 18 }: IconProps) => (
+  <svg {...base(size)}>
+    <path d="M6 21V4" />
+    <path d="M6 5h11l-2.5 3.5L17 12H6" />
+  </svg>
+)
+
 export const FlameIcon = ({ size = 20 }: IconProps) => (
   <svg {...base(size)}>
     <path d="M12 3s5.5 4.5 5.5 9.5a5.5 5.5 0 0 1-11 0C6.5 9 9 7 9.5 5c1 1.5 2 2 2.5 2 0-1.5 0-3 0-4z" />
