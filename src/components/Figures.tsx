@@ -180,7 +180,7 @@ const Network: FC = () => (
 )
 
 const Variable: FC = () => (
-  <svg viewBox="0 0 200 120" role="img" aria-label="変数xという箱に、x ← 2 + 3 の代入で値5が入る様子">
+  <svg viewBox="0 0 200 120" role="img" aria-label="変数xという箱に、x = 2 + 3 の代入で値5が入る様子">
     <title>変数</title>
     <desc>変数は値を入れておく箱。代入で中身が入れ替わる。</desc>
     <text x={52} y={44} fontSize={13} textAnchor="middle" fill={LABEL}>
@@ -191,7 +191,7 @@ const Variable: FC = () => (
       5
     </text>
     <text x={118} y={66} fontSize={13} fill={LABEL}>
-      ← 2 + 3
+      = 2 + 3
     </text>
     <text x={100} y={104} fontSize={10} textAnchor="middle" fill={MUTED}>
       箱の中身はいつでも入れ替えられる
@@ -202,7 +202,7 @@ const Variable: FC = () => (
 const Branch: FC = () => (
   <svg viewBox="0 0 200 120" role="img" aria-label="条件分岐の流れ図。条件が真のときと偽のときで実行する処理が分かれる">
     <title>条件分岐</title>
-    <desc>if 条件 then で、真のときと偽のときの処理に分かれる。</desc>
+    <desc>「もし 条件 ならば:」で、真のときと偽のときの処理に分かれる。</desc>
     <rect x={60} y={10} width={80} height={24} rx={12} fill={ACCENT} />
     <text x={100} y={26} fontSize={10} textAnchor="middle" fill="#fff">
       条件は正しい？
@@ -217,11 +217,11 @@ const Branch: FC = () => (
     </text>
     <rect x={24} y={60} width={62} height={26} rx={5} fill={TINT} stroke={BORDER} />
     <text x={55} y={77} fontSize={10} textAnchor="middle" fill={LABEL}>
-      then の処理
+      真の処理
     </text>
     <rect x={114} y={60} width={62} height={26} rx={5} fill={TINT} stroke={BORDER} />
     <text x={145} y={77} fontSize={10} textAnchor="middle" fill={LABEL}>
-      else の処理
+      偽の処理
     </text>
   </svg>
 )

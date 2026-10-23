@@ -34,7 +34,19 @@ import {
 
 type ParsedProgram = { ok: true; run: RunResult; names: string[] } | { ok: false; msg: string }
 
-function DnclStepper({ lines, label }: { lines: readonly string[]; label: string }) {
+function DnclStepper({
+  lines,
+  label,
+  displayLines,
+  lineMap,
+}: {
+  lines: readonly string[]
+  label: string
+  /** 画面に表示する公式表記。省略時は lines をそのまま表示する */
+  displayLines?: readonly string[]
+  /** lines の行番号 → displayLines の行番号。省略時は同じ番号 */
+  lineMap?: readonly number[]
+}) {
   const parsed = useMemo<ParsedProgram>(() => {
     try {
       const program = parseProgram(lines)
@@ -54,6 +66,8 @@ function DnclStepper({ lines, label }: { lines: readonly string[]; label: string
   const snaps = parsed.run.snapshots
   const n = snaps.length
   const curLine = k === 0 ? -1 : snaps[Math.min(k, n) - 1].line
+  const curDisplayLine = curLine < 0 ? -1 : lineMap ? (lineMap[curLine] ?? -1) : curLine
+  const shownLines = displayLines ?? lines
   const vars = k === 0 ? {} : snaps[Math.min(k, n) - 1].vars
   const done = k >= n && parsed.run.done
   return (
@@ -62,15 +76,15 @@ function DnclStepper({ lines, label }: { lines: readonly string[]; label: string
       status={
         k === 0
           ? '「次へ」を押すと、1手ずつ実行される。変数の値がどう変わるか見てみる。'
-          : `${k}手実行（${k === n ? '実行は完了' : `今は${curLine + 1}行目`})　変数: ${parsed.names.map((nm) => `${nm}=${vars[nm] ?? '—'}`).join(' / ')}`
+          : `${k}手実行（${k === n ? '実行は完了' : `今は${curDisplayLine + 1}行目`})　変数: ${parsed.names.map((nm) => `${nm}=${vars[nm] ?? '—'}`).join(' / ')}`
       }
       statusKind={done ? 'ok' : 'plain'}
     >
       <View label={label}>
         <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'flex-start' }}>
           <ol className={styles.code}>
-            {lines.map((ln, i) => (
-              <li key={i} className={`${styles.codeLine} ${curLine === i ? styles.codeCurrent : ''}`}>
+            {shownLines.map((ln, i) => (
+              <li key={i} className={`${styles.codeLine} ${curDisplayLine === i ? styles.codeCurrent : ''}`}>
                 <span className={styles.codeNo}>{i + 1}</span>
                 <span>{ln}</span>
               </li>
@@ -213,17 +227,45 @@ export function ProFig2() {
 /* ---------- q-pro-3: DNCL 繰り返し（合計と平均） ---------- */
 
 const P3_LINES = dnclPrograms.find((p) => p.id === 'sum')?.lines ?? []
+const P3_DISPLAY = [
+  'total = 0',
+  'i を 1 から 5 まで 1 ずつ増やしながら繰り返す:',
+  '    total = total + i',
+  'mean = total ÷ 5',
+]
+const P3_LINE_MAP = [0, 1, 2, 2, 3]
 
 export function ProFig3() {
-  return <DnclStepper lines={P3_LINES} label="total ← total + i を、i=1から5まで5回くり返す" />
+  return (
+    <DnclStepper
+      lines={P3_LINES}
+      displayLines={P3_DISPLAY}
+      lineMap={P3_LINE_MAP}
+      label="total = total + i を、i=1から5まで5回くり返す"
+    />
+  )
 }
 
-/* ---------- q-pro-4: DNCL ifの動き（偶数を数える） ---------- */
+/* ---------- q-pro-4: 条件分岐の動き（偶数を数える） ---------- */
 
 const P4_LINES = dnclPrograms.find((p) => p.id === 'count-even')?.lines ?? []
+const P4_DISPLAY = [
+  'count = 0',
+  'i を 1 から 6 まで 1 ずつ増やしながら繰り返す:',
+  '    もし i % 2 = 0 ならば:',
+  '        count = count + 1',
+]
+const P4_LINE_MAP = [0, 1, 2, 3, 3, 3]
 
 export function ProFig4() {
-  return <DnclStepper lines={P4_LINES} label="if で偶数のときだけ count を増やす" />
+  return (
+    <DnclStepper
+      lines={P4_LINES}
+      displayLines={P4_DISPLAY}
+      lineMap={P4_LINE_MAP}
+      label="「もし 〜 ならば:」で偶数のときだけ count を増やす"
+    />
+  )
 }
 
 /* ---------- q-pro-5: 繰り返しと表示の順序 ---------- */
@@ -274,25 +316,25 @@ export function ProFig5() {
   )
 }
 
-/* ---------- q-pro-6: 配列の添字は1始まり ---------- */
+/* ---------- q-pro-6: 配列の添字は問題文の指定を確認 ---------- */
 
 const P6_VALUES = ['りんご', 'みかん', 'ぶどう', 'なし', 'いちご']
 
 export function ProFig6() {
-  const [lang, setLang] = useState<'dncl' | 'other'>('dncl')
+  const [lang, setLang] = useState<'dncl' | 'other'>('other')
   const [sel, setSel] = useState(1) /* 1始まりの位置 */
   const shift = lang === 'other' ? 1 : 0
   return (
     <FigShell
-      title="図解: 添字の始まりは、表記によって違いがある"
-      status={`${lang === 'dncl' ? 'DNCL（1始まり）' : '0始まりの言語'}: ${sel}番目のデータ（${P6_VALUES[sel - 1]}）は a[${sel - shift}]。`}
+      title="図解: 添字の始まりは、問題文の指定で変わる"
+      status={`${lang === 'dncl' ? '1始まり（問題文で指定）' : '0始まり（指定なし）'}: ${sel}番目のデータ（${P6_VALUES[sel - 1]}）は a[${sel - shift}]。`}
     >
       <Segmented
         label="添字の付け方"
         value={lang}
         options={[
-          { value: 'dncl' as const, label: 'DNCL（共通テスト）' },
-          { value: 'other' as const, label: '0始まりの言語' },
+          { value: 'dncl' as const, label: '1始まり（指定あり）' },
+          { value: 'other' as const, label: '0始まり（既定）' },
         ]}
         onChange={setLang}
       />
@@ -313,10 +355,10 @@ export function ProFig6() {
           先頭のセルへ
         </Btn>
         <span className={styles.note}>
-          {lang === 'dncl' ? '共通テスト（DNCL）の配列は 1 から始まる' : '多くのプログラム言語では 0 から始まる'}
+          {lang === 'dncl' ? '問題文で「1から始まる」と指定された場合' : '特に指定がない場合の共通テスト用プログラム表記は0始まり'}
         </span>
       </div>
-      <Note>問題文で a[3] と書かれていたら、DNCLでは3番目のデータ。0始まりの言語では4番目を指すので、表記の違いを確認する。</Note>
+      <Note>問題文で a[3] と書かれていたら、添字の指定を確認する。0始まりなら4番目、1始まりなら3番目のデータ。</Note>
     </FigShell>
   )
 }
@@ -334,10 +376,10 @@ export function ProFig7() {
   const cell = P7_GRID[sel.r][sel.c]
   return (
     <FigShell
-      title="図解: a[行][列] の順に添字を書く"
-      status={`選んだセルは a[${sel.r + 1}][${sel.c + 1}] = ${cell}。1つ目の添字が「行」、2つ目が「列」。`}
+      title="図解: a[行,列] の順に添字を書く"
+      status={`選んだセルは a[${sel.r + 1},${sel.c + 1}] = ${cell}。1つ目の添字が「行」、2つ目が「列」。`}
     >
-      <View label="3行4列の二次元配列。セルを選ぶと a[行][列] の値を示す">
+      <View label="3行4列の二次元配列。セルを選ぶと a[行,列] の値を示す">
         <svg viewBox="0 0 320 108" className={styles.svg}>
           {P7_GRID.map((row, r) => (
             <g key={r}>
@@ -369,11 +411,11 @@ export function ProFig7() {
             </text>
           ))}
           <text x={160} y={104} fontSize={9.5} textAnchor="middle" fill={MUTED}>
-            a[{sel.r + 1}][{sel.c + 1}]（選択中）
+            a[{sel.r + 1},{sel.c + 1}]（選択中）
           </text>
         </svg>
       </View>
-      <Note>二次元配列は表のデータに使いやすい。設問の「2行目2列目」は a[2][2]。</Note>
+      <Note>二次元配列は表のデータに使いやすい。設問の「2行目2列目」は a[2,2]。</Note>
     </FigShell>
   )
 }
@@ -1003,15 +1045,15 @@ export function ProFig17() {
 
 /* ---------- q-pro-18: アルゴリズムを表現する手段 ---------- */
 
-const P18_CASES = ['chart', 'state', 'dncl', 'book'] as const
+const P18_CASES = ['chart', 'pseudo', 'dncl', 'book'] as const
 type P18Kind = (typeof P18_CASES)[number]
 
 export function ProFig18() {
   const [kind, setKind] = useState<P18Kind>('chart')
   const info: Record<P18Kind, { ok: boolean; title: string; body: string }> = {
     chart: { ok: true, title: 'フローチャート', body: '処理・判断・矢印で流れと分かれ道を示す。プログラムへ直しやすい。' },
-    state: { ok: true, title: '状態遷移図', body: '「状態」と遷移のきっかけでふるまいを表す。自動的なシステムの説明に向く。' },
-    dncl: { ok: true, title: 'DNCL', body: '共通テストの擬似言語。代入・繰り返し・条件分岐で手順を書く。' },
+    pseudo: { ok: true, title: '疑似言語', body: '日本語に近い文法で、処理の手順を文章のように表す。' },
+    dncl: { ok: true, title: '共通テスト用プログラム表記', body: '共通テストで使われるプログラム表記。代入・繰り返し・条件分岐で手順を書く。' },
     book: { ok: false, title: '会計の帳簿', body: '金銭や工程の記録を整えるための表。手順（処理の流れ）を表すものではない。' },
   }
   const c = info[kind]
@@ -1026,8 +1068,8 @@ export function ProFig18() {
         value={kind}
         options={[
           { value: 'chart' as const, label: 'フローチャート' },
-          { value: 'state' as const, label: '状態遷移図' },
-          { value: 'dncl' as const, label: 'DNCL' },
+          { value: 'pseudo' as const, label: '疑似言語' },
+          { value: 'dncl' as const, label: 'プログラム表記' },
           { value: 'book' as const, label: '会計の帳簿' },
         ]}
         onChange={setKind}
@@ -1047,30 +1089,29 @@ export function ProFig18() {
               </text>
             </>
           )}
-          {kind === 'state' && (
+          {kind === 'pseudo' && (
             <>
-              <GCircle cx={70} cy={50} r={22} text="通常" fs={10} />
-              <GCircle cx={230} cy={50} r={22} text="警報" fs={9} fill="var(--color-error)" />
-              <GArrow x1={94} y1={44} x2={206} y2={44} />
-              <text x={150} y={38} fontSize={8.5} textAnchor="middle" fill={MUTED}>
-                しきい値を超える
+              <text x={26} y={26} fontSize={11} fill={LABEL} fontFamily="var(--font-mono)">
+                手順:
               </text>
-              <GArrow x1={206} y1={60} x2={94} y2={60} stroke={MUTED} />
-              <text x={150} y={74} fontSize={8.5} textAnchor="middle" fill={MUTED}>
-                復旧
+              <text x={40} y={50} fontSize={11} fill={LABEL} fontFamily="var(--font-mono)">
+                1. データを読む
+              </text>
+              <text x={40} y={72} fontSize={11} fill={LABEL} fontFamily="var(--font-mono)">
+                2. 条件を調べる
+              </text>
+              <text x={40} y={94} fontSize={11} fill={LABEL} fontFamily="var(--font-mono)">
+                3. 結果を表示する
               </text>
             </>
           )}
           {kind === 'dncl' && (
             <>
-              <text x={26} y={26} fontSize={11} fill={LABEL} fontFamily="var(--font-mono)">
-                n を 1 から 5 まで 増やしながら 繰り返す:
+              <text x={20} y={30} fontSize={9.5} fill={LABEL} fontFamily="var(--font-mono)">
+                n を 1 から 5 まで 1 ずつ増やしながら繰り返す:
               </text>
-              <text x={40} y={50} fontSize={11} fill={LABEL} fontFamily="var(--font-mono)">
-                表示する n
-              </text>
-              <text x={26} y={74} fontSize={11} fill={LABEL} fontFamily="var(--font-mono)">
-                繰り返しここまで
+              <text x={36} y={56} fontSize={10.5} fill={LABEL} fontFamily="var(--font-mono)">
+                表示する(n)
               </text>
             </>
           )}
@@ -1089,7 +1130,7 @@ export function ProFig18() {
           </text>
         </svg>
       </View>
-      <Note>アルゴリズムとは「処理の手順の明確な表現」。フローチャート・自然言語・擬似言語（DNCL）・プログラム言語のどれでも書ける。</Note>
+      <Note>アルゴリズムとは「処理の手順の明確な表現」。フローチャート・疑似言語・共通テスト用プログラム表記・プログラム言語のどれでも書ける。</Note>
     </FigShell>
   )
 }
