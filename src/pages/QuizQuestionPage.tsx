@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { Suspense, lazy, useEffect, useRef, useState } from 'react'
 import { Link, Navigate, useParams } from 'react-router-dom'
 import { TopAppBar } from '@/components/TopAppBar'
 import { CheckIcon, CrossIcon, CircleIcon, StarIcon, FlagIcon } from '@/components/Icons'
@@ -7,10 +7,12 @@ import { FIELDS } from '@/lib/fields'
 import { nextQuestionId } from '@/lib/nextQuestion'
 import { useStore } from '@/lib/store'
 import { questionById } from '@/content/questions'
-import { getDemo } from '@/content/demos'
 import { usePageTitle } from '@/lib/usePageTitle'
 import ui from '@/styles/ui.module.css'
 import s from './QuizQuestionPage.module.css'
+
+/** 問題ごとのインタラクティブ図解（解説を開いたときにだけ読み込む） */
+const QuestionFigure = lazy(() => import('@/figures'))
 
 /** reduced motion 環境では即時スクロールにする */
 function scrollToRef(el: HTMLElement | null) {
@@ -31,11 +33,20 @@ export default function QuizQuestionPage() {
   const [reportOpen, setReportOpen] = useState(false)
   const expRef = useRef<HTMLDivElement>(null)
 
+  /* 「すぐに次の問題を解く」で同じ画面コンポーネントのまま問題を切り替えるので、
+     選択・結果・解説・報告フォームを初期化し、ページ先頭へ戻す */
+  useEffect(() => {
+    setSelected(null)
+    setResult(null)
+    setShowExp(false)
+    setReportOpen(false)
+    window.scrollTo(0, 0)
+  }, [id])
+
   if (!q) return <Navigate to="/quiz" replace />
 
   const field = FIELDS.find((f) => f.id === q.fieldId)!
   const isLater = later.includes(q.id)
-  const demo = q.demoId ? getDemo(q.demoId) : undefined
   const answered = result != null
 
   /* 前回の結果（Storeに記録されている最新の解答）を表示用に取得 */
@@ -43,7 +54,7 @@ export default function QuizQuestionPage() {
   const introText = prevAttempt
     ? prevAttempt.correct
       ? '前回は正解しました。仕上げにもう一度確認しましょう。'
-      : '前回は不正解でした。解説とデモで確認しましょう。'
+      : '前回は不正解でした。解説と図解で確認しましょう。'
     : null
 
   const answer = () => {
@@ -97,6 +108,7 @@ export default function QuizQuestionPage() {
           <span className={ui.chip} aria-label={`難易度${q.difficulty}`}>
             {'★'.repeat(q.difficulty)}
           </span>
+          {q.topic && <span className={ui.chip}>{q.topic}</span>}
         </div>
 
         <p className={s.text}>{q.text}</p>
@@ -154,20 +166,24 @@ export default function QuizQuestionPage() {
           </div>
         )}
 
-        {/* 解説（「解説を見る」で開く）: 該当デモへの逆リンクつき */}
+        {/* 解説（「解説を見る」で開く）: 問題ごとのインタラクティブ図解つき */}
         {answered && showExp && (
           <section ref={expRef} className={`${ui.card} ${ui.cardPad}`} aria-label="解説">
             <h2 className={ui.sectionTitle}>解説</h2>
-            {q.explanation.split('\n').map((para, i) => (
-              <p key={i} className={s.expPara}>
-                {para}
-              </p>
-            ))}
-            {demo && (
-              <Link to={`/fields/${field.id}/demo/${demo.id}`} className={s.demoLink}>
-                ▶ デモで確かめる: {demo.title}
-              </Link>
-            )}
+            {q.explanation
+              .split(/\n{2,}/)
+              .filter((para) => para.trim())
+              .map((para, i) => (
+                <p key={i} className={s.expPara}>
+                  {para}
+                </p>
+              ))}
+            <div className={s.figure}>
+              <Suspense fallback={<p className={s.expPara}>図解を準備中…</p>}>
+                <QuestionFigure id={q.id} />
+              </Suspense>
+            </div>
+            {q.source && <p className={s.source}>出典: {q.source}</p>}
           </section>
         )}
 

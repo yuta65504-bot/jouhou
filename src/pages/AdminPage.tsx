@@ -74,7 +74,7 @@ export default function AdminPage() {
   return (
     <div className={s.page}>
       <header className={s.header}>
-        <h1 className={s.title}>jouohu 管理者</h1>
+        <h1 className={s.title}>jouhou 管理者</h1>
         <p className={s.note}>
           このページはURLでの直接アクセス用です。メインページからの導線はありません。
         </p>
@@ -179,6 +179,7 @@ export default function AdminPage() {
                   <span className={s.at}>{q.id}</span>
                 </div>
                 <p className={s.qText}>{q.text}</p>
+                {q.topic && <p className={s.qMeta}>テーマ: {q.topic}</p>}
                 <ol className={s.choices}>
                   {q.choices.map((c, i) => (
                     <li key={i} className={`${s.choice} ${i === q.answerIndex ? s.choiceAnswer : ''}`}>
@@ -188,6 +189,7 @@ export default function AdminPage() {
                   ))}
                 </ol>
                 <p className={s.qExp}>{q.explanation}</p>
+                {q.source && <p className={s.qMeta}>出典: {q.source}</p>}
               </div>
             )
           })}

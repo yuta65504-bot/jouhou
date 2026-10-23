@@ -19,7 +19,7 @@ export default function HomePage() {
   return (
     <>
       <TopAppBar
-        title="jouohu"
+        title="jouhou"
         right={
           <Link to="/settings" className={s.gear} aria-label="設定">
             <GearIcon />

@@ -5,14 +5,10 @@
  * - CAPTCHA は hCaptcha 固定。差し替えは verifyCaptcha のみ変更すればよい構造
  * - 報告の種別・型は UI と共通（src/lib/report.ts を読む。Workers 側でも実行可能なモジュール）
  */
-import {
-  REPORT_CATEGORIES,
-  type Report,
-  type ReportCategory,
-  type ReportStatus,
-} from '../../src/lib/report'
+import { type Report, type ReportCategory, type ReportStatus } from '../../src/lib/report'
 
 export type { Report, ReportCategory, ReportStatus }
+export { isCategory, isStatus } from '../../src/lib/report'
 
 export type Env = {
   /** Pages → Functions の D1 バインディング（名前は DB 固定） */
@@ -65,12 +61,4 @@ export async function verifyCaptcha(
   } catch {
     return false
   }
-}
-
-export function isCategory(value: unknown): value is ReportCategory {
-  return typeof value === 'string' && REPORT_CATEGORIES.some((c) => c.value === value)
-}
-
-export function isStatus(value: unknown): value is ReportStatus {
-  return value === 'open' || value === 'resolved'
 }

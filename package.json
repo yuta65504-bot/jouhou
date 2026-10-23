@@ -1,11 +1,11 @@
 {
-  "name": "jouohu",
+  "name": "jouhou",
   "private": true,
   "version": "0.1.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc --noEmit && vite build",
+    "build": "tsc --noEmit && tsc --noEmit -p functions && vite build",
     "preview": "vite preview",
     "test": "npm run questions:check && vitest run",
     "check:functions": "tsc -p functions/tsconfig.json",

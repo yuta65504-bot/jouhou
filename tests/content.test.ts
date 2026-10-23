@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest'
-import { demos, getDemo } from '../src/content/demos'
 import { questions } from '../src/content/questions'
 import { terms } from '../src/content/terms'
 import { dnclPrograms } from '../src/content/dncl'
-import { computeRun, parseProgram, varNamesOf } from '../src/demos/dncl/engine'
+import { computeRun, parseProgram, varNamesOf } from '../src/lib/dncl-engine'
 import { FIGURE_IDS } from '../src/components/Figures'
+import { QUESTION_FIGURE_IDS } from '../src/figures'
 import { FIELD_IDS } from '../src/lib/fields'
 
 /** コンテンツの必須項目は zod で検証する（仕様書 §11）。CI/npm test で欠落を弾く */
@@ -13,20 +13,7 @@ describe('content validation', () => {
     expect(FIELD_IDS).toEqual(['society', 'network', 'programming', 'data'])
   })
 
-  it('デモ: IDが重複せず、関連ミニ問題が存在する', () => {
-    const demoIds = demos.map((d) => d.id)
-    expect(new Set(demoIds).size).toBe(demoIds.length)
-    const quizIds = new Set(questions.map((q) => q.id))
-    for (const d of demos) {
-      expect(quizIds.has(d.quizId), `demo ${d.id} の quizId ${d.quizId}`).toBe(true)
-    }
-  })
-
-  it('デモ: 4分野それぞれに最低1本ある', () => {
-    for (const f of FIELD_IDS) expect(demos.some((d) => d.fieldId === f), f).toBe(true)
-  })
-
-  it('用語: IDが重複せず、図解と関連用語とデモが存在する', () => {
+  it('用語: IDが重複せず、図解と関連用語が存在する', () => {
     const termIds = terms.map((t) => t.id)
     expect(new Set(termIds).size).toBe(termIds.length)
     for (const t of terms) {
@@ -34,22 +21,36 @@ describe('content validation', () => {
       for (const r of t.related) {
         expect(termIds, `${t.name} の関連用語 ${r}`).toContain(r)
       }
-      if (t.demoId) expect(getDemo(t.demoId), `${t.name} のデモ ${t.demoId}`).toBeDefined()
     }
   })
 
-  it('問題: 解答が選択肢の範囲内で、逆リンク先のデモが存在する', () => {
+  it('問題: 選択肢が4つで、解答が選択肢の範囲内', () => {
     for (const q of questions) {
       expect(q.choices).toHaveLength(4)
       expect(q.answerIndex).toBeGreaterThanOrEqual(0)
       expect(q.answerIndex).toBeLessThan(4)
-      if (q.demoId) expect(getDemo(q.demoId), `${q.id} のデモ ${q.demoId}`).toBeDefined()
     }
   })
 
-  it('問題: 4分野それぞれに最低2問ある', () => {
+  it('図解: 72問それぞれに1つずつ存在し、問題IDと1対1で対応する', () => {
+    expect(QUESTION_FIGURE_IDS.length).toBe(72)
+    expect(new Set(QUESTION_FIGURE_IDS).size).toBe(72)
+    const figIds = new Set<string>(QUESTION_FIGURE_IDS)
+    const qIds = new Set(questions.map((q) => q.id))
+    for (const id of figIds) {
+      expect(qIds.has(id), `対応する問題が無い図解: ${id}`).toBe(true)
+    }
+    for (const q of questions) {
+      expect(figIds.has(q.id), `${q.id} の図解がない`).toBe(true)
+    }
+  })
+
+  it('図解: 4分野それぞれに18問分ある', () => {
+    const figIds = new Set<string>(QUESTION_FIGURE_IDS)
     for (const f of FIELD_IDS) {
-      expect(questions.filter((q) => q.fieldId === f).length, f).toBeGreaterThanOrEqual(2)
+      const qs = questions.filter((q) => q.fieldId === f)
+      expect(qs.length, f).toBe(18)
+      for (const q of qs) expect(figIds.has(q.id), `${q.id} の図解`).toBe(true)
     }
   })
 

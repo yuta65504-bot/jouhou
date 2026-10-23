@@ -2,7 +2,7 @@ import { dnclProgramsSchema, type DnclProgram } from './schema'
 
 /**
  * DNCL風サブセットのサンプルプログラム。
- * ※DNCL（共通テスト用言語）の構文を参考にしたデモ用の簡易サブセットであり、
+ * ※DNCL（共通テスト用言語）の構文を参考にした図解用の簡易サブセットであり、
  * 　正式なDNCLの全構文を網羅するものではない（監修時に校正する）。
  */
 export const dnclPrograms: DnclProgram[] = dnclProgramsSchema.parse([

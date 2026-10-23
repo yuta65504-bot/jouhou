@@ -26,7 +26,7 @@ export default function SettingsPage() {
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `jouohu-records-${new Date().toISOString().slice(0, 10)}.json`
+    a.download = `jouhou-records-${new Date().toISOString().slice(0, 10)}.json`
     a.click()
     URL.revokeObjectURL(url)
     setMessage('記録をエクスポートしました。')
@@ -103,7 +103,7 @@ export default function SettingsPage() {
             このサイトについて
           </h2>
           <p className={ui.lead}>
-            jouohu は、情報Ⅰの共通テスト対策を「操作して理解する図解」で学べる学習サイトです。
+            jouhou は、情報Ⅰの共通テスト対策を「操作して理解する図解」で学べる学習サイトです。
             テキストと図解は、作者と高校教諭の共同執筆・監修により作成しています。
             図表はすべて自作で、過去問の図表は転載していません。
           </p>

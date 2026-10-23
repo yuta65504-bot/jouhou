@@ -111,6 +111,7 @@ export default function QuizPage() {
                     )}
                   </span>
                   <span className={ui.rowTitle}>{q.text.split('\n')[0]}</span>
+                  {q.topic && <span className={s.rowTopic}>{q.topic}</span>}
                 </Link>
                 <button
                   type="button"

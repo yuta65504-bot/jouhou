@@ -1,11 +1,11 @@
-# jouohu — 情報Ⅰ 共通テスト対策
+# jouhou — 情報Ⅰ 共通テスト対策
 
-「読む解説」ではなく「操作して理解する図解」。情報Ⅰの4分野を、インタラクティブデモ・用語図鑑・ミニ問題で学ぶWebサイトです。
+「読む解説」ではなく「操作して理解する図解」。情報Ⅰの4分野を、インタラクティブ図解・用語図鑑・ミニ問題で学ぶWebサイトです。
 
 ## 技術スタック
 
 - **Vite** + **React** + **TypeScript**（SPA。将来SSGを足せる構成）
-- **React Router**（URLベース遷移、デモ画面はルート単位で `React.lazy` 遅延読込）
+- **React Router**（URLベース遷移。問題ごとの図解は解説パネル内で `React.lazy` により遅延読込）
 - 状態管理は React 標準 + Context。入力保存は **localStorage**（JSON エクスポート／インポート必須実装）
 - スタイルは **CSS カスタムプロパティ + CSS Modules**、図解は **SVG + DOM**（Canvas不使用）
 - コンテンツは zod でスキーマ検証（`npm test` / CI で必須項目の欠落を検出）
@@ -16,37 +16,75 @@
 
 ```bash
 npm install
-npm run dev      # 開発サーバー
-npm run build    # 型チェック + 本番ビルド (dist/)
-npm run preview  # ビルド結果の確認
-npm test         # コンテンツの zod 検証 + DNCLエンジンのテスト
+npm run dev            # 開発サーバー
+npm run build          # 型チェック + 本番ビルド (dist/)
+npm run preview        # ビルド結果の確認
+npm test               # questions.ts の一致確認 + コンテンツの zod 検証 + 図解レジストリ + DNCLエンジンのテスト
+npm run questions:build # question.md → src/content/questions.ts を再生成
+npm run questions:check # question.md と questions.ts の一致を確認（差分あれば終了コード1）
+npm run check:functions # Pages Functions の型チェック
 ```
+
+### 報告機能・管理者ページのセットアップ（D1 + Secrets + hCaptcha）
+
+報告API（`/api/*`）の動作には Cloudflare 側の設定が必要です（サイト自体は設定なしでも動く）。
+
+```bash
+npx wrangler d1 create jouhou-reports                                 # D1 データベースを作成
+npx wrangler d1 execute jouhou-reports --remote --file=d1/schema.sql  # reports テーブルを作成
+```
+
+そのうえで、Cloudflare Pages プロジェクトの設定で以下を行います（`functions/` は自動検出されます）。
+
+- **D1 バインディング** `DB` → 上で作成したデータベース（設定 → Functions → D1 バインド）
+- **Secrets** `HCAPTCHA_SECRET`（hCaptcha のシークレットキー）と `ADMIN_TOKEN`（管理者ページ用トークン）。ダッシュボードまたは `npx wrangler pages secret put HCAPTCHA_SECRET` で設定
+- **ビルド変数** `VITE_HCAPTCHA_SITEKEY`（hCaptcha のサイトキー。公開情報）。未設定でもサイトは動作し、報告フォームは「送信できない」旨を表示する
+
+ローカルでの動作確認は Vite 単体（`npm run dev`）では `/api` が動かないため、ビルド結果に対して Wrangler を使います。
+
+```bash
+VITE_HCAPTCHA_SITEKEY=0x<hCaptchaのサイトキー> npm run build   # クライアントにサイトキーを組み込む（.env.local でも可）
+npx wrangler pages dev dist                                    # Functions + 静的アセットをローカル実行
+```
+
+- Function 側のシークレットは `.dev.vars` に書く（`.dev.vars.example` 参照・Gitにコミットしない）
+- `public/_routes.json` により Functions の起動範囲を `/api/*` に限定している（静的ページのリクエストでFunctionsを消費しない）
+- 管理者ページは `/admin` をURL直打ちで開き、`ADMIN_TOKEN` と一致するトークンを入力すると報告一覧を取得・更新できる。トークン値のみ端末の localStorage に保存する（報告データ自体はD1のみ）
 
 ## ディレクトリ構成
 
 ```
 src/
   content/        コンテンツデータ（zod スキーマで検証）
-    schema.ts     用語・問題・デモ・DNCLプログラムのスキーマ
-    terms.ts / questions.ts / demos.ts / dncl.ts
+    schema.ts     用語・問題・DNCLプログラムのスキーマ
+    terms.ts / questions.ts / dncl.ts
+    questionsFromMd.ts  question.md のパーサ（questions.ts の生成に利用）
   lib/
     store.tsx     学習記録（Store）とエクスポート/インポート
     dates.ts      JST日付・連続学習日数の計算
     today.ts      「今日の1問」の選択
+    nextQuestion.ts  「すぐに次の問題を解く」の翌問題ID（末尾は先頭へ戻る）
+    report.ts     報告の種別・APIクライアント（Functionsと共通の型/ガード）
     fields.ts     4分野の定義
+    dncl-engine.ts  DNCL風サンプルのステップ実行エンジン（図解で利用）
   components/     共通UI（レイアウト・下部タブ/サイドバー・カード・SVG図解レジストリ）
-  demos/          4本のデモ
-    ui-compare/   情報社会 L1: UI比較（Before/After切替＋差分ハイライト）
-    bit-ops/      ネットワーク L1: ビット演算（AND/OR/XOR＋ビットグリッド）
-    dncl/         プログラミング L2: DNCLステップ実行（Idle→Running→Paused→Finished/Error）
-    graph/        データ活用 L1: グラフ操作（種類切替＋縦軸範囲Slider）
-  pages/          画面（ホーム／分野／デモ／演習／用語／記録／設定／管理者）
+  figures/        問題ごとのインタラクティブ図解（72本）
+    index.tsx     問題ID → 図解のレジストリ（解説パネルで遅延読込）
+    parts.tsx     共通パーツ（FigShell / Btn / Slider / SVG部品）
+    society.tsx / network.tsx / programming.tsx / data.tsx  分野ごとの18本
+  pages/          画面（ホーム／分野／演習／用語／記録／設定／管理者）
   styles/
     tokens.css    デザイントークン（セマンティック・カラー、ダークモード、タップ領域44px）
     global.css    リセット・フォーカス表示・reduced motion 対応
     ui.module.css 共通パーツ
 functions/
   api/reports.ts  報告API（hCaptcha検証・D1への保存、一覧取得・ステータス更新）
+  api/reports/[id].ts  報告1件の status 更新（PATCH）
+  api/_lib.ts     報告API共通（認証・CAPTCHA検証、共通型/ガードの再エクスポート）
+scripts/
+  build-questions.ts  question.md → src/content/questions.ts の生成/一致確認
+d1/schema.sql      報告テーブル（reports）のDDL
+question.md        問題の一次ソース（問題バンク。下記「問題バンクの編集」参照）
 ```
 
 ## URL 設計
@@ -55,7 +93,6 @@ functions/
 |---|---|
 | `/` | ホーム（連続日数・4分野カード・今日の1問） |
 | `/fields` `/fields/:fieldId` | 分野一覧／詳細 |
-| `/fields/:fieldId/demo/:demoId` | デモ（遅延読込） |
 | `/quiz` `/quiz/:id` | 演習一覧（分野・難易度フィルタ）／問題 |
 | `/terms` `/terms/:termId` | 用語一覧（検索）／詳細（覚えた・あいまい） |
 | `/records` | 学習記録（カレンダー・正答率・苦手用語） |
@@ -64,10 +101,32 @@ functions/
 
 ## 問題・演習の仕様
 
-- プログラミング分野の問題はDNCLメインではなく、共通テストの過去問を参考にした形式で作成する（DNCLのステップ実行デモは補助教材として位置づける）
+- プログラミング分野の問題はDNCLメインではなく、共通テストの過去問を参考にした形式で作成する（DNCLのステップ実行は問題の図解で補助的に扱う）
+- 各問題の解説パネルには、問題IDに対応したインタラクティブ図解を表示する（操作ボタン・スライダー・セグメントで動かせる）
 - 問題画面では回答後に「すぐに次の問題を解く」ボタンを表示し、余分な画面遷移を挟まず連続で解答できるようにして、効率的な学習を支援する
 - 問題と解答を表示するユーザー画面（`/quiz/:id`）に「報告」ボタンを設置する。送信された報告は管理者ページ（`/admin`）に追加される
 - 問題と解答の一覧を表示する管理者ページ（`/admin`）を用意する。メインページなどからの遷移ボタンは必要としない（URL入力で直接アクセスする）
+
+## 問題バンク（question.md）
+
+問題の一次ソースはリポジトリ直下の `question.md`。`src/content/questions.ts` はここから自動生成し、`npm test` で一致を検証する。
+
+- **1問 = 1つの `###` ブロック**。見出しは `### q-<field>-<番号>`（`q-soc` / `q-net` / `q-pro` / `q-dat`）。IDは全ファイル内で一意にする
+- メタ行: `- 分野:`（society / network / programming / data）、`- 難易度:`（1〜3）、`- テーマ:`（学習テーマ）、`- 出典:`（共通テストの出題との対応）
+- セクション: `**問題文**` → `**選択肢**`（4つ）→ `**正解**`（1〜4の番号）→ `**解説**`
+- 解説パネルには、問題IDに対応したインタラクティブ図解（`src/figures/`）が自動で表示される。question.md に図解用の記述は不要
+- 編集手順: `question.md` に追記 → `npm run questions:build` → `npm test`（差分があれば `questions:check` が失敗する）
+
+### 収録範囲
+
+共通テスト（令和7年度本試・試作問題）の出題傾向に沿って、情報Ⅰの全範囲を4分野に分けて収録する。現在の収録数とテーマ:
+
+| 分野 | 問数 | 主なテーマ |
+|---|---|---|
+| 情報社会 | 18 | 著作権・引用・特許権・肖像権／個人情報保護／情報モラルと信ぴょう性／情報システム／問題解決／アンケート／標本化・量子化・解像度・圧縮・データ量／情報デザイン |
+| ネットワーク | 18 | ビットと基数変換／誤り訂正（パリティ）／データ量と転送時間／プロトコル／IPアドレスとサブネットマスク／パケット／暗号方式・デジタル署名・認証／攻撃と防御／無線LAN |
+| プログラミング | 18 | 変数と代入／条件分岐／繰り返し／配列と二次元配列／逐次探索・二分探索／選択ソート・挿入ソート／計算量／五大装置と論理回路／関数／モデル化とシミュレーション |
+| データ活用 | 18 | 最頻値と値域／箱ひげ図／標準偏差／相関と回帰直線／外れ値と欠損値／尺度水準／データベース（主キー・SQL）／ヒストグラム／分析の進め方／グラフの選び方／移動平均と時系列 |
 
 ## 報告APIの仕様（Pages Functions + D1 + hCaptcha）
 
@@ -76,7 +135,7 @@ functions/
 - 報告の送信は `POST /api/reports`（Pages Function）。報告フォームに hCaptcha ウィジェットを表示し、トークンを合わせて送信、Function 内で hCaptcha の siteverify API を呼び出して検証する。検証に失敗した送信は保存しない
   - `HCAPTCHA_SECRET` は Secrets で管理し、クライアントには参照させない
   - CAPTCHA は hCaptcha で固定。Turnstile などへの差し替えは siteverify 部分のみの変更で済む構成にする
-- `reports` テーブル: `id`（UUID）、`questionId`、`category`（誤字・脱字 ／ 解答・解説の誤り ／ 表示崩れ ／ その他）、`message`、`status`（`open` / `resolved`）、`createdAt`
+- `reports` テーブル: `id`（UUID）、`questionId`、`category`（D1には英文キー `typo` / `answer` / `layout` / `other` で保存し、UIでは「誤字・脱字／解答・解説の誤り／表示崩れ／その他」の日本語ラベルで表示する）、`message`、`status`（`open` / `resolved`）、`createdAt`
 - 管理者ページ（`/admin`）は `GET /api/reports`（管理トークン `ADMIN_TOKEN` を Secrets で管理し、Bearer 認証で要求する）で報告一覧を取得し、問題・解答と並べて表示する。対応済みの報告は `PATCH /api/reports/:id` で `status` を `resolved` に更新する
 - 報告は localStorage には保存せず、D1 のみに保存する
 
@@ -93,13 +152,13 @@ functions/
 - `sessions`: 日別・分野別の解答数（{ date, fieldId, correct, total }）
 - `attempts`: 1問ごとの解答履歴
 - `termReviews`: 用語ごとの復習状態（known / unsure）
-- 「後で解く」フラグ・デモ閲覧回数・テーマは別キーで保存。設定画面からJSONでエクスポート／インポート可能
+- 「後で解く」フラグ・テーマは別キーで保存。設定画面からJSONでエクスポート／インポート可能
 
 ## コンテンツの執筆・監修フロー
 
 問題の監修はオーナー本人が行う。
 
-1. `src/content/` にデータを追加（スキーマ検証は `npm test`）
+1. 問題は `question.md` に追記し、`npm run questions:build` で `src/content/questions.ts` を再生成する（他のコンテンツは `src/content/` に直接追加、スキーマ検証は `npm test`）
 2. PRごとに Cloudflare Pages のプレビューURLで確認
 3. 軽微な指摘はGitHubコメント、まとまった監修は共有ドキュメント（用途を固定）
 4. 修正履歴は Git、コンテンツにバージョンを付与（package.json の version）

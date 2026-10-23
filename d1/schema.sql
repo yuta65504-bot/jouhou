@@ -9,7 +9,7 @@
 CREATE TABLE IF NOT EXISTS reports (
   id TEXT PRIMARY KEY,                  -- UUID
   questionId TEXT NOT NULL,
-  category TEXT NOT NULL,               -- src/lib/report.ts の REPORT_CATEGORIES（誤字・脱字 / 解答・解説の誤り / 表示崩れ / その他）
+  category TEXT NOT NULL,               -- typo / answer / layout / other（英文キー。日本語ラベルはUIで表示）
   message TEXT NOT NULL,
   status TEXT NOT NULL DEFAULT 'open',  -- open / resolved
   createdAt TEXT NOT NULL               -- ISO-8601 (UTC)

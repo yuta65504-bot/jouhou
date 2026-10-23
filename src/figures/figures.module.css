@@ -1,0 +1,246 @@
+/* 問題ごとのインタラクティブ図解（解説パネル内に表示）共通スタイル */
+
+.fig {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  background: var(--color-surface);
+}
+
+.figTitle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--color-accent);
+}
+
+.visual {
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow-x: auto;
+}
+
+.svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.ctrl {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: var(--tap-min);
+  padding: 8px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--color-border);
+  background: var(--color-card);
+  color: var(--color-label);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.btnOn {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: #fff;
+}
+
+.btnSm {
+  min-height: 38px;
+  padding: 4px 10px;
+  min-width: 38px;
+}
+
+.status {
+  font-size: 0.8125rem;
+  font-weight: 700;
+}
+
+.statusOk {
+  color: var(--color-success-ink);
+}
+
+.statusNg {
+  color: var(--color-error-ink);
+}
+
+.note {
+  font-size: 0.75rem;
+  color: var(--color-secondary-label);
+}
+
+/* HTMLテーブル（配列・検索・SQLなど） */
+.tbl {
+  border-collapse: collapse;
+  width: 100%;
+  max-width: 420px;
+}
+
+.tbl th,
+.tbl td {
+  border: 1px solid var(--color-border);
+  padding: 4px 10px;
+  text-align: center;
+  font-size: 0.8125rem;
+}
+
+.tbl th {
+  background: var(--color-surface);
+  color: var(--color-secondary-label);
+  font-weight: 600;
+}
+
+.cellHit {
+  outline: 2px solid var(--color-accent);
+  outline-offset: -2px;
+  background: var(--color-accent-tint);
+  font-weight: 700;
+}
+
+.cellNg {
+  outline: 2px solid var(--color-error);
+  outline-offset: -2px;
+  background: var(--color-error-tint);
+}
+
+.cellMuted {
+  color: var(--color-secondary-label);
+}
+
+/* 行ごとの小型チャート */
+.barRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8125rem;
+}
+
+.barLabel {
+  flex: none;
+  width: 88px;
+  color: var(--color-secondary-label);
+}
+
+.barTrack {
+  flex: 1;
+  height: 14px;
+  border-radius: 7px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  overflow: hidden;
+  display: block;
+}
+
+.barFill {
+  display: block;
+  height: 100%;
+  border-radius: 7px;
+  background: var(--color-accent-tint);
+  border-right: 2px solid var(--color-accent);
+}
+
+.barValue {
+  flex: none;
+  width: 64px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+/* トグルスイッチ（スイッチの見た目＋44px操作領域） */
+.switch {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-width: var(--tap-min);
+  height: var(--tap-min);
+  padding-left: 22px;
+  cursor: pointer;
+}
+
+.switchKnobWrap {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+/* スライダー */
+.slider {
+  width: 100%;
+  accent-color: var(--color-accent);
+  min-height: var(--tap-min);
+}
+
+/* 小さい数値入力 */
+.numInput {
+  width: 86px;
+  min-height: 38px;
+  padding: 4px 8px;
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
+  background: var(--color-card);
+  color: var(--color-label);
+  font-size: 0.875rem;
+  font-variant-numeric: tabular-nums;
+}
+
+/* キーボード風のDNCLコード表示 */
+.code {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  line-height: 1.7;
+}
+
+.codeLine {
+  display: flex;
+  gap: 8px;
+  padding: 1px 6px;
+  border-radius: 6px;
+  white-space: pre;
+}
+
+.codeCurrent {
+  background: var(--color-accent-tint);
+  outline: 1.5px solid var(--color-accent);
+  outline-offset: -1.5px;
+  font-weight: 700;
+}
+
+.codeNo {
+  color: var(--color-secondary-label);
+  flex: none;
+  width: 1.2em;
+  text-align: right;
+  user-select: none;
+}

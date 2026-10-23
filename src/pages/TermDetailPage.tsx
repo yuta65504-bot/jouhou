@@ -4,7 +4,6 @@ import { CheckIcon } from '@/components/Icons'
 import { Figure } from '@/components/Figures'
 import { getField } from '@/lib/fields'
 import { terms } from '@/content/terms'
-import { getDemo } from '@/content/demos'
 import { useStore } from '@/lib/store'
 import { usePageTitle } from '@/lib/usePageTitle'
 import ui from '@/styles/ui.module.css'
@@ -22,7 +21,6 @@ export default function TermDetailPage() {
   if (!term) return <Navigate to="/terms" replace />
   const field = getField(term.fieldId)!
   const review = store.termReviews[term.id]
-  const demo = term.demoId ? getDemo(term.demoId) : undefined
   const related = term.related
     .map((id) => terms.find((t) => t.id === id))
     .filter((t): t is NonNullable<typeof t> => t != null)
@@ -85,12 +83,6 @@ export default function TermDetailPage() {
           </div>
           <p className={ui.lead}>記録は端末内（localStorage）に保存され、記録ページの「苦手用語」に反映されます。</p>
         </section>
-
-        {demo && (
-          <Link to={`/fields/${term.fieldId}/demo/${demo.id}`} className={s.demoLink}>
-            ▶ デモで確かめる: {demo.title}
-          </Link>
-        )}
 
         {related.length > 0 && (
           <section aria-labelledby="term-related">

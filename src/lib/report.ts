@@ -23,6 +23,16 @@ export function reportCategoryLabel(key: string): string {
 
 export type ReportStatus = 'open' | 'resolved'
 
+/** D1 に保存する category キーを検証する（Functions 側からも使う共通ガード） */
+export function isCategory(value: unknown): value is ReportCategory {
+  return typeof value === 'string' && REPORT_CATEGORIES.some((c) => c.value === value)
+}
+
+/** D1 の status カラム値を検証する（Functions 側からも使う共通ガード） */
+export function isStatus(value: unknown): value is ReportStatus {
+  return value === 'open' || value === 'resolved'
+}
+
 /** D1 reports テーブルの1行 */
 export type Report = {
   id: string
@@ -75,7 +85,7 @@ export async function submitReport(input: {
 
 /* ---------- 管理者用（/admin 画面から使用） ---------- */
 
-const ADMIN_TOKEN_KEY = 'jouohu.adminToken.v1'
+const ADMIN_TOKEN_KEY = 'jouhou.adminToken.v1'
 
 /**
  * localStorage に相当する保存先。Workers環境（Functionsからこのモジュールを読む場合）には

@@ -32,8 +32,6 @@
  * **解説**
  *
  * 解説の段落
- *
- * **デモ**: ui-compare
  * ```
  */
 import { FIELD_IDS, isFieldId, type FieldId } from '../lib/fields'
@@ -48,10 +46,7 @@ export type ParsedQuestion = {
   choices: string[]
   answerIndex: number
   explanation: string
-  demoId?: string
 }
-
-const DEMO_IDS = ['ui-compare', 'bit-ops', 'dncl-step', 'graph-explore'] as const
 
 /** 1問分のブロック（`###` から次の `###` まで）を解析する */
 function parseBlock(id: string, body: string): ParsedQuestion {
@@ -74,7 +69,7 @@ function parseBlock(id: string, body: string): ParsedQuestion {
       continue
     }
 
-    // セクション見出し: `**問題文**` / `**正解**: 1` / `**デモ**: ui-compare`
+    // セクション見出し: `**問題文**` / `**正解**: 1`
     const secMatch = /^\*\*(.+?)\*\*(?:\s*[:：]\s*(.*))?$/.exec(line)
     if (secMatch) {
       current = secMatch[1].trim()
@@ -121,11 +116,6 @@ function parseBlock(id: string, body: string): ParsedQuestion {
     .join('\n\n')
   if (!explanation) fail('解説がありません')
 
-  const demoId = (sections['デモ'] ?? [])[0]?.trim()
-  if (demoId && !DEMO_IDS.includes(demoId as (typeof DEMO_IDS)[number])) {
-    fail(`デモIDが不正です: ${demoId}（${DEMO_IDS.join(' / ')} のいずれか）`)
-  }
-
   return {
     id,
     fieldId,
@@ -136,7 +126,6 @@ function parseBlock(id: string, body: string): ParsedQuestion {
     choices,
     answerIndex: answerRaw - 1,
     explanation,
-    demoId: demoId || undefined,
   }
 }
 
@@ -199,7 +188,6 @@ export function renderQuestionsTs(questions: ParsedQuestion[]): string {
       lines.push(`    ],`)
       lines.push(`    answerIndex: ${q.answerIndex},`)
       lines.push(`    explanation: ${tsString(q.explanation)},`)
-      if (q.demoId) lines.push(`    demoId: ${tsString(q.demoId)},`)
       return `  {\n${lines.join('\n')}\n  },`
     })
     .join('\n')

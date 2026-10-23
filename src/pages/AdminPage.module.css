@@ -2,69 +2,48 @@
 
 .page {
   min-height: 100dvh;
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 16px 16px 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
   background: var(--color-bg);
   color: var(--color-label);
 }
 
-.top {
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  padding: 10px 16px;
-  background: var(--color-bar);
-  border-bottom: 1px solid var(--color-border);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+/* --- ヘッダー（URL直打ち専用の案内） --- */
+.header {
+  padding-top: 8px;
 }
 
-.brand {
+.title {
+  font-size: 1.4375rem;
   font-weight: 800;
   margin: 0;
 }
 
-.tagline {
-  font-size: 0.8125rem;
-  font-weight: 600;
+.note {
+  margin: 4px 0 0;
   color: var(--color-secondary-label);
-  margin-left: 6px;
+  font-size: 0.875rem;
 }
 
-.backLink {
-  display: inline-flex;
-  align-items: center;
-  min-height: var(--tap-min);
-  color: var(--color-accent);
-  text-decoration: none;
-  font-weight: 600;
-  font-size: 0.9375rem;
-}
-
-.wrap {
-  max-width: 720px;
-  margin: 0 auto;
-  padding: 16px 16px 64px;
+/* --- 報告: 管理トークン入力 --- */
+.tokenRow {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 6px;
+  margin-bottom: 12px;
 }
 
-.heading {
-  font-size: 1.25rem;
-  margin: 8px 0 0;
-}
-
-/* --- トークン入力 --- */
-.tokenForm {
+.tokenInputs {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
 }
 
-.input {
+.tokenInput {
   flex: 1;
   min-width: 220px;
   min-height: var(--tap-min);
@@ -76,21 +55,14 @@
   padding: 10px 12px;
 }
 
-.loadBtn {
-  min-width: 140px;
-}
-
-/* --- 報告一覧 --- */
-.reportList {
-  list-style: none;
+.error {
   margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+  color: var(--color-error-ink);
+  font-size: 0.9375rem;
 }
 
-.reportItem {
+/* --- 報告カード（状態チップ+ 本文 + 対象問題 + 対応ボタン） --- */
+.report {
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -107,31 +79,32 @@
   gap: 6px;
 }
 
-.statusOpen {
+/* チップ色の上書きは ui.module.css の読み込み後に評価される */
+.open {
   color: var(--color-error-ink);
   background: var(--color-error-tint);
   border-color: var(--color-error);
 }
 
-.statusOk {
+.resolved {
   color: var(--color-success-ink);
   background: var(--color-success-tint);
   border-color: var(--color-success);
 }
 
-.reportDate {
+.at {
   margin-left: auto;
   color: var(--color-secondary-label);
   font-size: 0.8125rem;
 }
 
-.reportBody {
+.reportMsg {
   margin: 0;
   white-space: pre-line;
   font-size: 0.9375rem;
 }
 
-.reportQ {
+.reportMeta {
   margin: 0;
   font-size: 0.8125rem;
   color: var(--color-secondary-label);
@@ -143,35 +116,52 @@
   font-family: var(--font-mono);
 }
 
-.reportBtn {
+.resolveBtn {
   align-self: flex-start;
   padding: 6px 14px;
 }
 
 /* --- 問題・解答の一覧 --- */
-.fieldBlock {
-  margin-top: 4px;
-}
-
-.fieldName {
-  font-size: 0.9375rem;
-  color: var(--color-secondary-label);
-  margin: 12px 0 2px;
-}
-
-.qBlock {
-  border-top: 1px solid var(--color-border);
-  padding: 12px 0;
+.question {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
 }
 
-.qId {
+.question:not(:first-child) {
+  border-top: 1px solid var(--color-border);
+  padding-top: 12px;
+}
+
+.stars {
+  white-space: nowrap;
+}
+
+.choices {
   margin: 0;
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
+  padding-left: 2px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.9375rem;
+}
+
+.choice {
+  padding: 2px 0;
   color: var(--color-secondary-label);
+  white-space: pre-line;
+}
+
+.choiceAnswer {
+  padding: 2px 0;
+  color: var(--color-success-ink);
+  font-weight: 700;
+  white-space: pre-line;
+}
+
+.answerMark {
+  font-weight: 400;
+  font-size: 0.875rem;
 }
 
 .qText {
@@ -181,25 +171,10 @@
   font-size: 0.9375rem;
 }
 
-.choices {
+.qMeta {
   margin: 0;
-  padding: 0;
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  font-size: 0.9375rem;
-}
-
-.choiceItem {
-  padding-left: 4px;
+  font-size: 0.8125rem;
   color: var(--color-secondary-label);
-}
-
-.choiceOk {
-  padding-left: 4px;
-  color: var(--color-success-ink);
-  font-weight: 700;
 }
 
 .qExp {
@@ -209,8 +184,8 @@
   color: var(--color-secondary-label);
 }
 
-.errorText {
+.footerNote {
   margin: 0;
-  color: var(--color-error-ink);
-  font-size: 0.9375rem;
+  color: var(--color-secondary-label);
+  font-size: 0.8125rem;
 }

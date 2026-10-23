@@ -2,7 +2,7 @@
  * 学習記録ストア（仕様書 §9）
  * - localStorage に永続化（schemaVersion を保持し、将来の端末間同期に備える）
  * - データ消去対策として JSON エクスポート／インポートを提供
- * - 「後で解く」フラグ・デモ閲覧回数・テーマは Store 本体のスキーマ外として別キーで管理
+ * - 「後で解く」フラグ・テーマは Store 本体のスキーマ外として別キーで管理
  */
 import { z } from 'zod'
 import {
@@ -54,17 +54,11 @@ export const settingsSchema = z.object({
 })
 export type Settings = z.infer<typeof settingsSchema>
 
-export const demoVisitsSchema = z.record(
-  z.object({ count: z.number().int().min(0), last: z.string() }),
-)
-export type DemoVisits = z.infer<typeof demoVisitsSchema>
-
 /* ---------- localStorage ---------- */
 
-const STORE_KEY = 'jouohu.store.v1'
-const SETTINGS_KEY = 'jouohu.settings.v1'
-const LATER_KEY = 'jouohu.quiz.later.v1'
-const DEMO_KEY = 'jouohu.demoVisits.v1'
+const STORE_KEY = 'jouhou.store.v1'
+const SETTINGS_KEY = 'jouhou.settings.v1'
+const LATER_KEY = 'jouhou.quiz.later.v1'
 
 export function emptyStore(): Store {
   return storeSchema.parse({ schemaVersion: 1, sessions: [], attempts: [], termReviews: {} })
@@ -94,15 +88,13 @@ type StoreContextValue = {
   store: Store
   settings: Settings
   later: string[]
-  demoVisits: DemoVisits
-  /** 学習活性日（演習・デモ・用語復習のいずれかがあった日付）の一覧 */
+  /** 学習活性日（演習・用語復習のいずれかがあった日付）の一覧 */
   activityDates: string[]
   streak: number
   todayActive: boolean
   recordAttempt: (fieldId: string, questionId: string, correct: boolean) => void
   reviewTerm: (termId: string, confidence: 'known' | 'unsure') => void
   toggleLater: (questionId: string) => void
-  recordDemoVisit: (demoId: string) => void
   setTheme: (theme: Settings['theme']) => void
   exportJson: () => string
   importJson: (json: string) => { ok: true } | { ok: false; error: string }
@@ -117,14 +109,10 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     load(SETTINGS_KEY, settingsSchema, settingsSchema.parse({ theme: 'system' })),
   )
   const [later, setLater] = useState<string[]>(() => load(LATER_KEY, z.array(z.string()), []))
-  const [demoVisits, setDemoVisits] = useState<DemoVisits>(() =>
-    load(DEMO_KEY, demoVisitsSchema, {}),
-  )
 
   useEffect(() => save(STORE_KEY, store), [store])
   useEffect(() => save(SETTINGS_KEY, settings), [settings])
   useEffect(() => save(LATER_KEY, later), [later])
-  useEffect(() => save(DEMO_KEY, demoVisits), [demoVisits])
 
   /* テーマを <html data-theme> に反映（system は CSS の media query に任せる） */
   useEffect(() => {
@@ -173,14 +161,6 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     )
   }, [])
 
-  const recordDemoVisit = useCallback((demoId: string) => {
-    const date = todayJst()
-    setDemoVisits((prev) => ({
-      ...prev,
-      [demoId]: { count: (prev[demoId]?.count ?? 0) + 1, last: date },
-    }))
-  }, [])
-
   const setTheme = useCallback((theme: Settings['theme']) => {
     setSettings((prev) => ({ ...prev, theme }))
   }, [])
@@ -203,16 +183,14 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const resetData = useCallback(() => {
     setStore(emptyStore())
     setLater([])
-    setDemoVisits({})
   }, [])
 
   const activityDates = useMemo(() => {
     const dates = new Set<string>()
     for (const s of store.sessions) if (s.total > 0) dates.add(s.date)
     for (const r of Object.values(store.termReviews)) dates.add(r.lastSeen)
-    for (const v of Object.values(demoVisits)) if (v.count > 0) dates.add(v.last)
     return [...dates]
-  }, [store, demoVisits])
+  }, [store])
 
   const { streak, todayActive } = useMemo(() => calcStreak(activityDates, today), [activityDates, today])
 
@@ -221,14 +199,12 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       store,
       settings,
       later,
-      demoVisits,
       activityDates,
       streak,
       todayActive,
       recordAttempt,
       reviewTerm,
       toggleLater,
-      recordDemoVisit,
       setTheme,
       exportJson,
       importJson,
@@ -238,14 +214,12 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       store,
       settings,
       later,
-      demoVisits,
       activityDates,
       streak,
       todayActive,
       recordAttempt,
       reviewTerm,
       toggleLater,
-      recordDemoVisit,
       setTheme,
       exportJson,
       importJson,

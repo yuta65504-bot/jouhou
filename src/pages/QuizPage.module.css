@@ -23,6 +23,12 @@
   letter-spacing: 1px;
 }
 
+/* 学習テーマ（question.md の「テーマ」欄） */
+.rowTopic {
+  font-size: 0.75rem;
+  color: var(--color-secondary-label);
+}
+
 .correctChip {
   background: var(--color-success-tint);
   color: var(--color-success-ink);

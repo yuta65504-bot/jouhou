@@ -1,6 +1,5 @@
 import { NavLink, Outlet } from 'react-router-dom'
 import { FIELDS, FIELD_IDS } from '@/lib/fields'
-import { demosByField } from '@/content/demos'
 import { GridIcon, BookIcon, PencilIcon, ChartIcon, HomeIcon, GearIcon } from './Icons'
 import styles from './AppLayout.module.css'
 
@@ -28,7 +27,7 @@ export function AppLayout() {
     <div className={styles.app}>
       <nav className={styles.sidebar} aria-label="サイトナビゲーション">
         <NavLink to="/" className={styles.brand}>
-          jouohu
+          jouhou
         </NavLink>
         <div className={styles.sideGroup}>
           <NavLink to="/" end className={sideCls}>
@@ -48,15 +47,6 @@ export function AppLayout() {
                     <span className={styles.dot} style={{ background: field.colorVar }} aria-hidden="true" />
                     {field.name}
                   </NavLink>
-                  <ul className={styles.subTree}>
-                    {demosByField(id).map((demo) => (
-                      <li key={demo.id}>
-                        <NavLink to={`/fields/${id}/demo/${demo.id}`} className={styles.subLink}>
-                          {demo.title}
-                        </NavLink>
-                      </li>
-                    ))}
-                  </ul>
                 </li>
               )
             })}

@@ -14,19 +14,18 @@ const WEEKS = 13
 
 export default function RecordsPage() {
   usePageTitle('学習記録')
-  const { store, streak, todayActive, demoVisits } = useStore()
+  const { store, streak, todayActive } = useStore()
   const todays = pickTodaysQuestion(attemptedTodayIds(store.attempts))
 
-  /* 日ごとの学習量（演習の解答、デモの閲覧、用語の復習） */
+  /* 日ごとの学習量（演習の解答、用語の復習） */
   const counts = useMemo(() => {
     const m = new Map<string, number>()
     const fmt = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Asia/Tokyo' })
     const add = (d: string, n = 1) => m.set(d, (m.get(d) ?? 0) + n)
     for (const a of store.attempts) add(fmt.format(new Date(a.at)))
-    for (const v of Object.values(demoVisits)) if (v.count > 0 && v.last) add(v.last)
     for (const r of Object.values(store.termReviews)) add(r.lastSeen)
     return m
-  }, [store.attempts, store.termReviews, demoVisits])
+  }, [store.attempts, store.termReviews])
 
   const days = useMemo(() => {
     const today = new Date(`${new Intl.DateTimeFormat('sv-SE', { timeZone: 'Asia/Tokyo' }).format(new Date())}T12:00:00Z`)

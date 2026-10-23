@@ -68,10 +68,3 @@
   background: var(--color-warning-tint);
   color: var(--color-warning-ink);
 }
-
-.demoLink {
-  color: var(--color-accent);
-  font-weight: 700;
-  text-decoration: none;
-  font-size: 0.9375rem;
-}

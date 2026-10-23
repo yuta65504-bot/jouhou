@@ -1,4 +1,4 @@
-import { lazy, Suspense } from 'react'
+import { Suspense } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { AppLayout } from './components/AppLayout'
 import HomePage from './pages/HomePage'
@@ -12,9 +12,6 @@ import RecordsPage from './pages/RecordsPage'
 import SettingsPage from './pages/SettingsPage'
 import AdminPage from './pages/AdminPage'
 
-/** デモ画面はルート単位で遅延読込（仕様書 §4） */
-const DemoPage = lazy(() => import('./pages/DemoPage'))
-
 export default function App() {
   return (
     <Suspense fallback={<p style={{ padding: 24 }}>読み込み中…</p>}>
@@ -25,7 +22,6 @@ export default function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/fields" element={<FieldsPage />} />
           <Route path="/fields/:fieldId" element={<FieldDetailPage />} />
-          <Route path="/fields/:fieldId/demo/:demoId" element={<DemoPage />} />
           <Route path="/quiz" element={<QuizPage />} />
           <Route path="/quiz/:id" element={<QuizQuestionPage />} />
           <Route path="/terms" element={<TermsPage />} />

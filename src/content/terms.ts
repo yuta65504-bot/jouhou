@@ -41,7 +41,6 @@ export const terms: Term[] = termsSchema.parse([
       'ビットは0か1のどちらかを表せる、情報の最小の単位。8ビットで256通り（0〜255）の状態を表せる。\n\n画像の色や文字も、このビットの並びで表現されている。',
     figure: 'bit',
     related: ['binary', 'digital-data'],
-    demoId: 'bit-ops',
   },
   {
     id: 'binary',
@@ -82,7 +81,6 @@ export const terms: Term[] = termsSchema.parse([
       '変数は値を入れておく「箱」。名前を付けておけば、プログラムの中で何度もその値を使える。\n\n代入（←）で箱の中身を入れ替える。同じ名前でも時々刻々と中身が変わるから「変数」。',
     figure: 'variable',
     related: ['condition', 'iteration'],
-    demoId: 'dncl-step',
   },
   {
     id: 'condition',
@@ -93,7 +91,6 @@ export const terms: Term[] = termsSchema.parse([
       '条件分岐は「もし〜ならばA、そうでなければB」というように、条件の結果で実行する処理を変える構造。\n\n共通テストのDNCLでは if 条件 then … else … end と書く。',
     figure: 'branch',
     related: ['variable', 'iteration'],
-    demoId: 'dncl-step',
   },
   {
     id: 'iteration',
@@ -104,7 +101,6 @@ export const terms: Term[] = termsSchema.parse([
       '繰り返しは、同じような処理を何度も書かずにすむ構造。「i を 1 から 5 まで 増やしながら 繰り返す」のように回数や範囲を指定する。\n\n条件が真のまま変わらないと、プログラムが止まらなくなる（無限ループ）。',
     figure: 'loop',
     related: ['condition'],
-    demoId: 'dncl-step',
   },
   {
     id: 'average',
@@ -135,6 +131,5 @@ export const terms: Term[] = termsSchema.parse([
       '同じデータでも、縦軸の始まりを0からにするか50からにするか、棒グラフにするか折れ線グラフにするかで、受ける印象が大きく変わる。\n\nグラフを読むときは「縦軸はどこから始まっているか」「増減が誇張されていないか」を確かめる。',
     figure: 'truncated-axis',
     related: ['average', 'median'],
-    demoId: 'graph-explore',
   },
 ])
