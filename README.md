@@ -19,7 +19,8 @@ npm install
 npm run dev            # 開発サーバー
 npm run build          # 型チェック + 本番ビルド (dist/)
 npm run preview        # ビルド結果の確認
-npm test               # questions.ts の一致確認 + コンテンツの zod 検証 + 図解レジストリ + DNCLエンジンのテスト
+npm test               # questions.ts の一致 + コンテンツ検証 + 図解の静的/SSRチェック + DNCLエンジンのテスト
+npm run check:figures  # 図解のSVG構造チェック（移行中の文字サイズ・インラインstyle警告も表示）
 npm run questions:build # question.md → src/content/questions.ts を再生成
 npm run questions:check # question.md と questions.ts の一致を確認（差分あれば終了コード1）
 npm run check:functions # Pages Functions の型チェック
@@ -158,6 +159,8 @@ question.md        問題の一次ソース（問題バンク。下記「問題�
 - SVG図解に `role="img"` + `aria-label`（+ `<title>/<desc>`）
 - ビット演算セルは `aria-pressed`、演算結果・DNCL状態は `aria-live="polite"`
 - `prefers-reduced-motion` 対応、`:focus-visible` の定義、タップ領域44px以上
+- 図解の動作確認は `npm run dev` で `/dev/figures`（開発時のみ）。320/375/768pxを切り替えて、文字サイズ・折返し・操作部品の大きさを確認できる
+- 図解のモーションは100〜240ms（バウンド・無限ループなし）。自動再生は初期状態で停止し、`prefers-reduced-motion` では再生ボタンを出さず即時表示にする
 
 ## 学習記録のデータモデル（localStorage, schemaVersion 1）
 

@@ -1,4 +1,4 @@
-import { Suspense } from 'react'
+import { Suspense, lazy } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { AppLayout } from './components/AppLayout'
 import HomePage from './pages/HomePage'
@@ -11,6 +11,9 @@ import TermDetailPage from './pages/TermDetailPage'
 import RecordsPage from './pages/RecordsPage'
 import SettingsPage from './pages/SettingsPage'
 import AdminPage from './pages/AdminPage'
+
+/** 開発時だけ使う図解ギャラリー。本番ビルドではルートごと無効化する */
+const DevFiguresPage = lazy(() => import('./pages/DevFiguresPage'))
 
 export default function App() {
   return (
@@ -28,6 +31,7 @@ export default function App() {
           <Route path="/terms/:termId" element={<TermDetailPage />} />
           <Route path="/records" element={<RecordsPage />} />
           <Route path="/settings" element={<SettingsPage />} />
+          {import.meta.env.DEV && <Route path="/dev/figures" element={<DevFiguresPage />} />}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
       </Routes>

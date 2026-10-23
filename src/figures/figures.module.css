@@ -4,36 +4,84 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
-  padding: 12px;
-  border: 1px solid var(--color-border);
-  border-radius: 12px;
-  background: var(--color-surface);
+  width: 100%;
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  min-width: 0;
+}
+
+.figHead {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.figBadge {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 8px;
+  border-radius: var(--radius-chip);
+  background: var(--color-accent-tint);
+  color: var(--color-accent);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  line-height: 1.6;
 }
 
 .figTitle {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 0.8125rem;
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  font-size: 0.9375rem;
   font-weight: 700;
-  color: var(--color-accent);
+  line-height: 1.45;
+  color: var(--color-label);
+  text-wrap: pretty;
+}
+
+/* 旧クラス（タイトルのみのspan）との互換 */
+.stepTotal {
+  flex: none;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--color-secondary-label);
+  font-variant-numeric: tabular-nums;
 }
 
 .visual {
   background: var(--color-card);
   border: 1px solid var(--color-border);
   border-radius: 10px;
-  padding: 10px;
+  padding: 8px;
   display: flex;
   flex-direction: column;
   justify-content: center;
+  gap: 8px;
   overflow-x: auto;
+  min-width: 0;
+}
+
+.visualInteractive {
+  overscroll-behavior-x: contain;
 }
 
 .svg {
   display: block;
   width: 100%;
+  max-width: 440px;
   height: auto;
+  margin: 0 auto;
+}
+
+/* SVG内の文字は原則クラスで指定する（直書きは移行時に削除） */
+.svg text {
+  font-family: var(--font-stack);
 }
 
 .ctrl {
@@ -43,6 +91,7 @@
   gap: 8px;
 }
 
+/* --- ボタン --- */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -57,6 +106,21 @@
   font-size: 0.8125rem;
   font-weight: 700;
   white-space: nowrap;
+  transition:
+    background var(--motion-fast) var(--ease-standard),
+    border-color var(--motion-fast) var(--ease-standard),
+    color var(--motion-fast) var(--ease-standard),
+    transform var(--motion-fast) var(--ease-standard);
+}
+
+.btn:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+@media (hover: hover) {
+  .btn:hover:not(:disabled) {
+    background: var(--color-surface);
+  }
 }
 
 .btn:disabled {
@@ -70,15 +134,46 @@
   color: #fff;
 }
 
-.btnSm {
-  min-height: 38px;
-  padding: 4px 10px;
-  min-width: 38px;
+.btnPrimary {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: #fff;
 }
 
-.status {
+.btnGhost {
+  border-color: transparent;
+  color: var(--color-secondary-label);
+}
+
+@media (hover: hover) {
+  .btnPrimary:hover:not(:disabled) {
+    background: var(--color-accent);
+    filter: brightness(1.06);
+  }
+  .btnGhost:hover:not(:disabled) {
+    background: var(--color-surface);
+  }
+}
+
+/* 旧・小さいボタン。44px要件に合わせて高さを揃える */
+.btnSm {
+  min-height: var(--tap-min);
+  min-width: var(--tap-min);
+  padding: 6px 10px;
   font-size: 0.8125rem;
-  font-weight: 700;
+}
+
+/* --- 状態テキスト --- */
+.status {
+  display: flex;
+  align-items: flex-start;
+  margin: 0;
+  min-height: 3.2em;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1.55;
+  color: var(--color-label);
+  text-wrap: pretty;
 }
 
 .statusOk {
@@ -89,12 +184,245 @@
   color: var(--color-error-ink);
 }
 
+.checkLabel {
+  font-size: 0.8125rem;
+  line-height: 1.55;
+  color: var(--color-label);
+  text-wrap: pretty;
+}
+
 .note {
+  margin: 0;
   font-size: 0.75rem;
+  line-height: 1.6;
+  color: var(--color-secondary-label);
+  text-wrap: pretty;
+}
+
+/* --- 数値の読み取り専用表示 --- */
+.readout {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  max-width: 440px;
+  margin: 0 auto;
+}
+
+.readoutItem {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  min-width: 0;
+  max-width: 100%;
+  padding: 5px 10px;
+  border-radius: 8px;
+  background: var(--color-surface);
+}
+
+.readoutKey {
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.4;
   color: var(--color-secondary-label);
 }
 
-/* HTMLテーブル（配列・検索・SQLなど） */
+.readoutValue {
+  margin: 0;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  line-height: 1.45;
+  color: var(--color-label);
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.readoutStrong {
+  color: var(--color-accent);
+}
+
+.readoutOk {
+  color: var(--color-success-ink);
+}
+
+.readoutNg {
+  color: var(--color-error-ink);
+}
+
+/* --- ステップ操作 --- */
+.stepArea {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.stepDots {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 16px;
+}
+
+.stepDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--color-border);
+  transition: background var(--motion-base) var(--ease-standard);
+}
+
+.stepDotOn {
+  background: var(--color-accent);
+}
+
+.stepBar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* --- HTMLのセル列（配列・ビット） --- */
+.cells {
+  display: grid;
+  gap: 4px;
+  width: 100%;
+  max-width: 440px;
+  margin: 0 auto;
+  padding: 0;
+  list-style: none;
+}
+
+.cellItem {
+  min-width: 0;
+}
+
+.cell {
+  width: 100%;
+  min-height: var(--tap-min);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  padding: 4px 2px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-card);
+  color: var(--color-label);
+  font-size: 0.875rem;
+  font-weight: 700;
+  line-height: 1.2;
+  text-align: center;
+  transition:
+    background var(--motion-base) var(--ease-standard),
+    border-color var(--motion-base) var(--ease-standard),
+    color var(--motion-base) var(--ease-standard),
+    opacity var(--motion-base) var(--ease-standard);
+}
+
+button.cell {
+  cursor: pointer;
+}
+
+button.cell:active {
+  transform: scale(0.98);
+}
+
+@media (hover: hover) {
+  button.cell:hover {
+    background: var(--color-surface);
+  }
+}
+
+.cellCompact {
+  min-height: var(--tap-min);
+  padding: 2px 0;
+  font-size: 0.9375rem;
+}
+
+.cellValue {
+  font-variant-numeric: tabular-nums;
+}
+
+.cellMark {
+  max-width: 100%;
+  overflow: hidden;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--color-secondary-label);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cellCurrent {
+  border-color: var(--color-accent);
+  background: var(--color-accent-tint);
+  box-shadow: inset 0 0 0 1px var(--color-accent);
+}
+
+.cellOk {
+  border-color: var(--color-success);
+  background: var(--color-success-tint);
+  color: var(--color-success-ink);
+}
+
+.cellBad {
+  border-color: var(--color-error);
+  background: var(--color-error-tint);
+  color: var(--color-error-ink);
+}
+
+.cellDim {
+  border-style: dashed;
+  background: var(--color-surface);
+  color: var(--color-secondary-label);
+}
+
+.cellPulse {
+  animation: figPop var(--motion-step) var(--ease-emphasized) both;
+}
+
+.pop {
+  animation: figPop var(--motion-step) var(--ease-emphasized) both;
+}
+
+.popSvg {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: figPop var(--motion-step) var(--ease-emphasized) both;
+}
+
+.cellTag {
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1.4;
+  color: var(--color-secondary-label);
+}
+
+.bitRows {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  max-width: 440px;
+  min-width: 0;
+  margin: 0 auto;
+}
+
+.controlRow {
+  width: 100%;
+  max-width: 440px;
+  margin: 0 auto;
+}
+
+.bitRow {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+/* --- テーブル（配列・検索・SQLなど） --- */
 .tbl {
   border-collapse: collapse;
   width: 100%;
@@ -132,7 +460,7 @@
   color: var(--color-secondary-label);
 }
 
-/* 行ごとの小型チャート */
+/* --- 行ごとの小型チャート --- */
 .barRow {
   display: flex;
   align-items: center;
@@ -142,7 +470,7 @@
 
 .barLabel {
   flex: none;
-  width: 88px;
+  width: 96px;
   color: var(--color-secondary-label);
 }
 
@@ -162,17 +490,18 @@
   border-radius: 7px;
   background: var(--color-accent-tint);
   border-right: 2px solid var(--color-accent);
+  transition: width var(--motion-step) var(--ease-emphasized);
 }
 
 .barValue {
   flex: none;
-  width: 64px;
+  width: 56px;
   text-align: right;
   font-variant-numeric: tabular-nums;
   font-weight: 600;
 }
 
-/* トグルスイッチ（スイッチの見た目＋44px操作領域） */
+/* --- トグルスイッチ（スイッチの見た目＋44px操作領域） --- */
 .switch {
   position: relative;
   display: inline-flex;
@@ -190,7 +519,32 @@
   transform: translateY(-50%);
 }
 
-/* スライダー */
+/* --- スライダー --- */
+.sliderRow {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sliderHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.sliderLabel {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--color-label);
+}
+
+.sliderValue {
+  font-size: 0.75rem;
+  color: var(--color-secondary-label);
+  font-variant-numeric: tabular-nums;
+}
+
 .slider {
   width: 100%;
   accent-color: var(--color-accent);
@@ -200,7 +554,7 @@
 /* 小さい数値入力 */
 .numInput {
   width: 86px;
-  min-height: 38px;
+  min-height: var(--tap-min);
   padding: 4px 8px;
   border-radius: 8px;
   border: 1px solid var(--color-border);
@@ -210,6 +564,24 @@
   font-variant-numeric: tabular-nums;
 }
 
+.stepperGrid {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 12px;
+  min-width: 0;
+}
+
+.stepperGrid > .code {
+  flex: 1 1 190px;
+  min-width: 0;
+}
+
+.stepperGrid > .tbl {
+  flex: 1 1 150px;
+  max-width: 260px;
+}
+
 /* キーボード風のDNCLコード表示 */
 .code {
   margin: 0;
@@ -217,9 +589,14 @@
   list-style: none;
   display: flex;
   flex-direction: column;
+  max-height: 300px;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: auto;
   font-family: var(--font-mono);
   font-size: 0.75rem;
   line-height: 1.7;
+  scrollbar-width: thin;
 }
 
 .codeLine {
@@ -228,12 +605,15 @@
   padding: 1px 6px;
   border-radius: 6px;
   white-space: pre;
+  scroll-margin: 32px;
+  transition:
+    background var(--motion-base) var(--ease-standard),
+    box-shadow var(--motion-base) var(--ease-standard);
 }
 
 .codeCurrent {
   background: var(--color-accent-tint);
-  outline: 1.5px solid var(--color-accent);
-  outline-offset: -1.5px;
+  box-shadow: inset 0 0 0 1.5px var(--color-accent);
   font-weight: 700;
 }
 
@@ -243,4 +623,107 @@
   width: 1.2em;
   text-align: right;
   user-select: none;
+}
+
+/* --- モーション（控えめ・300ms以内） --- */
+@keyframes figReveal {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes figFade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes figDraw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes figPop {
+  0% {
+    transform: scale(1);
+  }
+  45% {
+    transform: scale(1.06);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes figBarIn {
+  from {
+    transform: scaleY(0);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+
+.reveal {
+  animation: figReveal var(--motion-base) var(--ease-standard) both;
+}
+
+.fadeIn {
+  animation: figFade var(--motion-base) var(--ease-standard) both;
+}
+
+.draw {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: figDraw var(--motion-draw) var(--ease-standard) forwards;
+}
+
+.barGrow {
+  transform-box: fill-box;
+  transform-origin: bottom;
+  animation: figBarIn var(--motion-step) var(--ease-emphasized) both;
+}
+
+.barGrowDown {
+  transform-box: fill-box;
+  transform-origin: top;
+  animation: figBarIn var(--motion-step) var(--ease-emphasized) both;
+}
+
+.scaleG {
+  transition: transform var(--motion-step) var(--ease-emphasized);
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal,
+  .fadeIn,
+  .draw,
+  .barGrow,
+  .barGrowDown,
+  .cellPulse,
+  .pop,
+  .popSvg {
+    animation: none;
+  }
+  .draw {
+    stroke-dashoffset: 0;
+  }
+  .scaleG,
+  .btn,
+  .cell,
+  .barFill,
+  .stepDot {
+    transition: none;
+  }
 }

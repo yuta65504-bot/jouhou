@@ -1,15 +1,20 @@
 /**
  * ネットワーク（network, q-net-1〜18）: 問題ごとのインタラクティブ図解。
  */
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import styles from './figures.module.css'
 import { Segmented } from '@/components/Segmented'
+import { useStepPlayer } from '@/lib/motion'
 import {
   ACCENT,
   BORDER,
   LABEL,
+  BitGrid,
   Calc,
+  Canvas,
+  CellTrack,
   FigShell,
+  FigureFrame,
   MUTED,
   NGINK,
   Note,
@@ -78,43 +83,95 @@ export function NetFig1() {
 /* ---------- q-net-2: DNS ---------- */
 
 export function NetFig2() {
-  const [step, setStep] = useState(0)
-  const showIp = step >= 1
+  const player = useStepPlayer(3, 1200)
+  const { step } = player
+  const status =
+    step === 0
+      ? '「次へ」で、ブラウザからDNSサーバへ問い合わせる。'
+      : step === 1
+        ? 'DNSサーバが、ドメイン名に対応するIPアドレスを探している。'
+        : '203.0.113.5 が返った。以降はこの番号で接続する。'
   return (
-    <FigShell
+    <FigureFrame
       title="図解: 名前を番号に繋げる仕組み（DNS）"
-      status="DNSは「ドメイン名（名前）→ IPアドレス（番号）」の対応づけを行う仕組み。"
+      status={status}
+      statusKind={step >= 2 ? 'ok' : 'plain'}
+      step={step}
+      total={3}
+      playing={player.playing}
+      onPrev={player.prev}
+      onNext={player.next}
+      onReset={player.reset}
+      onPlayToggle={player.toggle}
     >
-      <View label="ブラウザがDNSサーバに問い合わせ、IPアドレスを受け取る流れ">
-        <svg viewBox="0 0 320 132" className={styles.svg}>
-          <GBox x={10} y={16} w={84} h={30} text="ブラウザ" fs={9.5} />
-          <GBox x={118} y={16} w={84} h={30} text="example.jp" fs={9} fill="var(--color-warning-tint)" stroke="var(--color-warning)" ink="var(--color-warning-ink)" />
+      <Canvas label="ブラウザがDNSサーバに問い合わせ、IPアドレスを受け取る流れ" interactive>
+        <svg viewBox="0 0 320 164" className={styles.svg}>
+          <GBox x={10} y={34} w={82} h={34} text="ブラウザ" fs={14} />
+          <GBox
+            x={120}
+            y={4}
+            w={86}
+            h={28}
+            text="example.jp"
+            fs={13}
+            fill="var(--color-warning-tint)"
+            stroke="var(--color-warning)"
+            ink="var(--color-warning-ink)"
+          />
+          <line x1={163} y1={32} x2={163} y2={51} stroke={BORDER} strokeDasharray="2 2" />
+          <g className={step === 1 ? styles.popSvg : undefined}>
+            <GCircle cx={258} cy={51} r={21} text="DNS" fs={12} />
+          </g>
+
           {step >= 1 && (
             <>
-              <GCircle cx={252} cy={31} r={18} text="DNS" fs={9} />
-              <path d="M 204 31 L 234 31" stroke={ACCENT} />
-              <path d="M 270 40 C 262 84 176 84 100 80" stroke={ACCENT} fill="none" strokeDasharray="4 3" />
-              <GBox x={24} y={86} w={150} h={30} text={`${showIp ? '203.0.113.5' : '— … IPアドレスを聞く'} `} fs={showIp ? 10.5 : 8.5} rx={8} fill={showIp ? 'var(--color-success-tint)' : TINT} stroke={showIp ? 'var(--color-success)' : ACCENT} ink={showIp ? OKINK : MUTED} bold={showIp} />
-              <text x={236} y={104} fontSize={8} fill={MUTED}>
-                {showIp ? '対応づけを返す' : ''}
+              <path d="M 94 51 L 234 51" pathLength={1} stroke={ACCENT} strokeWidth={2} className={styles.draw} />
+              <path d="M 234 46 L 242 51 L 234 56 Z" fill={ACCENT} className={styles.fadeIn} />
+            </>
+          )}
+          <text x={160} y={70} fontSize={13} textAnchor="middle" fill={MUTED}>
+            問い合わせ
+          </text>
+
+          {step >= 2 && (
+            <>
+              <path
+                d="M 246 66 C 230 102 160 108 84 108"
+                pathLength={1}
+                fill="none"
+                stroke={ACCENT}
+                strokeWidth={2}
+                className={styles.draw}
+              />
+              <path d="M 78 104 L 84 112 L 90 104 Z" fill={ACCENT} className={styles.fadeIn} />
+              <g className={styles.reveal}>
+                <GBox
+                  x={16}
+                  y={112}
+                  w={160}
+                  h={28}
+                  text="203.0.113.5"
+                  fs={14}
+                  rx={8}
+                  fill="var(--color-success-tint)"
+                  stroke="var(--color-success)"
+                  ink={OKINK}
+                  bold
+                />
+              </g>
+              <text x={196} y={132} fontSize={13} fill={OKINK} fontWeight={700}>
+                対応づけを返す
               </text>
             </>
           )}
-          <text x={200} y={72} fontSize={9} fill={MUTED}>
-            {step >= 1 ? '' : '「問い合わせる」を押すと、対応づけが返る'}
+
+          <text x={160} y={158} fontSize={13} textAnchor="middle" fill={MUTED}>
+            ドメイン名（名前） → IPアドレス（番号）
           </text>
         </svg>
-      </View>
-      <div className={styles.ctrl}>
-        <Btn small onClick={() => setStep(0)} disabled={step === 0}>
-          戻す
-        </Btn>
-        <Btn small on={step >= 1} onClick={() => setStep(1)}>
-          問い合わせる
-        </Btn>
-        <span className={styles.note}>DHCP=IPの自動割当 / FTP=ファイル転送 / SMTP=メール送信。役割が違う。</span>
-      </div>
-    </FigShell>
+      </Canvas>
+      <Note>DNSは名前→番号の対応づけ。IPの自動割当はDHCP、ファイル転送はFTP、メール送信はSMTP。</Note>
+    </FigureFrame>
   )
 }
 
@@ -174,18 +231,22 @@ export function NetFig4() {
     >
       <View label={`${n}を16進数に直す計算の様子`}>
         <svg viewBox="0 0 320 108" className={styles.svg}>
-          <Calc
-            parts={[
-              { k: '16で割った商', v: `${hi}`, strong: true },
-              { k: '余り', v: `${lo}`, strong: true },
-            ]}
-          />
-          <GBox x={20} y={34} w={94} h={28} text={`${n} ÷ 16`} fs={10} />
-          <GBox x={122} y={34} w={62} h={28} text={`商 ${hi}（上の桁）`} fs={8} />
-          <GBox x={196} y={34} w={86} h={28} text={`余り ${lo} → ${lo.toString(16).toUpperCase()}（下の桁）`} fs={7.5} />
-          <GBox x={110} y={76} w={100} h={26} text={is90 ? '90 → 5A' : `${n} → ${hex}`} fs={12} bold rx={10} fill={ACCENT} ink="#fff" />
+          <GBox x={20} y={20} w={94} h={30} text={`${n} ÷ 16`} fs={12} />
+          <GBox x={122} y={20} w={62} h={30} text={`商 ${hi}`} fs={11} />
+          <GBox x={196} y={20} w={86} h={30} text={`余り ${lo}`} fs={11} />
+          <text x={160} y={78} fontSize={13} textAnchor="middle" fill={MUTED}>
+            商が上の桁、余りが下の桁
+          </text>
+          <GBox x={110} y={88} w={100} h={26} text={is90 ? '90 → 5A' : `${n} → ${hex}`} fs={12} bold rx={10} fill={ACCENT} ink="#fff" />
         </svg>
       </View>
+      <Calc
+        parts={[
+          { k: '16で割った商', v: `${hi}`, strong: true },
+          { k: '余り', v: `${lo}`, strong: true },
+          { k: '16進数', v: hex, strong: is90 },
+        ]}
+      />
       <Slider label="10進数の値" value={n} min={0} max={255} onChange={setN} />
       <Note>10〜15は A・B・C・D・E・F で表す。1桁で4ビット（0〜15）が入る。</Note>
     </FigShell>
@@ -240,57 +301,77 @@ export function NetFig5() {
 export function NetFig6() {
   const [data, setData] = useState<(0 | 1)[]>([1, 0, 1, 1, 0, 1, 0, 0])
   const [flipIdx, setFlipIdx] = useState<number | null>(null)
+  const [pulse, setPulse] = useState<number | null>(null)
   const ones = data.reduce<number>((n, b) => n + b, 0)
   const parity = (ones % 2) as 0 | 1
   const received = flipIdx != null ? data.map((b, i) => (i === flipIdx ? ((b ^ 1) as 0 | 1) : b)) : data
+
+  useEffect(() => {
+    if (pulse == null) return
+    const timer = window.setTimeout(() => setPulse(null), 260)
+    return () => window.clearTimeout(timer)
+  }, [pulse])
+
+  const toggleBit = (i: number) => {
+    setData((prev) => prev.map((b, j) => (j === i ? ((b ^ 1) as 0 | 1) : b)))
+    setPulse(i)
+  }
+
   return (
-    <FigShell
+    <FigureFrame
       title="図解: 1の個数が偶数になるように1つ付ける"
       status={
         flipIdx == null
-          ? `1の個数は${ones}個（${ones % 2 === 0 ? '偶数' : '奇数'}）→ ${parity} を付けて ${[...data, parity].join('')} を送る。`
-          : '1の個数が奇数に変わった → どこか1ビットが反転したことを検出できる（どこが反転したかまでは分からない）。'
+          ? `1の個数は${ones}個（${ones % 2 === 0 ? '偶数' : '奇数'}）。パリティ ${parity} を付けて ${[...data, parity].join('')} を送る。`
+          : '1ビット反転 → 1の個数が奇数になり、誤りを検出できる（位置は分からない）。'
       }
-      statusKind={flipIdx != null ? 'ng' : 'ok'}
+      statusKind={flipIdx != null ? 'ng' : 'plain'}
     >
-      <View label="パリティビットを付けた9ビット列">
-        <svg viewBox="0 0 320 112" className={styles.svg}>
-          <GBitRow x={84} y={14} bits={data} tag="データ" />
-          <GBitRow x={84} y={44} bits={[...data, parity]} tag="送る列" />
-          <rect x={82 + 8 * 22} y={42} width={22} height={30} rx={4} fill="none" stroke={ACCENT} strokeWidth={2} />
-          <text x={269} y={86} fontSize={8.5} textAnchor="middle" fill={MUTED}>
-            パリティ
-          </text>
+      <Canvas label="パリティビットを付けた9ビット列。データのビットは押して切り替えられる" interactive>
+        <div className={styles.bitRows}>
+          <BitGrid bits={data} label="データ（押して 0/1 を切替）" onToggle={toggleBit} pulseIndex={pulse} />
+          <div className={styles.bitRow}>
+            <span className={styles.cellTag}>送る列（9ビット目がパリティ）</span>
+            <CellTrack
+              values={[...data, parity]}
+              compact
+              wrap
+              showIndex
+              marks={[...Array(8).fill(undefined), 'P']}
+              ariaLabel="送る列"
+            />
+          </div>
           {flipIdx != null && (
-            <>
-              <GBitRow x={84} y={76} bits={received} tag="受信" />
-              <rect x={82 + flipIdx * 22} y={73} width={22} height={28} rx={4} fill="var(--color-error-tint)" stroke="var(--color-error)" strokeWidth={2} />
-              <text x={104} y={108} fontSize={9.5} fill={NGINK} fontWeight={700}>
-                送信の途中で {flipIdx + 1} 番目のビットが反転 → 1の個数が奇数になり、誤りを検出
-              </text>
-            </>
+            <div className={styles.reveal}>
+              <BitGrid bits={[...received, parity]} label="受信（誤りあり）" errorIndex={flipIdx} />
+            </div>
           )}
-        </svg>
-      </View>
+        </div>
+      </Canvas>
       <div className={styles.ctrl}>
-        <Btn small
+        <Btn
+          small
           onClick={() => {
-            if (flipIdx != null) {
-              setFlipIdx(null)
-            } else {
-              setFlipIdx(1)
-            }
+            const inserting = flipIdx == null
+            setFlipIdx(inserting ? 1 : null)
+            setPulse(null)
           }}
         >
           {flipIdx == null ? '1ビットの誤りを入れてみる' : '誤りを取り除く'}
         </Btn>
-        <Btn small onClick={() => { setFlipIdx(null); setData([1, 0, 1, 1, 0, 1, 0, 0]) }}>
+        <Btn
+          small
+          onClick={() => {
+            setFlipIdx(null)
+            setPulse(null)
+            setData([1, 0, 1, 1, 0, 1, 0, 0])
+          }}
+        >
           リセット
         </Btn>
-        <span className={styles.note}>データ側のビットはクリックで切り替えられる（1の個数が偶数か奇数かで付ける値が変わる）</span>
       </div>
       <Note>2ビットが同時に反転すると1の個数が偶数のまま残るため、この方式では検出できない。</Note>
-    </FigShell>
+    </FigureFrame>
   )
 }
 
@@ -307,20 +388,20 @@ export function NetFig7() {
       status={`${mb}MB = ${(mb * 8).toLocaleString()}メガビット。÷ ${mbps}Mbps で ${sec.toLocaleString()} 秒。`}
     >
       <View label="データ量（ビット）と回線速度（Mbps）から転送時間を求める計算">
-        <svg viewBox="0 0 320 98" className={styles.svg}>
-          <Calc
-            parts={[
-              { k: '1MB', v: '8メガビット' },
-              { k: `${mb}MB`, v: `${(mb * 8).toLocaleString()}メガビット` },
-              { k: `÷${mbps}Mbps`, v: `${sec.toLocaleString()}秒`, strong: true, ok: sec === 32 },
-            ]}
-          />
-          <GBox x={14} y={38} w={128} h={28} text={`データ: ${mb}MB（ビット）`} fs={9} />
-          <path d="M 148 52 L 168 52" stroke={MUTED} />
-          <GBox x={174} y={38} w={128} h={28} text={`速度 ${mbps}Mbps（ビット/秒）`} fs={9} />
-          <GBox x={96} y={76} w={128} h={22} text={`転送時間 ${sec.toLocaleString()} 秒`} fs={10.5} bold rx={10} fill={ACCENT} ink="#fff" />
+        <svg viewBox="0 0 320 92" className={styles.svg}>
+          <GBox x={14} y={12} w={128} h={30} text={`データ: ${mb}MB`} fs={11} />
+          <path d="M 148 27 L 168 27" stroke={MUTED} />
+          <GBox x={174} y={12} w={128} h={30} text={`速度 ${mbps}Mbps`} fs={11} />
+          <GBox x={96} y={54} w={128} h={26} text={`転送時間 ${sec.toLocaleString()} 秒`} fs={12} bold rx={10} fill={ACCENT} ink="#fff" />
         </svg>
       </View>
+      <Calc
+        parts={[
+          { k: '1MB', v: '8メガビット' },
+          { k: `${mb}MB`, v: `${(mb * 8).toLocaleString()}メガビット` },
+          { k: `÷${mbps}Mbps`, v: `${sec.toLocaleString()}秒`, strong: true, ok: sec === 32 },
+        ]}
+      />
       <Slider label="データ量 [MB]" value={mb} min={1} max={100} step={1} onChange={setMb} />
       <Slider label="回線の速度 [Mbps]" value={mbps} min={1} max={100} step={1} onChange={setMbps} />
       <Note>bpsは「1秒あたり何ビット」。MBは8ビット=1バイト。8MB=8×10^6×8ビット＝6400万ビット→2Mbpsでは32秒。</Note>
@@ -403,20 +484,20 @@ export function NetFig10() {
     >
       <Slider label="ホスト部のビット数 [bit]" value={host} min={2} max={8} onChange={setHost} />
       <View label="ホスト部ビット数と、割り当てられるアドレス数">
-        <svg viewBox="0 0 320 110" className={styles.svg}>
-          <Calc
-            parts={[
-              { k: 'アドレス数', v: `${total}`, strong: host === 8 },
-              { k: '端末に使える数', v: `${total - 2}` },
-              { k: '−2の中身', v: 'ネットワーク & ブロードキャスト' },
-            ]}
-          />
-          <GBox x={16} y={34} w={120} h={28} text="192.168.1.0/24" fs={10} />
-          <GBox x={148} y={34} w={62} h={28} text="+ 8ビット" fs={9} fill="var(--color-warning-tint)" stroke="var(--color-warning)" ink="var(--color-warning-ink)" />
-          <GBox x={218} y={34} w={88} h={28} text="→ 0〜255 = 256個" fs={8.5} />
-          <GBox x={84} y={76} w={152} h={26} rx={10} fill={host === 8 ? ACCENT : TINT} stroke={host === 8 ? ACCENT : BORDER} ink={host === 8 ? '#fff' : MUTED} text={host === 8 ? '最大数（設問の答え）= 256' : `${total} 個（ホスト部${host}bit）`} fs={10} bold />
+        <svg viewBox="0 0 320 100" className={styles.svg}>
+          <GBox x={16} y={18} w={120} h={30} text="192.168.1.0/24" fs={11} />
+          <GBox x={148} y={18} w={62} h={30} text="+ 8ビット" fs={10} fill="var(--color-warning-tint)" stroke="var(--color-warning)" ink="var(--color-warning-ink)" />
+          <GBox x={218} y={18} w={88} h={30} text="→ 0〜255 = 256個" fs={9.5} />
+          <GBox x={84} y={62} w={152} h={28} rx={10} fill={host === 8 ? ACCENT : TINT} stroke={host === 8 ? ACCENT : BORDER} ink={host === 8 ? '#fff' : MUTED} text={host === 8 ? '最大数（設問の答え）= 256' : `${total} 個（ホスト部${host}bit）`} fs={11} bold />
         </svg>
       </View>
+      <Calc
+        parts={[
+          { k: 'アドレス数', v: `${total}`, strong: host === 8 },
+          { k: '端末に使える数', v: `${total - 2}` },
+          { k: '−2の中身', v: 'ネットワーク & ブロードキャスト' },
+        ]}
+      />
       <Note>設問は「（ネットワーク・ブロードキャストを含まない）最大数」。254は「端末に割り当てられる数」なので、選択肢2とは別物。</Note>
     </FigShell>
   )

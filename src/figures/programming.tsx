@@ -3,19 +3,24 @@
  * - q-pro-3 / q-pro-4 は、src/lib/dncl-engine.ts のステップ実行エンジンを使う
  * - それ以外は問題に合わせた個別のステップ・シミュレーション図解
  */
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import styles from './figures.module.css'
 import { Segmented } from '@/components/Segmented'
+import { useStepPlayer } from '@/lib/motion'
 import { dnclPrograms } from '@/content/dncl'
 import { computeRun, parseProgram, varNamesOf, STEP_LIMIT, type RunResult } from '@/lib/dncl-engine'
 import {
   ACCENT,
   BORDER,
+  Canvas,
+  CellTrack,
   FigShell,
+  FigureFrame,
   MUTED,
   NGINK,
   Note,
   OKINK,
+  Readout,
   TINT,
   View,
   Btn,
@@ -55,7 +60,31 @@ function DnclStepper({
       return { ok: false, msg: 'プログラムを読み取れませんでした' }
     }
   }, [lines])
-  const [k, setK] = useState(0)
+
+  const snaps = parsed.ok ? parsed.run.snapshots : []
+  const n = snaps.length
+  const player = useStepPlayer(n + 1, 1400)
+  const { step } = player
+  const codeRef = useRef<HTMLOListElement>(null)
+  const lineRef = useRef<HTMLLIElement>(null)
+
+  const curLine = !parsed.ok || step === 0 ? -1 : snaps[Math.min(step, n) - 1].line
+  const curDisplayLine = curLine < 0 ? -1 : lineMap ? (lineMap[curLine] ?? curLine) : curLine
+
+  useEffect(() => {
+    if (curDisplayLine < 0) {
+      if (codeRef.current) codeRef.current.scrollTop = 0
+      return
+    }
+    const list = codeRef.current
+    const line = lineRef.current
+    if (!list || !line) return
+    const top = line.offsetTop - list.offsetTop
+    if (top < list.scrollTop || top + line.offsetHeight > list.scrollTop + list.clientHeight) {
+      list.scrollTop = Math.max(0, top - 8)
+    }
+  }, [curDisplayLine])
+
   if (!parsed.ok) {
     return (
       <FigShell title="図解: プログラムを1手ずつ実行する">
@@ -63,68 +92,76 @@ function DnclStepper({
       </FigShell>
     )
   }
-  const snaps = parsed.run.snapshots
-  const n = snaps.length
-  const curLine = k === 0 ? -1 : snaps[Math.min(k, n) - 1].line
-  const curDisplayLine = curLine < 0 ? -1 : lineMap ? (lineMap[curLine] ?? -1) : curLine
+
   const shownLines = displayLines ?? lines
-  const vars = k === 0 ? {} : snaps[Math.min(k, n) - 1].vars
-  const done = k >= n && parsed.run.done
+  const vars = step === 0 ? {} : snaps[Math.min(step, n) - 1].vars
+  const done = step >= n && parsed.run.done
   return (
-    <FigShell
+    <FigureFrame
       title="図解: 1手ずつ実行して、変数の変化を見る"
       status={
-        k === 0
+        step === 0
           ? '「次へ」を押すと、1手ずつ実行される。変数の値がどう変わるか見てみる。'
-          : `${k}手実行（${k === n ? '実行は完了' : `今は${curDisplayLine + 1}行目`})　変数: ${parsed.names.map((nm) => `${nm}=${vars[nm] ?? '—'}`).join(' / ')}`
+          : `${step}手実行（${step === n ? '実行は完了' : `今は${curDisplayLine + 1}行目`}）。変数の値は表で確認。`
       }
       statusKind={done ? 'ok' : 'plain'}
+      step={step}
+      total={n + 1}
+      playing={player.playing}
+      onPrev={player.prev}
+      onNext={player.next}
+      onReset={player.reset}
+      onPlayToggle={player.toggle}
     >
-      <View label={label}>
-        <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'flex-start' }}>
-          <ol className={styles.code}>
+      <Canvas label={label} interactive>
+        <div className={styles.stepperGrid}>
+          <ol className={styles.code} ref={codeRef}>
             {shownLines.map((ln, i) => (
-              <li key={i} className={`${styles.codeLine} ${curDisplayLine === i ? styles.codeCurrent : ''}`}>
+              <li
+                key={i}
+                ref={curDisplayLine === i ? lineRef : undefined}
+                className={`${styles.codeLine} ${curDisplayLine === i ? styles.codeCurrent : ''}`}
+                aria-current={curDisplayLine === i ? 'step' : undefined}
+              >
                 <span className={styles.codeNo}>{i + 1}</span>
                 <span>{ln}</span>
               </li>
             ))}
           </ol>
-          <table className={styles.tbl}>
+          <table className={styles.tbl} aria-label="変数の値">
             <thead>
               <tr>
-                <th>変数</th>
-                <th>値</th>
+                <th scope="col">変数</th>
+                <th scope="col">値</th>
               </tr>
             </thead>
             <tbody>
-              {parsed.names.map((nm) => (
-                <tr key={nm}>
-                  <td>{nm}</td>
-                  <td className={vars[nm] != null ? styles.cellHit : styles.cellMuted}>{vars[nm] ?? '—'}</td>
-                </tr>
-              ))}
+              {parsed.names.map((nm) => {
+                const value = vars[nm]
+                return (
+                  <tr key={nm}>
+                    <td>{nm}</td>
+                    <td className={value != null ? styles.cellHit : styles.cellMuted}>
+                      <span key={String(value ?? '—')} className={styles.fadeIn}>
+                        {value ?? '—'}
+                      </span>
+                    </td>
+                  </tr>
+                )
+              })}
             </tbody>
           </table>
         </div>
-      </View>
-      <div className={styles.ctrl}>
-        <Btn small onClick={() => setK(k + 1)} disabled={k >= n}>
-          次へ ▶
-        </Btn>
-        <Btn small onClick={() => setK(Math.max(0, k - 1))} disabled={k <= 0}>
-          ◀ 1手戻る
-        </Btn>
-        <Btn small onClick={() => setK(n)} disabled={k >= n}>
-          最後まで
-        </Btn>
-        <Btn small onClick={() => setK(0)} disabled={k === 0}>
-          リセット
-        </Btn>
-      </div>
+      </Canvas>
+      <Readout
+        items={[
+          { k: '実行した手数', v: `${step} / ${n}` },
+          { k: '現在の行', v: curDisplayLine >= 0 ? `${curDisplayLine + 1}行目` : '開始前' },
+        ]}
+      />
       {parsed.run.error != null && <Note>エラー: {parsed.run.error.message}</Note>}
       {done && <Note>このプログラムは{n}手で実行が終わった。最後の変数の値が「出力（結果）」になる。</Note>}
-    </FigShell>
+    </FigureFrame>
   )
 }
 
@@ -133,47 +170,54 @@ function DnclStepper({
 const P1_VALUES = [80, 45, 70, 55, 90, 60, 65]
 
 export function ProFig1() {
-  const [k, setK] = useState(0) /* ここまで調べ終えた個数 */
   const max = P1_VALUES.length
+  const player = useStepPlayer(max + 1, 1200)
+  const { step: k } = player
   const taken = P1_VALUES.slice(0, k).filter((v) => v >= 65)
-  const marks: Record<number, string> = {}
-  P1_VALUES.slice(0, k).forEach((v, i) => {
-    if (v >= 65) marks[i] = '取り出した'
+
+  const states = P1_VALUES.map((v, i) => {
+    if (i >= k) return undefined
+    return v >= 65 ? ('ok' as const) : ('muted' as const)
   })
-  if (k < max) marks[k] = '調べている'
+  const marks = P1_VALUES.map((_, i) => (i < k ? '✓' : undefined))
+
   return (
-    <FigShell
+    <FigureFrame
       title="図解: 先頭から1つずつ調べて条件に合うものを取り出す"
       status={
         k === 0
           ? '「次へ」で1つずつ調べる。条件は「65以上」。'
           : k >= max
             ? `7個すべてを調べた。条件に合ったのは ${taken.length}個（${taken.join('・')}）。`
-            : `${k + 1}番目の ${P1_VALUES[k]} を調べた → ${P1_VALUES[k] >= 65 ? '65以上なので取り出す' : '条件外なので取り出さない'}。`
+            : `${k}番目の ${P1_VALUES[k - 1]} を調べた → ${P1_VALUES[k - 1] >= 65 ? '65以上なので取り出す' : '条件外なので取り出さない'}。`
       }
       statusKind={k >= max ? 'ok' : 'plain'}
+      step={k}
+      total={max + 1}
+      playing={player.playing}
+      onPrev={player.prev}
+      onNext={player.next}
+      onReset={player.reset}
+      onPlayToggle={player.toggle}
     >
-      <View label="配列の値を先頭から順に調べる様子">
-        <svg viewBox="0 0 320 88" className={styles.svg}>
-          <GArrayRow x={20} y={14} values={P1_VALUES} cw={42} ch={26} marks={marks} />
-          <text x={20} y={82} fontSize={9.5} fill={MUTED}>
-            取り出した値の並び: {taken.length > 0 ? taken.join(' → ') : '（まだ取り出していない）'}
-          </text>
-        </svg>
-      </View>
-      <div className={styles.ctrl}>
-        <Btn small onClick={() => setK(Math.min(max, k + 1))} disabled={k >= max}>
-          次へ ▶
-        </Btn>
-        <Btn small onClick={() => setK(Math.max(0, k - 1))} disabled={k <= 0}>
-          ◀ 1つ戻る
-        </Btn>
-        <Btn small onClick={() => setK(0)} disabled={k === 0}>
-          リセット
-        </Btn>
-      </div>
+      <Canvas label="配列の値を先頭から順に調べる様子" interactive>
+        <CellTrack
+          values={P1_VALUES}
+          states={states}
+          marks={marks}
+          current={k < max ? k : undefined}
+          ariaLabel="調べる配列。左から順に65以上かを確認する"
+        />
+        <Readout
+          items={[
+            { k: '調べた数', v: `${k} / ${max}` },
+            { k: '取り出した数', v: `${taken.length}個`, strong: taken.length > 0 },
+            { k: '取り出した値', v: taken.length > 0 ? taken.join('・') : 'まだなし' },
+          ]}
+        />
+      </Canvas>
       <Note>先頭から順に、1個ずつ条件（65以上か）を調べ、合うものだけを別の配列へ入れていく。これが「取り出す」手順。</Note>
-    </FigShell>
+    </FigureFrame>
   )
 }
 

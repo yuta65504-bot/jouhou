@@ -5,21 +5,24 @@
 import { useMemo, useState } from 'react'
 import styles from './figures.module.css'
 import { Segmented } from '@/components/Segmented'
+import { useAnimatedNumber, useStepPlayer } from '@/lib/motion'
 import {
   ACCENT,
   BORDER,
-  Calc,
+  Canvas,
+  CellTrack,
   FigShell,
+  FigureFrame,
   MUTED,
   NGINK,
   Note,
   OK,
   OKINK,
+  Readout,
   TINT,
   View,
   Btn,
   Slider,
-  GArrayRow,
   GBox,
   GCircle,
   GArrow,
@@ -30,42 +33,132 @@ import {
 const D1_VALUES = [2, 3, 3, 10]
 
 export function DatFig1() {
-  const [k, setK] = useState(0) /* 0: 並べる → 1: 平均値 → 2: 中央値 */
-  const marks: Record<number, string> = k >= 2 ? { 1: '中央の左', 2: '中央の右' } : {}
+  const player = useStepPlayer(3, 1200)
+  const { step } = player
+  const mean = useAnimatedNumber(step >= 1 ? 4.5 : 0)
+  const median = useAnimatedNumber(step >= 2 ? 3 : 0)
+
+  const x = (v: number) => 30 + v * 22.5
+  const counts = new Map<number, number>()
+  for (const v of D1_VALUES) counts.set(v, (counts.get(v) ?? 0) + 1)
+  const seen = new Map<number, number>()
+  const positions = D1_VALUES.map((v) => {
+    const total = counts.get(v) ?? 1
+    const index = seen.get(v) ?? 0
+    seen.set(v, index + 1)
+    const offset = total > 1 ? (index - (total - 1) / 2) * 14 : 0
+    return { v, cx: x(v) + offset, y: 92 }
+  })
+
   return (
-    <FigShell
+    <FigureFrame
       title="図解: 並べてから、外れ値の影響を見る"
       status={
-        k === 0
-          ? 'データは 2, 3, 3, 10。大きさ順に並べる（このデータはすでに小さい順）。'
-          : k === 1
-            ? '平均値 = (2 + 3 + 3 + 10) ÷ 4 = 18 ÷ 4 = 4.5。'
-            : '中央値 = 中央の2つの値（3と3）の平均 = 3。10があっても中央値は3のまま。'
+        step === 0
+          ? 'データは 2, 3, 3, 10。小さい順に並んでいる。'
+          : step === 1
+            ? '平均値 = (2 + 3 + 3 + 10) ÷ 4 = 18 ÷ 4 = 4.5。10に引っ張られる。'
+            : '中央値 = 真ん中の2つ（3と3）の平均 = 3。10があっても変わらない。'
       }
-      statusKind={k >= 2 ? 'ok' : 'plain'}
+      statusKind={step >= 2 ? 'ok' : 'plain'}
+      step={step}
+      total={3}
+      playing={player.playing}
+      onPrev={player.prev}
+      onNext={player.next}
+      onReset={player.reset}
+      onPlayToggle={player.toggle}
     >
-      <View label="配列の値と、平均・中央値の計算の様子">
-        <svg viewBox="0 0 320 92" className={styles.svg}>
-          <GArrayRow x={20} y={12} values={D1_VALUES} cw={56} ch={26} marks={marks} />
-          <text x={20} y={86} fontSize={9.5} fill={k >= 1 ? OKINK : MUTED} fontWeight={k >= 1 ? 700 : 400}>
-            {k >= 1 ? '平均: 18 ÷ 4 = 4.5　' : ''}
-            {k >= 2 ? '中央値: (3 + 3) ÷ 2 = 3' : ''}
-          </text>
+      <Canvas label="4つの値と、平均値・中央値の位置" interactive>
+        <CellTrack values={D1_VALUES} marks={[undefined, undefined, undefined, '外れ値']} ariaLabel="データの値" />
+        <svg viewBox="0 0 320 132" className={styles.svg}>
+          <line x1={30} y1={108} x2={306} y2={108} stroke={BORDER} />
+          {[0, 4, 8, 12].map((v) => (
+            <g key={v}>
+              <line x1={x(v)} y1={104} x2={x(v)} y2={112} stroke={BORDER} />
+              <text x={x(v)} y={126} fontSize={13} textAnchor="middle" fill={MUTED}>
+                {v}
+              </text>
+            </g>
+          ))}
+
+          {positions.map((p, i) => (
+            <g key={i}>
+              <circle
+                cx={p.cx}
+                cy={p.y}
+                r={6.5}
+                fill={p.v === 10 && step >= 1 ? 'var(--color-warning)' : TINT}
+                stroke={p.v === 10 && step >= 1 ? 'var(--color-warning)' : ACCENT}
+                strokeWidth={2}
+              />
+              <text
+                x={p.cx}
+                y={p.y - 12}
+                fontSize={14}
+                textAnchor="middle"
+                fill={p.v === 10 && step >= 1 ? 'var(--color-warning-ink)' : MUTED}
+                fontWeight={p.v === 10 && step >= 1 ? 700 : 400}
+              >
+                {p.v}
+              </text>
+            </g>
+          ))}
+
+          {step >= 1 && (
+            <g>
+              <line
+                x1={x(4.5)}
+                y1={54}
+                x2={x(4.5)}
+                y2={112}
+                pathLength={1}
+                stroke={ACCENT}
+                strokeWidth={2}
+                strokeDasharray="4 3"
+                className={styles.draw}
+              />
+              <text x={x(4.5) + 6} y={52} fontSize={13} fill={ACCENT} fontWeight={700}>
+                平均
+              </text>
+              <text x={x(4.5) + 6} y={68} fontSize={13} fill={MUTED}>
+                4.5
+              </text>
+            </g>
+          )}
+
+          {step >= 2 && (
+            <g>
+              <path
+                d={`M ${x(3) - 10} 66 L ${x(3) - 10} 58 L ${x(3) + 10} 58 L ${x(3) + 10} 66`}
+                pathLength={1}
+                fill="none"
+                stroke="var(--color-success)"
+                strokeWidth={2}
+                className={styles.draw}
+              />
+              <text x={x(3) - 14} y={50} fontSize={13} textAnchor="end" fill={OKINK} fontWeight={700}>
+                中央値 3
+              </text>
+            </g>
+          )}
+
+          {step >= 1 && (
+            <text x={x(10)} y={56} fontSize={13} textAnchor="middle" fill="var(--color-warning-ink)">
+              外れ値
+            </text>
+          )}
         </svg>
-      </View>
-      <div className={styles.ctrl}>
-        <Btn small onClick={() => setK(Math.min(2, k + 1))} disabled={k >= 2}>
-          次へ ▶
-        </Btn>
-        <Btn small onClick={() => setK(Math.max(0, k - 1))} disabled={k <= 0}>
-          ◀ 戻る
-        </Btn>
-        <Btn small onClick={() => setK(0)} disabled={k === 0}>
-          リセット
-        </Btn>
-      </div>
-      <Note>10という大きな値（外れ値）は平均値を引き上げる（4.5 は 3 より大きい）。中央値は真ん中の値なので影響を受けにくい。</Note>
-    </FigShell>
+        <Readout
+          items={[
+            { k: '平均値', v: step >= 1 ? mean.toFixed(1) : '—', strong: step >= 1 },
+            { k: '中央値', v: step >= 2 ? median.toFixed(0) : '—', strong: step >= 2, ok: step >= 2 },
+            { k: '外れ値', v: '10', ng: step >= 1 },
+          ]}
+        />
+      </Canvas>
+      <Note>10という大きな値（外れ値）は平均値を引き上げる。中央値は並べたときの真ん中なので影響を受けにくい。</Note>
+    </FigureFrame>
   )
 }
 
@@ -270,50 +363,76 @@ export function DatFig5() {
   const rows = D5_SETS.map((set) => ({ ...set, sigma: d5Sigma(set.values) }))
   const s = rows[pick]
   const mean = 70
+  const sigma = useAnimatedNumber(s.sigma)
   return (
-    <FigShell
+    <FigureFrame
       title="図解: 平均からのずれが大きいほど標準偏差は大きい"
-      status={`${s.label}: 平均はどちらも70、標準偏差は σ ≈ ${s.sigma.toFixed(1)}。${pick === 1 ? '後者の方が大きく散らばっている → 標準偏差も大きい。' : '前者は70の周りにまとまっている → 標準偏差は小さい。'}`}
+      status={`${pick === 1 ? '後者' : '前者'}は平均70、σ ≈ ${s.sigma.toFixed(1)}。${pick === 1 ? '後者の方が大きく散らばっている。' : '前者は70の周りにまとまっている。'}`}
     >
-      <Segmented
-        label="どちらのデータを見るか"
-        value={String(pick)}
-        options={rows.map((r, i) => ({ value: String(i), label: r.label }))}
-        onChange={(v) => setPick(Number(v))}
-      />
-      <View label="平均値70からのずれの大きさを棒で見る">
-        <svg viewBox="0 0 320 108" className={styles.svg}>
-          <line x1={20} y1={54} x2={300} y2={54} stroke={BORDER} />
-          <text x={12} y={58} fontSize={8.5} fill={MUTED}>
-            70
+      <div className={styles.controlRow}>
+        <Segmented
+          label="どちらのデータを見るか"
+          value={String(pick)}
+          options={rows.map((r, i) => ({ value: String(i), label: r.label }))}
+          onChange={(v) => setPick(Number(v))}
+        />
+      </div>
+      <Canvas label="平均値70からのずれの大きさを棒で見る" interactive>
+        <svg viewBox="0 0 320 150" className={styles.svg}>
+          <line x1={20} y1={74} x2={302} y2={74} stroke={BORDER} strokeDasharray="4 3" />
+          <text x={160} y={64} fontSize={13} textAnchor="middle" fill={MUTED}>
+            平均 70
           </text>
-          {s.values.map((v, i) => {
-            const d = v - mean
-            const h = Math.abs(d) * 1.8
-            const top = d > 0 ? 54 - h : 54
-            return (
-              <g key={i}>
-                <rect x={54 + i * 44} y={top} width={28} height={Math.max(2, h)} rx={2} fill={d === 0 ? 'var(--color-card)' : TINT} stroke={d === 0 ? BORDER : ACCENT} />
-                <text x={68 + i * 44} y={d > 0 ? top - 4 : top + h + 10} fontSize={9} textAnchor="middle" fill={MUTED}>
-                  {v}
-                </text>
-              </g>
-            )
-          })}
-          <text x={160} y={102} fontSize={9} textAnchor="middle" fill={MUTED}>
-            棒の高さ = 平均70からのずれ。ずれが大きい値が多いほど σ は大きい
+          <g key={pick}>
+            {s.values.map((v, i) => {
+              const d = v - mean
+              const h = Math.abs(d) * 1.7
+              const top = d > 0 ? 74 - h : 74
+              return (
+                <g key={i}>
+                  {d === 0 ? (
+                    <rect x={52 + i * 48} y={70} width={32} height={8} rx={3} fill="var(--color-card)" stroke={BORDER} />
+                  ) : (
+                    <rect
+                      x={52 + i * 48}
+                      y={top}
+                      width={32}
+                      height={Math.max(2, h)}
+                      rx={3}
+                      fill={TINT}
+                      stroke={ACCENT}
+                      className={d > 0 ? styles.barGrow : styles.barGrowDown}
+                      style={{ animationDelay: `${i * 20}ms` }}
+                    />
+                  )}
+                  <text
+                    x={68 + i * 48}
+                    y={d > 0 ? top - 6 : d < 0 ? top + h + 16 : 94}
+                    fontSize={14}
+                    textAnchor="middle"
+                    fill={MUTED}
+                  >
+                    {v}
+                  </text>
+                </g>
+              )
+            })}
+          </g>
+          <text x={160} y={144} fontSize={13} textAnchor="middle" fill={MUTED}>
+            棒の高さ = 平均70からのずれ
           </text>
         </svg>
-      </View>
-      <Calc
-        parts={[
-          { k: '前者 σ', v: `${rows[0].sigma.toFixed(1)}` },
-          { k: '後者 σ', v: `${rows[1].sigma.toFixed(1)}`, strong: true },
-          { k: '平均', v: 'どちらも 70' },
-        ]}
-      />
-      <Note>標準偏差は「平均からのずれの平均的な大きさ」。平均が同じでも散らばりの大きさで決まる。「外れ値が多い＝標準偏差が大きい」ではない。</Note>
-    </FigShell>
+        <Readout
+          items={[
+            { k: '今回の σ', v: sigma.toFixed(1), strong: true },
+            { k: '前者 σ', v: rows[0].sigma.toFixed(1) },
+            { k: '後者 σ', v: rows[1].sigma.toFixed(1) },
+            { k: '平均', v: 'どちらも 70' },
+          ]}
+        />
+      </Canvas>
+      <Note>標準偏差は「平均からのずれの平均的な大きさ」。平均が同じでも散らばりで決まる。「外れ値が多い＝標準偏差が大きい」ではない。</Note>
+    </FigureFrame>
   )
 }
 

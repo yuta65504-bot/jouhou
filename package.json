@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "tsc --noEmit && tsc --noEmit -p functions && vite build",
     "preview": "vite preview",
-    "test": "npm run questions:check && vitest run",
+    "test": "npm run questions:check && npm run check:figures && vitest run",
+    "check:figures": "tsx scripts/check-figures.ts",
     "check:functions": "tsc -p functions/tsconfig.json",
     "questions:build": "tsx scripts/build-questions.ts",
     "questions:check": "tsx scripts/build-questions.ts --check"

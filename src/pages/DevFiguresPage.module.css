@@ -1,0 +1,96 @@
+.page {
+  padding: 16px;
+  max-width: 1180px;
+  margin: 0 auto;
+}
+
+.lead {
+  margin: 0 0 12px;
+  color: var(--color-secondary-label);
+  font-size: 0.8125rem;
+  line-height: 1.65;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.controlLabel {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--color-secondary-label);
+}
+
+.segmented {
+  display: flex;
+  gap: 3px;
+  padding: 3px;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: var(--color-surface);
+}
+
+.segment {
+  min-width: var(--tap-min);
+  min-height: var(--tap-min);
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--color-secondary-label);
+  transition:
+    background var(--motion-fast) var(--ease-standard),
+    color var(--motion-fast) var(--ease-standard);
+}
+
+.segmentOn {
+  background: var(--color-card);
+  color: var(--color-accent);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 8%);
+}
+
+.grid {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.card {
+  width: 100%;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  background: var(--color-card);
+}
+
+.cardHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.id {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  color: var(--color-secondary-label);
+}
+
+.field {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: var(--color-accent);
+}
+
+@media (max-width: 420px) {
+  .page {
+    padding: 12px;
+  }
+}

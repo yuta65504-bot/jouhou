@@ -10,11 +10,13 @@ import {
   BORDER,
   LABEL,
   Calc,
+  Canvas,
   FigShell,
   MUTED,
   NGINK,
   Note,
   OKINK,
+  Readout,
   TINT,
   View,
   Btn,
@@ -38,35 +40,45 @@ export function SocFig1() {
   return (
     <FigShell
       title="図解: タップ領域の広さを変えてみる"
-      status={ok ? '44px以上。指に収まりやすく、誤タップが減る設計。' : '44px未満。指が収まりにくく、誤タップが増えやすい。'}
+      status={ok ? '44px以上。指に収まりやすく、誤タップが減る。' : '44px未満。指が収まりにくく、誤タップが増えやすい。'}
       statusKind={ok ? 'ok' : 'ng'}
     >
-      <View label={`一辺${size}pxのタップ領域を模した図`}>
-        <svg viewBox="0 0 320 150" className={styles.svg}>
+      <Canvas label={`一辺${size}pxのタップ領域を模した図`}>
+        <svg viewBox="0 0 320 148" className={styles.svg}>
           <rect x={40} y={10} width={240} height={104} rx={10} fill="var(--color-card)" stroke={BORDER} />
-          <text x={160} y={32} fontSize={9} textAnchor="middle" fill={MUTED}>
-            スマホの画面（部分）
+          <text x={48} y={108} fontSize={13} fill={MUTED}>
+            画面
           </text>
           <rect
-            x={160 - size / 2}
-            y={62 - size / 2}
-            width={size}
-            height={size}
+            x={116}
+            y={18}
+            width={88}
+            height={88}
             rx={8}
             fill={ok ? ACCENT : 'var(--color-error-tint)'}
             stroke={ok ? ACCENT : 'var(--color-error)'}
             strokeWidth={2}
+            vectorEffect="non-scaling-stroke"
+            style={{
+              transform: `scale(${size / 88})`,
+              transformBox: 'view-box',
+              transformOrigin: '160px 62px',
+              transition: 'transform var(--motion-step) var(--ease-emphasized)',
+            }}
           />
-          <text x={160} y={62} fontSize={Math.min(11, size * 0.3)} textAnchor="middle" fill={ok ? '#fff' : NGINK} fontWeight={700}>
+          <rect x={116} y={18} width={88} height={88} rx={8} fill="none" stroke={BORDER} strokeDasharray="4 3" />
+          <text x={160} y={66} fontSize={14} textAnchor="middle" fill={ok ? '#fff' : NGINK} fontWeight={700}>
             送信
           </text>
-          <line x1={60} y1={130} x2={260} y2={130} stroke={MUTED} strokeWidth={1} strokeDasharray="3 3" />
-          <text x={160} y={144} fontSize={10} textAnchor="middle" fill={MUTED}>
-            ボタンの一辺 {size}px ／ 目安は44px以上
+          <text x={160} y={126} fontSize={13} textAnchor="middle" fill={MUTED}>
+            点線が44pxの目安
+          </text>
+          <text x={160} y={142} fontSize={14} textAnchor="middle" fill={MUTED}>
+            ボタンの一辺 {size}px
           </text>
         </svg>
-      </View>
-      <Slider label="ボタンの一辺 [px]" value={size} min={24} max={88} step={4} onChange={setSize} />
+      </Canvas>
+      <Slider label="ボタンの一辺 [px]" value={size} min={24} max={88} step={4} onChange={setSize} fmt={(v) => `${v}px`} />
       <div className={styles.barRow}>
         <span className={styles.barLabel}>誤タップの目安</span>
         <span className={styles.barTrack}>
@@ -77,7 +89,7 @@ export function SocFig1() {
         </span>
         <span className={styles.barValue}>{ok ? '低い' : '高い'}</span>
       </div>
-      <Note>サイズ以外に「色だけでなく文字・アイコンでも状態を伝える」「端ぎりぎりに置かない」ことも大切。</Note>
+      <Note>色だけでなく、文字・アイコン・配置でも状態を伝える。端ぎりぎりに置かないことも大切。</Note>
     </FigShell>
   )
 }
@@ -135,19 +147,26 @@ export function SocFig3() {
   return (
     <FigShell
       title="図解: 条件を満たしているか順にチェック"
-      status={all ? '3条件かつあてはまる → 引用として認められ得る。' : `まだ満たしていない条件が${3 - n}つある → 引用としては成立しない。`}
+      status={all ? '3条件すべてが当てはまる → 引用として認められ得る。' : `まだ満たしていない条件が${3 - n}つある → 引用としては成立しない。`}
       statusKind={all ? 'ok' : 'ng'}
     >
       <Col>
         {COND3.map((text, i) => (
           <div key={text} className={styles.ctrl}>
-            <Btn on={on[i]} ariaPressed={on[i]} onClick={() => setOn((prev) => prev.map((v, j) => (j === i ? !v : v)))}>
+            <Btn
+              on={on[i]}
+              ariaPressed={on[i]}
+              ariaLabel={`条件「${text}」を${on[i] ? '未確認に戻す' : '確認済みにする'}`}
+              className={on[i] ? styles.pop : undefined}
+              onClick={() => setOn((prev) => prev.map((v, j) => (j === i ? !v : v)))}
+            >
               {on[i] ? '✓' : '✗'}
             </Btn>
-            <span className={styles.status}>{text}</span>
+            <span className={styles.checkLabel}>{text}</span>
           </div>
         ))}
       </Col>
+      <Readout items={[{ k: '満たした条件', v: `${n} / 3`, strong: all, ok: all, ng: !all }]} />
       <div className={styles.barRow}>
         <span className={styles.barLabel}>引用の成立</span>
         <span className={styles.barTrack}>
@@ -155,7 +174,7 @@ export function SocFig3() {
         </span>
         <span className={styles.barValue}>{all ? 'OK' : 'NG'}</span>
       </div>
-      <Note>引用した割合の多寡（「半分以下ならよい」）や順番の入れ替え、著作者名の省略は、どの条件にも含まれない。</Note>
+      <Note>引用した割合の多寡（「半分以下ならよい」）、順番の入れ替え、著作者名の省略は、どの条件にも含まれない。</Note>
     </FigShell>
   )
 }

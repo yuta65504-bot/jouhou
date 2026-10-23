@@ -2,8 +2,10 @@
  * インタラクティブ図解の共通パーツ。
  * - 図は SVG + DOM（Canvas不使用: 仕様の「文字選択・拡大・読み上げに有利」を踏襲）
  * - 操作部品は44px以上、状態は色＋テキスト（アクセシビリティ §は README 参照）
+ * - 解説の動きは「控えめ」: 100〜240ms。reduced motion では即時表示
  */
-import { useId, type FC, type ReactNode } from 'react'
+import { useId, type CSSProperties, type FC, type ReactNode } from 'react'
+import { useReducedMotion } from '@/lib/motion'
 import styles from './figures.module.css'
 
 /* SVG内で使うトークン色（components/Figures.tsx と共通 var(--color-*)） */
@@ -18,37 +20,182 @@ export const NG = 'var(--color-error)'
 export const NGINK = 'var(--color-error-ink)'
 export const WARNINK = 'var(--color-warning-ink)'
 
-/** 解説内の図解コンテナ */
+const cleanTitle = (title: string) => title.replace(/^図解\s*[:：]\s*/, '')
+
+/** 状態テキスト。高さを予約してステップ切替時のガタつきを抑える */
+export const StatusLine: FC<{
+  children: ReactNode
+  kind?: 'ok' | 'ng' | 'plain'
+  live?: boolean
+}> = ({ children, kind = 'plain', live = true }) => (
+  <p
+    className={`${styles.status} ${kind === 'ok' ? styles.statusOk : kind === 'ng' ? styles.statusNg : ''}`}
+    role="status"
+    aria-live={live ? 'polite' : 'off'}
+  >
+    <span key={typeof children === 'string' ? children : undefined} className={styles.fadeIn}>
+      {children}
+    </span>
+  </p>
+)
+
+export type StepControlsProps = {
+  step: number
+  total: number
+  playing?: boolean
+  onPrev: () => void
+  onNext: () => void
+  onReset: () => void
+  onPlayToggle?: () => void
+}
+
+/** 図解のステップ操作。44px以上・キーボード操作可能 */
+export const StepControls: FC<StepControlsProps> = ({
+  step,
+  total,
+  playing = false,
+  onPrev,
+  onNext,
+  onReset,
+  onPlayToggle,
+}) => {
+  const last = total - 1
+  const reduced = useReducedMotion()
+  return (
+    <div className={styles.stepArea}>
+      <div className={styles.stepDots} aria-hidden="true">
+        {Array.from({ length: total }, (_, i) => (
+          <span key={i} className={`${styles.stepDot} ${i <= step ? styles.stepDotOn : ''}`} />
+        ))}
+      </div>
+      <div className={styles.stepBar}>
+        <button type="button" className={styles.btn} onClick={onPrev} disabled={step <= 0}>
+          ← 戻る
+        </button>
+        <button
+          type="button"
+          className={`${styles.btn} ${styles.btnPrimary}`}
+          onClick={onNext}
+          disabled={step >= last}
+        >
+          次へ →
+        </button>
+        {onPlayToggle && !reduced && (
+          <button
+            type="button"
+            className={styles.btn}
+            onClick={onPlayToggle}
+            aria-pressed={playing}
+            disabled={total <= 1}
+          >
+            {playing ? '一時停止' : '再生'}
+          </button>
+        )}
+        <button type="button" className={`${styles.btn} ${styles.btnGhost}`} onClick={onReset} disabled={step <= 0}>
+          最初から
+        </button>
+      </div>
+    </div>
+  )
+}
+
+/** 解説内の図解コンテナ（新API） */
+export const FigureFrame: FC<{
+  title: string
+  children: ReactNode
+  status?: ReactNode
+  statusKind?: 'ok' | 'ng' | 'plain'
+  step?: number
+  total?: number
+  playing?: boolean
+  onPrev?: () => void
+  onNext?: () => void
+  onReset?: () => void
+  onPlayToggle?: () => void
+  className?: string
+}> = ({
+  title,
+  children,
+  status,
+  statusKind = 'plain',
+  step,
+  total,
+  playing,
+  onPrev,
+  onNext,
+  onReset,
+  onPlayToggle,
+  className,
+}) => {
+  const headingId = useId()
+  const hasSteps = total != null && total > 1 && step != null && onPrev && onNext && onReset
+  return (
+    <section className={`${styles.fig} ${className ?? ''}`} aria-labelledby={headingId}>
+      <header className={styles.figHead}>
+        <span className={styles.figBadge} aria-hidden="true">
+          図解
+        </span>
+        <h3 className={styles.figTitle} id={headingId}>
+          {cleanTitle(title)}
+        </h3>
+        {hasSteps && (
+          <span className={styles.stepTotal} aria-label={`全${total}ステップ中${step + 1}番目`}>
+            {step + 1}/{total}
+          </span>
+        )}
+      </header>
+      {children}
+      {status != null && (
+        <StatusLine kind={statusKind} live={!playing}>
+          {status}
+        </StatusLine>
+      )}
+      {hasSteps && (
+        <StepControls
+          step={step}
+          total={total}
+          playing={playing}
+          onPrev={onPrev}
+          onNext={onNext}
+          onReset={onReset}
+          onPlayToggle={onPlayToggle}
+        />
+      )}
+    </section>
+  )
+}
+
+/** 旧API。残り64本の図解を壊さずに新フレームへ載せる */
 export const FigShell: FC<{
   title: string
   children: ReactNode
-  status?: string
+  status?: ReactNode
   statusKind?: 'ok' | 'ng' | 'plain'
 }> = ({ title, children, status, statusKind = 'plain' }) => (
-  <div className={styles.fig}>
-    <span className={styles.figTitle} aria-hidden="true">
-      <svg width={14} height={14} viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth={2}>
-        <path d="M2 2l10 5-10 5" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
-      {title}
-    </span>
+  <FigureFrame title={title} status={status} statusKind={statusKind}>
     {children}
-    {status != null && (
-      <p
-        className={`${styles.status} ${statusKind === 'ok' ? styles.statusOk : statusKind === 'ng' ? styles.statusNg : ''}`}
-        aria-live="polite"
-      >
-        {status}
-      </p>
-    )}
+  </FigureFrame>
+)
+
+/** 図の本体。interactive のときは role=img にせず、中の操作を読み上げ可能にする */
+export const Canvas: FC<{
+  label: string
+  children: ReactNode
+  interactive?: boolean
+  className?: string
+}> = ({ label, children, interactive = false, className }) => (
+  <div
+    className={`${styles.visual} ${interactive ? styles.visualInteractive : ''} ${className ?? ''}`}
+    role={interactive ? 'group' : 'img'}
+    aria-label={label}
+  >
+    {children}
   </div>
 )
 
-/** 図の本体（SVGの幅はビューボックスの高さに合わせる） */
+/** 旧API（静的図向け）。新規は Canvas を使う */
 export const View: FC<{ children: ReactNode; label: string }> = ({ children, label }) => (
-  <div className={styles.visual} role="img" aria-label={label}>
-    {children}
-  </div>
+  <Canvas label={label}>{children}</Canvas>
 )
 
 type BtnProps = {
@@ -59,13 +206,23 @@ type BtnProps = {
   small?: boolean
   ariaPressed?: boolean
   ariaLabel?: string
+  className?: string
 }
 
 /** 図解内の切り替え・実行ボタン（押されたら on で強調） */
-export const Btn: FC<BtnProps> = ({ children, onClick, on = false, disabled = false, small = false, ariaPressed, ariaLabel }) => (
+export const Btn: FC<BtnProps> = ({
+  children,
+  onClick,
+  on = false,
+  disabled = false,
+  small = false,
+  ariaPressed,
+  ariaLabel,
+  className,
+}) => (
   <button
     type="button"
-    className={`${styles.btn} ${on ? styles.btnOn : ''} ${small ? styles.btnSm : ''}`}
+    className={`${styles.btn} ${on ? styles.btnOn : ''} ${small ? styles.btnSm : ''} ${className ?? ''}`}
     onClick={onClick}
     disabled={disabled}
     aria-pressed={ariaPressed}
@@ -90,10 +247,14 @@ export const Slider: FC<{
 }> = ({ label, value, min, max, step = 1, onChange, fmt }) => {
   const id = useId()
   return (
-    <div className={styles.ctrl} style={{ flexDirection: 'column', alignItems: 'stretch', gap: 2 }}>
-      <div className={styles.ctrl} style={{ justifyContent: 'space-between' }}>
-        <span className={styles.status}>{label}</span>
-        <span className={styles.note}>{fmt ? fmt(value) : value}</span>
+    <div className={styles.sliderRow}>
+      <div className={styles.sliderHead}>
+        <label className={styles.sliderLabel} htmlFor={id}>
+          {label}
+        </label>
+        <output className={styles.sliderValue} htmlFor={id}>
+          {fmt ? fmt(value) : value}
+        </output>
       </div>
       <input
         id={id}
@@ -103,25 +264,147 @@ export const Slider: FC<{
         max={max}
         step={step}
         value={value}
+        aria-valuetext={fmt ? fmt(value) : String(value)}
         onChange={(e) => onChange(Number(e.target.value))}
       />
     </div>
   )
 }
 
-/** 数値表示の横並びカード（計算の中間値など。strong で強調、ok/ng で色分け） */
-export const Calc: FC<{ parts: { k: string; v: string; strong?: boolean; ok?: boolean; ng?: boolean }[] }> = ({ parts }) => (
-  <div className={styles.ctrl} style={{ gap: 6, flexWrap: 'wrap' }}>
-    {parts.map((p, i) => (
-      <span
-        key={`${p.k}-${i}`}
-        className={`${styles.btn} ${p.strong ? styles.btnOn : ''}`}
-        style={{ minHeight: 0, padding: '6px 10px', cursor: 'default', color: p.ok ? OKINK : p.ng ? NGINK : undefined }}
-      >
-        <span>{p.k} </span>
-        <b>{p.v}</b>
-      </span>
+export type ReadoutItem = { k: string; v: string; strong?: boolean; ok?: boolean; ng?: boolean }
+
+/** 数値表示（計算の中間値など）。ボタンに見えない読み取り専用のdl */
+export const Readout: FC<{ items: ReadoutItem[] }> = ({ items }) => (
+  <dl className={styles.readout}>
+    {items.map((p, i) => (
+      <div key={`${p.k}-${i}`} className={styles.readoutItem}>
+        <dt className={styles.readoutKey}>{p.k}</dt>
+        <dd
+          className={`${styles.readoutValue} ${p.strong ? styles.readoutStrong : ''} ${p.ok ? styles.readoutOk : p.ng ? styles.readoutNg : ''}`}
+        >
+          {p.v}
+        </dd>
+      </div>
     ))}
+  </dl>
+)
+
+/** 旧API（既存図解との互換） */
+export const Calc: FC<{ parts: ReadoutItem[] }> = ({ parts }) => <Readout items={parts} />
+
+/* ---------- HTMLのセル列（配列・ビット） ---------- */
+
+export type CellState = 'ok' | 'ng' | 'muted'
+
+export const CellTrack: FC<{
+  values: (string | number)[]
+  states?: (CellState | undefined)[]
+  marks?: (string | undefined)[]
+  current?: number
+  pressed?: (boolean | undefined)[]
+  onSelect?: (index: number) => void
+  pulseIndex?: number | null
+  showIndex?: boolean
+  compact?: boolean
+  wrap?: boolean
+  ariaLabel?: string
+}> = ({
+  values,
+  states = [],
+  marks = [],
+  current,
+  pressed,
+  onSelect,
+  pulseIndex = null,
+  showIndex = false,
+  compact = false,
+  wrap = false,
+  ariaLabel,
+}) => (
+  <ul
+    className={styles.cells}
+    style={
+      {
+        gridTemplateColumns: wrap
+          ? 'repeat(auto-fill, minmax(var(--tap-min), 1fr))'
+          : `repeat(${values.length}, minmax(0, 1fr))`,
+      } as CSSProperties
+    }
+    aria-label={ariaLabel}
+  >
+    {values.map((value, i) => {
+      const stateClass =
+        states[i] === 'ok'
+          ? styles.cellOk
+          : states[i] === 'ng'
+            ? styles.cellBad
+            : states[i] === 'muted'
+              ? styles.cellDim
+              : ''
+      const cls = [
+        styles.cell,
+        compact ? styles.cellCompact : '',
+        stateClass,
+        current === i ? styles.cellCurrent : '',
+        pulseIndex === i ? styles.cellPulse : '',
+      ]
+        .filter(Boolean)
+        .join(' ')
+      const stateMark = marks[i]
+      const mark = stateMark ?? (showIndex ? String(i + 1) : undefined)
+      const inner = (
+        <>
+          <span className={styles.cellValue}>{value}</span>
+          {mark && <span className={styles.cellMark}>{mark}</span>}
+        </>
+      )
+      return (
+        <li key={i} className={styles.cellItem}>
+          {onSelect ? (
+            <button
+              type="button"
+              className={cls}
+              onClick={() => onSelect(i)}
+              aria-pressed={pressed ? pressed[i] : undefined}
+              aria-current={current === i ? 'step' : undefined}
+              aria-label={`${i + 1}番目 ${value}${stateMark ? `、${stateMark}` : ''}`}
+            >
+              {inner}
+            </button>
+          ) : (
+            <span className={cls} aria-current={current === i ? 'step' : undefined}>
+              {inner}
+            </span>
+          )}
+        </li>
+      )
+    })}
+  </ul>
+)
+
+/** ビット列。操作可能な場合は1ビットずつフォーカスできるボタンになる */
+export const BitGrid: FC<{
+  bits: (0 | 1)[]
+  label?: string
+  onToggle?: (index: number) => void
+  errorIndex?: number | null
+  pulseIndex?: number | null
+  dim?: boolean
+}> = ({ bits, label, onToggle, errorIndex = null, pulseIndex = null, dim = false }) => (
+  <div className={styles.bitRow}>
+    {label && <span className={styles.cellTag}>{label}</span>}
+    <CellTrack
+      values={bits}
+      compact
+      onSelect={onToggle}
+      pressed={bits.map((b) => b === 1)}
+      states={bits.map((_, i) => (errorIndex === i ? 'ng' : dim ? 'muted' : undefined))}
+      marks={bits.map((_, i) => (errorIndex === i ? '誤' : undefined))}
+      pulseIndex={pulseIndex}
+      wrap
+      showIndex
+      ariaLabel={label ? `${label}のビット列` : 'ビット列'}
+    />
   </div>
 )
 
@@ -143,7 +426,14 @@ export const GBox: FC<{
 }> = ({ x, y, w, h, text, fill = TINT, stroke = ACCENT, ink = LABEL, fs = 11, rx = 6, bold = false }) => (
   <g>
     <rect x={x} y={y} width={w} height={h} rx={rx} fill={fill} stroke={stroke} />
-    <text x={x + w / 2} y={y + h / 2 + fs * 0.36} fontSize={fs} textAnchor="middle" fill={ink} fontWeight={bold ? 700 : 400}>
+    <text
+      x={x + w / 2}
+      y={y + h / 2 + fs * 0.36}
+      fontSize={fs}
+      textAnchor="middle"
+      fill={ink}
+      fontWeight={bold ? 700 : 400}
+    >
       {text}
     </text>
   </g>
@@ -178,24 +468,47 @@ export const GArrow: FC<{ x1: number; y1: number; x2: number; y2: number; stroke
 }
 
 /** 二値グリッドの1セル（ビット演算・パリティなど） */
-export const GBit: FC<{ x: number; y: number; v: 0 | 1; size?: number; dim?: boolean }> = ({ x, y, v, size = 18, dim = false }) => (
+export const GBit: FC<{ x: number; y: number; v: 0 | 1; size?: number; dim?: boolean }> = ({
+  x,
+  y,
+  v,
+  size = 18,
+  dim = false,
+}) => (
   <g>
-    <rect x={x} y={y} width={size} height={size} rx={3} fill={v ? ACCENT : TINT} stroke={BORDER} opacity={dim ? 0.45 : 1} />
-    <text x={x + size / 2} y={y + size * 0.72} fontSize={10} textAnchor="middle" fill={v ? '#fff' : LABEL} opacity={dim ? 0.45 : 1} fontWeight={700}>
+    <rect
+      x={x}
+      y={y}
+      width={size}
+      height={size}
+      rx={3}
+      fill={v ? ACCENT : TINT}
+      stroke={BORDER}
+      opacity={dim ? 0.45 : 1}
+    />
+    <text
+      x={x + size / 2}
+      y={y + size * 0.72}
+      fontSize={10}
+      textAnchor="middle"
+      fill={v ? '#fff' : LABEL}
+      opacity={dim ? 0.45 : 1}
+      fontWeight={700}
+    >
       {v}
     </text>
   </g>
 )
 
 /** ビット列の行ラベル＋セル群。tag は左ラベル */
-export const GBitRow: FC<{ x: number; y: number; bits: (0 | 1)[]; tag?: string; cell?: number; dim?: boolean }> = ({
-  x,
-  y,
-  bits,
-  tag,
-  cell = 18,
-  dim = false,
-}) => (
+export const GBitRow: FC<{
+  x: number
+  y: number
+  bits: (0 | 1)[]
+  tag?: string
+  cell?: number
+  dim?: boolean
+}> = ({ x, y, bits, tag, cell = 18, dim = false }) => (
   <g>
     {tag && (
       <text x={x - 6} y={y + cell * 0.72} fontSize={10} textAnchor="end" fill={MUTED}>
@@ -219,14 +532,14 @@ export const GBar: FC<{ x: number; y: number; w: number; h: number; fill?: strin
 }) => <rect x={x} y={y} width={w} height={Math.max(0, h)} rx={3} fill={fill} stroke={stroke} />
 
 /** 横方向の要素列（配列セル）＋添字行 */
-export const GArrayRow: FC<{ x: number; y: number; values: (string | number)[]; cw?: number; ch?: number; marks?: Record<number, string> }> = ({
-  x,
-  y,
-  values,
-  cw = 34,
-  ch = 26,
-  marks = {},
-}) => (
+export const GArrayRow: FC<{
+  x: number
+  y: number
+  values: (string | number)[]
+  cw?: number
+  ch?: number
+  marks?: Record<number, string>
+}> = ({ x, y, values, cw = 34, ch = 26, marks = {} }) => (
   <g>
     {values.map((v, i) => (
       <g key={i}>
@@ -240,10 +553,23 @@ export const GArrayRow: FC<{ x: number; y: number; values: (string | number)[]; 
           stroke={marks[i] ? ACCENT : BORDER}
           strokeWidth={marks[i] ? 2 : 1}
         />
-        <text x={x + i * cw + (cw - 2) / 2} y={y + ch * 0.66} fontSize={11} textAnchor="middle" fill={LABEL} fontWeight={marks[i] ? 700 : 400}>
+        <text
+          x={x + i * cw + (cw - 2) / 2}
+          y={y + ch * 0.66}
+          fontSize={11}
+          textAnchor="middle"
+          fill={LABEL}
+          fontWeight={marks[i] ? 700 : 400}
+        >
           {v}
         </text>
-        <text x={x + i * cw + (cw - 2) / 2} y={y + ch + 12} fontSize={9} textAnchor="middle" fill={MUTED}>
+        <text
+          x={x + i * cw + (cw - 2) / 2}
+          y={y + ch + 12}
+          fontSize={9}
+          textAnchor="middle"
+          fill={MUTED}
+        >
           {marks[i] ?? i + 1}
         </text>
       </g>
@@ -252,7 +578,13 @@ export const GArrayRow: FC<{ x: number; y: number; values: (string | number)[]; 
 )
 
 /** 決定のひし形（条件） */
-export const GDiamond: FC<{ cx: number; cy: number; w: number; h: number; text: string }> = ({ cx, cy, w, h, text }) => (
+export const GDiamond: FC<{ cx: number; cy: number; w: number; h: number; text: string }> = ({
+  cx,
+  cy,
+  w,
+  h,
+  text,
+}) => (
   <g>
     <path
       d={`M ${cx} ${cy - h / 2} L ${cx + w / 2} ${cy} L ${cx} ${cy + h / 2} L ${cx - w / 2} ${cy} Z`}
@@ -266,15 +598,15 @@ export const GDiamond: FC<{ cx: number; cy: number; w: number; h: number; text: 
 )
 
 /** 円＋中身テキスト（プロトコル・装置など） */
-export const GCircle: FC<{ cx: number; cy: number; r: number; text: string; fill?: string; ink?: string; fs?: number }> = ({
-  cx,
-  cy,
-  r,
-  text,
-  fill = ACCENT,
-  ink = '#fff',
-  fs = 10,
-}) => (
+export const GCircle: FC<{
+  cx: number
+  cy: number
+  r: number
+  text: string
+  fill?: string
+  ink?: string
+  fs?: number
+}> = ({ cx, cy, r, text, fill = ACCENT, ink = '#fff', fs = 10 }) => (
   <g>
     <circle cx={cx} cy={cy} r={r} fill={fill} />
     <text x={cx} y={cy + fs * 0.36} fontSize={fs} textAnchor="middle" fill={ink} fontWeight={700}>

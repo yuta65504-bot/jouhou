@@ -52,6 +52,20 @@
   --tabbar-h: 54px;
   --radius-card: 12px;
   --radius-chip: 999px;
+
+  /* モーション: 解説図解は「控えめ」。300msを超えない */
+  --motion-fast: 100ms;
+  --motion-base: 180ms;
+  --motion-step: 220ms;
+  --motion-draw: 240ms;
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-emphasized: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  /* 図解内の文字サイズ（SVGのviewBox単位。375px端末で12px以上を目標） */
+  --fig-font-note: 11px;
+  --fig-font-label: 13px;
+  --fig-font-value: 16px;
+  --fig-font-title: 15px;
 }
 
 /* システム設定のダークモード（明示的にライト指定されていない場合） */

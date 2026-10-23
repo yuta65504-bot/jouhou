@@ -4,6 +4,7 @@ import { TopAppBar } from '@/components/TopAppBar'
 import { CheckIcon, CrossIcon, CircleIcon, StarIcon, FlagIcon } from '@/components/Icons'
 import { ReportDialog } from '@/components/ReportDialog'
 import { FIELDS } from '@/lib/fields'
+import { useReducedMotion } from '@/lib/motion'
 import { nextQuestionId } from '@/lib/nextQuestion'
 import { useStore } from '@/lib/store'
 import { questionById } from '@/content/questions'
@@ -31,7 +32,10 @@ export default function QuizQuestionPage() {
   const [result, setResult] = useState<boolean | null>(null)
   const [showExp, setShowExp] = useState(false)
   const [reportOpen, setReportOpen] = useState(false)
-  const expRef = useRef<HTMLDivElement>(null)
+  const expRef = useRef<HTMLElement>(null)
+  const feedbackRef = useRef<HTMLDivElement>(null)
+  const expBtnRef = useRef<HTMLButtonElement>(null)
+  const reduceMotion = useReducedMotion()
 
   /* 「すぐに次の問題を解く」で同じ画面コンポーネントのまま問題を切り替えるので、
      選択・結果・解説・報告フォームを初期化し、ページ先頭へ戻す */
@@ -43,11 +47,17 @@ export default function QuizQuestionPage() {
     window.scrollTo(0, 0)
   }, [id])
 
+  /* 回答後はフィードバックへフォーカスを移し、読み上げとキーボード操作の起点にする */
+  useEffect(() => {
+    if (result != null) feedbackRef.current?.focus({ preventScroll: true })
+  }, [result])
+
   if (!q) return <Navigate to="/quiz" replace />
 
   const field = FIELDS.find((f) => f.id === q.fieldId)!
   const isLater = later.includes(q.id)
   const answered = result != null
+  const expId = `exp-${q.id}`
 
   /* 前回の結果（Storeに記録されている最新の解答）を表示用に取得 */
   const prevAttempt = [...store.attempts].reverse().find((a) => a.questionId === q.id)
@@ -66,9 +76,13 @@ export default function QuizQuestionPage() {
   }
   const showExplanation = () => {
     setShowExp(true)
-    requestAnimationFrame(() => scrollToRef(expRef.current))
+    /* パネルの展開（220ms）と図解の読み込み後に位置を合わせる */
+    window.setTimeout(() => scrollToRef(expRef.current), reduceMotion ? 0 : 240)
   }
-  const hideExplanation = () => setShowExp(false)
+  const hideExplanation = () => {
+    setShowExp(false)
+    requestAnimationFrame(() => expBtnRef.current?.focus({ preventScroll: true }))
+  }
 
   /* 「すぐに次の問題を解く」用: コンテンツ登録順の次の問題（最後の次は先頭に戻る） */
   const nextId = nextQuestionId(q.id)
@@ -137,9 +151,18 @@ export default function QuizQuestionPage() {
                 type="button"
                 role="radio"
                 aria-checked={isSelected}
-                disabled={answered}
+                aria-disabled={answered}
+                aria-label={
+                  answered && isAnswer
+                    ? `${choice}（正解）`
+                    : answered && isSelected
+                      ? `${choice}（不正解の解答）`
+                      : undefined
+                }
                 className={cls}
-                onClick={() => setSelected(i)}
+                onClick={() => {
+                  if (!answered) setSelected(i)
+                }}
               >
                 <span className={s.choiceMark} aria-hidden="true">
                   {answered && isAnswer ? (
@@ -158,7 +181,12 @@ export default function QuizQuestionPage() {
 
         {/* 正誤フィードバック（色＋アイコン＋テキスト） */}
         {answered && (
-          <div className={`${s.feedback} ${result ? s.feedbackOk : s.feedbackNg}`} aria-live="polite">
+          <div
+            ref={feedbackRef}
+            className={`${s.feedback} ${result ? s.feedbackOk : s.feedbackNg}`}
+            role="status"
+            tabIndex={-1}
+          >
             <span className={s.feedbackIcon} aria-hidden="true">
               {result ? <CheckIcon size={22} /> : <CrossIcon size={22} />}
             </span>
@@ -167,23 +195,39 @@ export default function QuizQuestionPage() {
         )}
 
         {/* 解説（「解説を見る」で開く）: 問題ごとのインタラクティブ図解つき */}
-        {answered && showExp && (
-          <section ref={expRef} className={`${ui.card} ${ui.cardPad}`} aria-label="解説">
-            <h2 className={ui.sectionTitle}>解説</h2>
-            {q.explanation
-              .split(/\n{2,}/)
-              .filter((para) => para.trim())
-              .map((para, i) => (
-                <p key={i} className={s.expPara}>
-                  {para}
-                </p>
-              ))}
-            <div className={s.figure}>
-              <Suspense fallback={<p className={s.expPara}>図解を準備中…</p>}>
-                <QuestionFigure id={q.id} />
-              </Suspense>
+        {answered && (
+          <section
+            ref={expRef}
+            id={expId}
+            className={`${ui.card} ${s.exp} ${showExp ? s.expOpen : ''}`}
+            aria-label="解説"
+            aria-hidden={!showExp}
+          >
+            <div className={s.expInner}>
+              <h2 className={ui.sectionTitle}>解説</h2>
+              {q.explanation
+                .split(/\n{2,}/)
+                .filter((para) => para.trim())
+                .map((para, i) => (
+                  <p key={i} className={s.expPara}>
+                    {para}
+                  </p>
+                ))}
+              {showExp && (
+                <div className={s.figure}>
+                  <Suspense
+                    fallback={
+                      <div className={s.figSkeleton} role="status">
+                        図解を準備中…
+                      </div>
+                    }
+                  >
+                    <QuestionFigure id={q.id} />
+                  </Suspense>
+                </div>
+              )}
+              {q.source && <p className={s.source}>出典: {q.source}</p>}
             </div>
-            {q.source && <p className={s.source}>出典: {q.source}</p>}
           </section>
         )}
 
@@ -207,8 +251,11 @@ export default function QuizQuestionPage() {
                 {nextId ? 'すぐに次の問題を解く' : '問題一覧へ'}
               </Link>
               <button
+                ref={expBtnRef}
                 type="button"
                 className={`${ui.subtleBtn} ${ui.fullWidth}`}
+                aria-expanded={showExp}
+                aria-controls={expId}
                 onClick={showExp ? hideExplanation : showExplanation}
               >
                 {showExp ? '解説を隠す' : '解説を見る'}
