@@ -361,7 +361,13 @@ function* exec(stmts: readonly Stmt[], vars: Vars): Generator<number, void, unkn
         yield st.line
         for (let v = from; v <= to; v++) {
           vars[st.varName] = v
-          yield* exec(st.body, vars)
+          if (st.body.length === 0) {
+            // 本体が空でも1反復ごとに yield し、巨大な回数のときに
+            // 呼び出し側（computeRun のステップ上限）で必ず止まるようにする
+            yield st.line
+          } else {
+            yield* exec(st.body, vars)
+          }
         }
         break
       }

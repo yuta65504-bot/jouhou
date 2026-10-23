@@ -37,7 +37,8 @@ npx wrangler d1 execute jouhou-reports --remote --file=d1/schema.sql  # reports 
 そのうえで、Cloudflare Pages プロジェクトの設定で以下を行います（`functions/` は自動検出されます）。
 
 - **D1 バインディング** `DB` → 上で作成したデータベース（設定 → Functions → D1 バインド）
-- **Secrets** `HCAPTCHA_SECRET`（hCaptcha のシークレットキー）と `ADMIN_TOKEN`（管理者ページ用トークン）。ダッシュボードまたは `npx wrangler pages secret put HCAPTCHA_SECRET` で設定
+- **Secrets** `HCAPTCHA_SECRET`（hCaptcha のシークレットキー）と `ADMIN_TOKEN`（管理者ページ用トークン。32文字以上のランダム値）。ダッシュボードまたは `npx wrangler pages secret put HCAPTCHA_SECRET` で設定
+- **任意の Secrets** `HCAPTCHA_HOSTNAME`（本番ドメイン。設定すると siteverify の hostname も検証し、他ドメインで発行されたトークンを拒否する）
 - **ビルド変数** `VITE_HCAPTCHA_SITEKEY`（hCaptcha のサイトキー。公開情報）。未設定でもサイトは動作し、報告フォームは「送信できない」旨を表示する
 
 ローカルでの動作確認は Vite 単体（`npm run dev`）では `/api` が動かないため、ビルド結果に対して Wrangler を使います。
@@ -49,7 +50,7 @@ npx wrangler pages dev dist                                    # Functions + 静
 
 - Function 側のシークレットは `.dev.vars` に書く（`.dev.vars.example` 参照・Gitにコミットしない）
 - `public/_routes.json` により Functions の起動範囲を `/api/*` に限定している（静的ページのリクエストでFunctionsを消費しない）
-- 管理者ページは `/admin` をURL直打ちで開き、`ADMIN_TOKEN` と一致するトークンを入力すると報告一覧を取得・更新できる。トークン値のみ端末の localStorage に保存する（報告データ自体はD1のみ）
+- 管理者ページは `/admin` をURL直打ちで開き、`ADMIN_TOKEN` と一致するトークンを入力すると報告一覧を取得・更新できる。トークン値は端末の sessionStorage に保存する（タブを閉じると消える。報告データ自体はD1のみ）
 
 ## ディレクトリ構成
 
@@ -80,10 +81,11 @@ src/
 functions/
   api/reports.ts  報告API（hCaptcha検証・D1への保存、一覧取得・ステータス更新）
   api/reports/[id].ts  報告1件の status 更新（PATCH）
-  api/_lib.ts     報告API共通（認証・CAPTCHA検証、共通型/ガードの再エクスポート）
+  api/_lib.ts     報告API共通（認証・CAPTCHA検証・レート制限、共通型/ガードの再エクスポート）
 scripts/
   build-questions.ts  question.md → src/content/questions.ts の生成/一致確認
 d1/schema.sql      報告テーブル（reports）のDDL
+public/_headers    セキュリティヘッダ（CSP など。Cloudflare Pages が dist/ 直下へ反映）
 question.md        問題の一次ソース（問題バンク。下記「問題バンクの編集」参照）
 ```
 
@@ -138,6 +140,16 @@ question.md        問題の一次ソース（問題バンク。下記「問題�
 - `reports` テーブル: `id`（UUID）、`questionId`、`category`（D1には英文キー `typo` / `answer` / `layout` / `other` で保存し、UIでは「誤字・脱字／解答・解説の誤り／表示崩れ／その他」の日本語ラベルで表示する）、`message`、`status`（`open` / `resolved`）、`createdAt`
 - 管理者ページ（`/admin`）は `GET /api/reports`（管理トークン `ADMIN_TOKEN` を Secrets で管理し、Bearer 認証で要求する）で報告一覧を取得し、問題・解答と並べて表示する。対応済みの報告は `PATCH /api/reports/:id` で `status` を `resolved` に更新する
 - 報告は localStorage には保存せず、D1 のみに保存する
+
+## セキュリティ
+
+- **セキュリティヘッダ**: `public/_headers` で CSP（`script-src`/`frame-src` は hCaptcha のみ許可）・`X-Content-Type-Options`・`X-Frame-Options`・`Referrer-Policy`・`Permissions-Policy` を付与する
+- **管理APIの保護**: `ADMIN_TOKEN` は 32文字以上のランダム値を Secrets に設定する。照合は内容によらず一定回数比較する（早期リターンしない）。`GET/PATCH /api/reports` は同一IPあたり1分30回、`POST /api/reports` は10分10回に制限する
+  - レート制限は Workers isolate 内のメモリで保持するベストエフォート実装（isolate 入れ替わりでリセットされる）。大規模な攻撃が想定される場合は Cloudflare WAF のレート制限ルールを併用する
+- **CAPTCHA**: `POST /api/reports` は siteverify 成功時のみ保存する。`HCAPTCHA_HOSTNAME` を設定すると hostname も検証する
+- **保存するのはトークンではなくセッション**: 管理トークンは sessionStorage に保存し、旧バージョンが localStorage に残した値を起動時に削除する
+- **インジェクション対策**: D1 へのアクセスはすべてプレースホルダ束縛、UI は React のエスケープに依存（`dangerouslySetInnerHTML` は不使用）、`question.md` からのコード生成は `\`・`'`・改行・CR・U+2028/2029 をエスケープする
+- **依存関係**: 実行時依存は `npm audit --omit=dev` で 0 件。開発用ツール（vitest/vite 系）の指摘はビルド成果物には含まれない
 
 ## アクセシビリティ
 

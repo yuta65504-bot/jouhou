@@ -5,12 +5,25 @@
  *
  * error メッセージは src/lib/report.ts の errorMessage() を経由してUIにそのまま表示されるため日本語で書く。
  */
-import { isAuthorizedAdmin, isCategory, json, verifyCaptcha, type Env } from './_lib'
+import {
+  clientKey,
+  isAuthorizedAdmin,
+  isCategory,
+  json,
+  rateLimit,
+  tooMany,
+  verifyCaptcha,
+  type Env,
+} from './_lib'
 import type { Report } from '../../src/lib/report'
 
 type Ctx = { request: Request; env: Env }
 
 export const onRequestPost = async (ctx: Ctx): Promise<Response> => {
+  // 同一IPからの連投を抑制（CAPTCHA と併用。10分あたり10件まで）
+  const limit = rateLimit(clientKey(ctx.request, 'reports:create'), 10, 10 * 60_000)
+  if (!limit.ok) return tooMany(limit.retryAfter)
+
   if (!ctx.env.DB) return json({ error: 'サーバー側の設定が完了していません（D1バインディング）。' }, 500)
   const secret = ctx.env.HCAPTCHA_SECRET
   if (!secret) return json({ error: 'サーバー側の設定が完了していません（hCaptchaシークレット）。' }, 500)
@@ -41,7 +54,12 @@ export const onRequestPost = async (ctx: Ctx): Promise<Response> => {
     return json({ error: 'CAPTCHAを確認してください。' }, 400)
   }
 
-  const ok = await verifyCaptcha(captchaToken, secret, ctx.request.headers.get('CF-Connecting-IP'))
+  const ok = await verifyCaptcha(
+    captchaToken,
+    secret,
+    ctx.request.headers.get('CF-Connecting-IP'),
+    ctx.env.HCAPTCHA_HOSTNAME,
+  )
   if (!ok) {
     return json({ error: 'CAPTCHAの確認ができませんでした。もう一度お試しください。' }, 403)
   }
@@ -67,6 +85,10 @@ export const onRequestPost = async (ctx: Ctx): Promise<Response> => {
 }
 
 export const onRequestGet = async (ctx: Ctx): Promise<Response> => {
+  // 管理トークンの総当たり対策（1分あたり30回まで）
+  const limit = rateLimit(clientKey(ctx.request, 'reports:list'), 30, 60_000)
+  if (!limit.ok) return tooMany(limit.retryAfter)
+
   if (!ctx.env.DB) return json({ error: 'サーバー側の設定が完了していません（D1バインディング）。' }, 500)
   if (!isAuthorizedAdmin(ctx.request.headers, ctx.env)) {
     return json({ error: 'トークンが正しくありません。' }, 401)

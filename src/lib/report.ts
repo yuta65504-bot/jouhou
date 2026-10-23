@@ -87,27 +87,42 @@ export async function submitReport(input: {
 
 const ADMIN_TOKEN_KEY = 'jouhou.adminToken.v1'
 
+type AdminStorage = {
+  getItem(key: string): string | null
+  setItem(key: string, value: string): void
+  removeItem(key: string): void
+}
+
 /**
- * localStorage に相当する保存先。Workers環境（Functionsからこのモジュールを読む場合）には
- * localStorage が無いため、globalThis を介して存在チェックする（無ければ毎回入力で運用される）。
+ * 管理トークンの保存先。XSS 等でトークンを長期間奪われないよう localStorage ではなく
+ * sessionStorage（タブを閉じると消える）を使う。Workers環境（Functionsからこのモジュールを
+ * 読む場合）には sessionStorage が無いため、globalThis を介して存在チェックする。
  */
-function adminStorage(): { getItem(key: string): string | null; setItem(key: string, value: string): void } | undefined {
+function adminStorage(): AdminStorage | undefined {
   try {
-    const g = globalThis as {
-      localStorage?: { getItem(key: string): string | null; setItem(key: string, value: string): void }
-    }
-    return g.localStorage
+    return (globalThis as { sessionStorage?: AdminStorage }).sessionStorage
   } catch {
     return undefined
   }
 }
 
+/** 旧バージョンが localStorage に保存したトークンを残さない */
+function removeLegacyToken(): void {
+  try {
+    ;(globalThis as { localStorage?: AdminStorage }).localStorage?.removeItem(ADMIN_TOKEN_KEY)
+  } catch {
+    /* 参照できない環境では何もしない */
+  }
+}
+
 export function loadAdminToken(): string {
+  removeLegacyToken()
   return adminStorage()?.getItem(ADMIN_TOKEN_KEY) ?? ''
 }
 
 export function saveAdminToken(token: string): void {
-  adminStorage()?.setItem(ADMIN_TOKEN_KEY, token)
+  removeLegacyToken()
+  if (token) adminStorage()?.setItem(ADMIN_TOKEN_KEY, token)
 }
 
 /** GET /api/reports（Bearer 認証）で報告一覧を取得する */

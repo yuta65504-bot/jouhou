@@ -90,6 +90,19 @@ describe('dncl engine', () => {
     expect(r.snapshots.length).toBe(100)
   })
 
+  it('本体が空の繰り返しでもステップ上限で必ず止まる（巨大回数でも固まらない）', () => {
+    const program = parseProgram([
+      'n ← 1',
+      'i を 1 から 1000000000 まで 増やしながら 繰り返す:',
+      '繰り返しここまで',
+      'n ← 2',
+    ])
+    const r = computeRun(program, 10)
+    expect(r.done).toBe(false)
+    expect(r.error).toBeNull()
+    expect(r.snapshots.length).toBe(10)
+  })
+
   it('1手戻る: N手目とN-1手目でスナップショットが連続する', () => {
     const lines = byId('sum').lines
     const r5 = computeRun(parseProgram(lines), 5)

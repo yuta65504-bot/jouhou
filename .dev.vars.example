@@ -2,6 +2,9 @@
 # 実ファイルは .dev.vars（Gitにコミットしない）
 HCAPTCHA_SECRET=0x<hCaptchaのシークレットキー>
 ADMIN_TOKEN=<管理ページで使う管理トークン>
+# 任意: siteverify の hostname 検証（カンマ区切りで複数可）。本番ドメインを設定すると、
+# 他ドメインで発行された hCaptcha トークンを拒否できる。
+# HCAPTCHA_HOSTNAME=jouhou.example.com
 # クライアントの hCaptcha サイトキー（公開情報）はビルド変数。
 # Function ではなく Vite のビルドに渡すので .env.local に設定する:
 #   VITE_HCAPTCHA_SITEKEY=0x<hCaptchaのサイトキー>
