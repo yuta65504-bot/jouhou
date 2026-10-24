@@ -83,6 +83,7 @@
   justify-content: center;
   gap: 4px;
   text-align: center;
+  word-break: auto-phrase;
   transition: background 0.15s ease, color 0.15s ease;
 }
 

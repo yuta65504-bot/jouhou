@@ -183,16 +183,16 @@ export function SocFig3() {
 
 const IP_ROWS = [
   [
-    { k: '発生', t: '出願・審査を経て成立' },
-    { k: '公開', t: '内容を公開する（独占と交換）' },
-    { k: '独占', t: '一定期間だけ独占できる' },
-    { k: '他社', t: '許諾を受ければ製作できる → 普及が進む' },
+    { k: '発生', lines: ['出願・審査を経て成立'] },
+    { k: '公開', lines: ['内容を公開する（独占と交換）'] },
+    { k: '独占', lines: ['一定期間だけ独占できる'] },
+    { k: '他社', lines: ['許諾を受ければ製作できる', '→ 普及が進む'] },
   ],
   [
-    { k: '発生', t: '創作した時点で自動的に発生' },
-    { k: '公開', t: '公開する義務はない' },
-    { k: '独占', t: '保護期間の間、保護される' },
-    { k: '他社', t: '権利者の許諾がないと使えない（引用などの例外を除く）' },
+    { k: '発生', lines: ['創作した時点で自動的に発生'] },
+    { k: '公開', lines: ['公開する義務はない'] },
+    { k: '独占', lines: ['保護期間の間、保護される'] },
+    { k: '他社', lines: ['権利者の許諾がないと使えない', '（引用などの例外を除く）'] },
   ],
 ] as const
 
@@ -214,22 +214,29 @@ export function SocFig4() {
         onChange={setKind}
       />
       <View label="それぞれの権利の特徴の対照表">
-        <svg viewBox="0 0 320 150" className={styles.svg}>
-          <rect x={8} y={8} width={304} height={134} rx={10} fill="var(--color-card)" stroke={BORDER} />
-          {rows.map((r, i) => (
-            <g key={r.k}>
-              <GBox x={22} y={14 + i * 30} w={58} h={24} text={r.k} fs={10} fill={TINT} stroke={ACCENT} />
-              <text
-                x={92}
-                y={14 + i * 30 + 16}
-                fontSize={9.5}
-                fill={i === 1 ? ACCENT : MUTED}
-                fontWeight={i === 1 ? 700 : 400}
-              >
-                {r.t}
-              </text>
-            </g>
-          ))}
+        <svg viewBox="0 0 320 158" className={styles.svg}>
+          <rect x={8} y={8} width={304} height={142} rx={10} fill="var(--color-card)" stroke={BORDER} />
+          {rows.map((r, i) => {
+            const rowY = 14 + i * 32
+            const baseY = rowY + 16
+            return (
+              <g key={r.k}>
+                <GBox x={22} y={rowY} w={58} h={24} text={r.k} fill={TINT} stroke={ACCENT} />
+                {r.lines.map((line, j) => (
+                  <text
+                    key={line}
+                    x={92}
+                    y={r.lines.length === 1 ? baseY : baseY - 7 + j * 14}
+                    fontSize={11}
+                    fill={i === 1 ? ACCENT : MUTED}
+                    fontWeight={i === 1 ? 700 : 400}
+                  >
+                    {line}
+                  </text>
+                ))}
+              </g>
+            )
+          })}
         </svg>
       </View>
       <Note>「初めて作れば独占」「政府の補助金」「秘密のまま独占」は、どれも「公開と交換の取引」の考え方に合わない。</Note>
@@ -256,7 +263,7 @@ export function SocFig5() {
       </div>
       <View label={`©表示${mark ? 'あり' : 'なし'}の作品と、創作から${year}年経過した時点の保護状態`}>
         <svg viewBox="0 0 320 128" className={styles.svg}>
-          <GBox x={16} y={10} w={110} h={30} text={mark ? '© 表示ありの作品' : '© 表示なしの作品'} fs={9} fill={TINT} />
+          <GBox x={16} y={10} w={110} h={30} text={mark ? '© 表示ありの作品' : '© 表示なしの作品'} fill={TINT} />
           <path d="M 126 25 L 158 25" stroke={MUTED} />
           <rect
             x={162}
@@ -267,20 +274,20 @@ export function SocFig5() {
             fill={inTerm ? 'var(--color-success-tint)' : 'var(--color-warning-tint)'}
             stroke={inTerm ? 'var(--color-success)' : 'var(--color-warning)'}
           />
-          <text x={233} y={30} fontSize={9.5} textAnchor="middle" fill={inTerm ? OKINK : 'var(--color-warning-ink)'} fontWeight={700}>
+          <text x={233} y={30} fontSize={11} textAnchor="middle" fill={inTerm ? OKINK : 'var(--color-warning-ink)'} fontWeight={700}>
             {inTerm ? '著作権の保護対象' : 'パブリックドメイン'}
           </text>
           <line x1={20} y1={92} x2={300} y2={92} stroke={BORDER} />
           <circle cx={40} cy={92} r={6} fill={ACCENT} />
-          <text x={40} y={112} fontSize={9} textAnchor="middle" fill={MUTED}>
+          <text x={40} y={112} fontSize={11} textAnchor="middle" fill={MUTED}>
             創作時点
           </text>
           <line x1={40} y1={92} x2={268} y2={92} stroke={ACCENT} strokeWidth={3} />
-          <text x={154} y={80} fontSize={10} textAnchor="middle" fill={OKINK} fontWeight={700}>
+          <text x={154} y={80} fontSize={11} textAnchor="middle" fill={OKINK} fontWeight={700}>
             自動的に保護が続く
           </text>
           <circle cx={272} cy={92} r={6} fill={MUTED} />
-          <text x={272} y={112} fontSize={9} textAnchor="middle" fill={MUTED}>
+          <text x={272} y={112} fontSize={11} textAnchor="middle" fill={MUTED}>
             保護期間の終了
           </text>
           <line x1={40 + (228 * year) / 80} y1={84} x2={40 + (228 * year) / 80} y2={100} stroke={year < 70 ? 'var(--color-success)' : 'var(--color-warning)'} strokeWidth={2} />
@@ -320,15 +327,15 @@ export function SocFig6() {
           <rect x={22} y={12} width={96} height={76} rx={8} fill={TINT} stroke={BORDER} />
           <circle cx={70} cy={38} r={12} fill="var(--color-card)" stroke={MUTED} />
           <path d="M 52 70 q 18 -18 36 0" stroke={MUTED} fill="none" />
-          <text x={70} y={100} fontSize={9} textAnchor="middle" fill={MUTED}>
+          <text x={70} y={100} fontSize={11} textAnchor="middle" fill={MUTED}>
             本人の写真・名前
           </text>
           <path d="M 120 50 L 152 50" stroke={MUTED} />
-          <GBox x={154} y={36} w={120} h={28} text="無断で投稿" fs={10} fill="var(--color-error-tint)" stroke="var(--color-error)" ink={NGINK} />
+          <GBox x={154} y={36} w={120} h={28} text="無断で投稿" fill="var(--color-error-tint)" stroke="var(--color-error)" ink={NGINK} />
           <text x={214} y={96} fontSize={11} fill={NGINK} fontWeight={700} textAnchor="middle">
             ✕ 同意なしは使えない
           </text>
-          <text x={214} y={114} fontSize={10} fill={LABEL} fontWeight={700} textAnchor="middle">
+          <text x={214} y={114} fontSize={11} fill={LABEL} fontWeight={700} textAnchor="middle">
             {SOC6_RIGHTS[act].split('（')[0]}
           </text>
         </svg>
@@ -365,8 +372,8 @@ export function SocFig7() {
         onChange={setPurpose}
       />
       <View label="収集した個人情報の流れと、同意・目的の判定">
-        <svg viewBox="0 0 320 118" className={styles.svg}>
-          <GBox x={12} y={34} w={92} h={30} text="氏名・住所・電話" fs={9.5} />
+        <svg viewBox="0 0 320 140" className={styles.svg}>
+          <GBox x={12} y={34} w={92} h={30} text="氏名・住所・電話" />
           <path d="M 108 49 L 138 49" stroke={MUTED} />
           <rect
             x={140}
@@ -381,15 +388,18 @@ export function SocFig7() {
             {ok ? '✓ OK' : '✕ NG'}
           </text>
           <path d="M 194 49 L 222 49" stroke={MUTED} />
-          <GBox x={224} y={34} w={84} h={30} text={purpose === 'order' ? '注文の処理' : '広告の送付'} fs={9.5} />
-          <text x={160} y={16} fontSize={10} textAnchor="middle" fill={MUTED}>
+          <GBox x={224} y={34} w={84} h={30} text={purpose === 'order' ? '注文の処理' : '広告の送付'} />
+          <text x={160} y={16} fontSize={11} textAnchor="middle" fill={MUTED}>
             取得した目的の範囲内で管理する
           </text>
-          <text x={160} y={94} fontSize={10} textAnchor="middle" fill={ok ? OKINK : NGINK} fontWeight={700}>
+          <text x={160} y={94} fontSize={11} textAnchor="middle" fill={ok ? OKINK : NGINK} fontWeight={700}>
             {ok ? '＋ 暗号化やアクセス制御で漏えいを防ぐ' : '目的外利用・無同意・むやみの社内共有は不適切'}
           </text>
-          <text x={160} y={112} fontSize={9} textAnchor="middle" fill={MUTED}>
-            暗号化は管理の手段の一つで、同意を不要にするものではない
+          <text x={160} y={116} fontSize={11} textAnchor="middle" fill={MUTED}>
+            暗号化は管理の手段の一つで、
+          </text>
+          <text x={160} y={132} fontSize={11} textAnchor="middle" fill={MUTED}>
+            同意を不要にするものではない
           </text>
         </svg>
       </View>
@@ -453,10 +463,10 @@ export function SocFig9() {
       />
       <View label="情報システムは人・機器・技術・手順・法規の要素からなる">
         <svg viewBox="0 0 320 120" className={styles.svg}>
-          <GBox x={98} y={8} w={124} h={28} text="情報システム" fs={10} fill={TINT} />
+          <GBox x={98} y={8} w={124} h={28} text="情報システム" fill={TINT} />
           <path d="M 160 36 L 160 52" stroke={MUTED} />
           {SYS5.map((v, i) => (
-            <g key={v.k} onClick={() => setSel(i)} style={{ cursor: 'pointer' }}>
+            <g key={v.k} onClick={() => setSel(i)} className={styles.clickableDot}>
               <rect
                 x={8 + i * 62}
                 y={54}
@@ -471,7 +481,7 @@ export function SocFig9() {
               </text>
             </g>
           ))}
-          <text x={160} y={106} fontSize={9.5} textAnchor="middle" fill={MUTED}>
+          <text x={160} y={106} fontSize={11} textAnchor="middle" fill={MUTED}>
             選択肢1の「五大装置」はコンピュータ本体の構成
           </text>
         </svg>
@@ -494,7 +504,7 @@ export function SocFig10() {
       status={last ? '評価の結果をふまえ、課題把握へ戻って改善（サイクル）。' : `${step + 1}/5: ${SOLVE_STEPS[step]} の段階。`}
     >
       <View label="課題把握 → 調査 → 立案 → 実行 → 評価の順路と、評価から課題把握への戻り矢印">
-        <svg viewBox="0 0 320 120" className={styles.svg}>
+        <svg viewBox="0 0 320 142" className={styles.svg}>
           {SOLVE_STEPS.map((s, i) => {
             const x = 12 + (i % 3) * 104
             const y = 12 + Math.floor(i / 3) * 56
@@ -506,7 +516,6 @@ export function SocFig10() {
                   w={96}
                   h={36}
                   text={s}
-                  fs={9.5}
                   fill={i <= step ? ACCENT : TINT}
                   stroke={i <= step ? ACCENT : BORDER}
                   ink={i <= step ? '#fff' : MUTED}
@@ -523,7 +532,7 @@ export function SocFig10() {
             fill="none"
             strokeDasharray="4 3"
           />
-          {last && <text x={96} y={116} fontSize={9} fill={ACCENT} fontWeight={700}>評価のつぎは課題へ戻る（改善）</text>}
+          {last && <text x={160} y={136} fontSize={11} textAnchor="middle" fill={ACCENT} fontWeight={700}>評価のつぎは課題へ戻る（改善）</text>}
         </svg>
       </View>
       <div className={styles.ctrl}>
@@ -573,15 +582,15 @@ export function SocFig11() {
                 fill={leading && i === 0 ? 'var(--color-error-tint)' : TINT}
                 stroke={leading && i === 0 ? 'var(--color-error)' : ACCENT}
               />
-              <text x={46 + i * 70} y={92 - h - 6} fontSize={10} textAnchor="middle" fill={LABEL} fontWeight={700}>
+              <text x={46 + i * 70} y={92 - h - 6} fontSize={11} textAnchor="middle" fill={LABEL} fontWeight={700}>
                 {h}%
               </text>
-              <text x={46 + i * 70} y={106} fontSize={9} textAnchor="middle" fill={MUTED}>
+              <text x={46 + i * 70} y={106} fontSize={11} textAnchor="middle" fill={MUTED}>
                 {['満足', 'まあ満足', 'ふつう', '不満'][i]}
               </text>
             </g>
           ))}
-          <text x={160} y={124} fontSize={9.5} textAnchor="middle" fill={NGINK} fontWeight={700}>
+          <text x={160} y={124} fontSize={11} textAnchor="middle" fill={NGINK} fontWeight={700}>
             {leading ? '目立った選択肢（満足）に答えが寄る' : 'まんべんなく回答が分かれる'}
           </text>
         </svg>
@@ -608,7 +617,7 @@ export function SocFig12() {
     <FigShell title="図解: 対応の3段取り" status={r.why} statusKind={r.ok ? 'ok' : 'ng'}>
       <Segmented label="対応方法" value={act} options={SOC12_ACTIONS.map((a) => ({ value: a, label: a }))} onChange={setAct} />
       <View label="記録 → 通報 → 法的措置の3段取り">
-        <svg viewBox="0 0 320 118" className={styles.svg}>
+        <svg viewBox="0 0 320 134" className={styles.svg}>
           {[
             { t: '1. 証拠を保存', s: 'URL・日時など' },
             { t: '2. 通報', s: '運営者に対応を求める' },
@@ -621,22 +630,24 @@ export function SocFig12() {
                 w={94}
                 h={34}
                 text={b.t}
-                fs={9.5}
                 bold
                 fill={r.ok ? ACCENT : TINT}
                 stroke={r.ok ? ACCENT : BORDER}
                 ink={r.ok ? '#fff' : LABEL}
               />
-              <text x={59 + i * 106} y={66} fontSize={8.5} textAnchor="middle" fill={MUTED}>
+              <text x={59 + i * 106} y={68} fontSize={11} textAnchor="middle" fill={MUTED}>
                 {b.s}
               </text>
               {i < 2 && <path d={`M ${108 + i * 106} 37 L ${118 + i * 106} 37`} stroke={MUTED} />}
             </g>
           ))}
-          <text x={160} y={96} fontSize={10.5} textAnchor="middle" fill={r.ok ? OKINK : NGINK} fontWeight={700}>
-            不正な投稿は人格権（名誉権・プライバシー・肖像権）の侵害になり得る
+          <text x={160} y={92} fontSize={11} textAnchor="middle" fill={r.ok ? OKINK : NGINK} fontWeight={700}>
+            不正な投稿は人格権
           </text>
-          <text x={160} y={112} fontSize={8.5} textAnchor="middle" fill={MUTED}>
+          <text x={160} y={107} fontSize={11} textAnchor="middle" fill={r.ok ? OKINK : NGINK} fontWeight={700}>
+            （名誉権・プライバシー・肖像権）の侵害になり得る
+          </text>
+          <text x={160} y={126} fontSize={11} textAnchor="middle" fill={MUTED}>
             報復や拡散は事態を悪化させるだけ
           </text>
         </svg>
@@ -659,16 +670,16 @@ export function SocFig13() {
       statusKind={ok ? 'ok' : 'ng'}
     >
       <View label={`標本化周波数${fs}kHzで上限20kHzの音を拾う様子`}>
-        <svg viewBox="0 0 320 122" className={styles.svg}>
+        <svg viewBox="0 0 320 136" className={styles.svg}>
           <path d="M 16 60 Q 52 4 88 60 T 160 60 T 232 60 T 304 60" stroke={MUTED} strokeWidth={1.5} fill="none" />
           <line x1={16} y1={60} x2={304} y2={60} stroke={BORDER} />
           {xs.map((x, i) => (
-            <circle key={i} cx={x} cy={60 - 44 * Math.sin(i * 2.5)} r={3.5} fill={ok ? 'var(--color-success)' : 'var(--color-error)'} />
+            <circle key={i} cx={x} cy={60 - 30 * Math.sin(i * 2.5)} r={3.5} fill={ok ? 'var(--color-success)' : 'var(--color-error)'} />
           ))}
-          <text x={160} y={100} fontSize={10} textAnchor="middle" fill={ok ? OKINK : NGINK} fontWeight={700}>
+          <text x={160} y={110} fontSize={11} textAnchor="middle" fill={ok ? OKINK : NGINK} fontWeight={700}>
             {ok ? 'サンプル点が元の波を忠実に拾えている' : 'サンプル点が疎で、別の低い波と見分けがつかない'}
           </text>
-          <text x={160} y={116} fontSize={9} textAnchor="middle" fill={MUTED}>
+          <text x={160} y={126} fontSize={11} textAnchor="middle" fill={MUTED}>
             音の上限 20kHz ／ 標本化 {fs}kHz
           </text>
         </svg>
@@ -699,7 +710,7 @@ export function SocFig14() {
     >
       <Slider label="量子化ビット数 [bit]" value={bits} min={1} max={5} step={1} onChange={setBits} fmt={(v) => `${v} bit（${2 ** v}段階）`} />
       <View label={`量子化ビット数${bits}ビットで音量の段階を表す様子`}>
-        <svg viewBox="0 0 320 124" className={styles.svg}>
+        <svg viewBox="0 0 320 136" className={styles.svg}>
           <path d="M 16 112 Q 60 24 100 112 T 184 112 T 268 112 L 304 112" stroke={MUTED} strokeWidth={1.5} fill="none" strokeDasharray="4 3" />
           {stair.map((i) => (
             <line key={i} x1={16} y1={112 - i * step} x2={304} y2={112 - i * step} stroke={BORDER} strokeDasharray="2 4" opacity={0.4} />
@@ -712,7 +723,7 @@ export function SocFig14() {
             strokeWidth={2}
             fill="none"
           />
-          <text x={160} y={122} fontSize={9.5} textAnchor="middle" fill={MUTED}>
+          <text x={160} y={130} fontSize={11} textAnchor="middle" fill={MUTED}>
             {levels}段階の音量を表せる（1標本あたり {bits} ビット）
           </text>
         </svg>
@@ -769,8 +780,8 @@ export function SocFig15() {
               stroke={BORDER}
             />
           ))}
-          <GBox x={226} y={24} w={82} h={26} text={k4 ? '1辺 半分' : '1辺 大きめ'} fs={9.5} bold />
-          <GBox x={226} y={58} w={82} h={26} text={k4 ? '画素数 ×4' : '画素数 ×1'} fs={9.5} fill={k4 ? 'var(--color-success-tint)' : TINT} stroke={k4 ? 'var(--color-success)' : ACCENT} ink={k4 ? OKINK : MUTED} />
+          <GBox x={226} y={24} w={82} h={26} text={k4 ? '1辺 半分' : '1辺 大きめ'} bold />
+          <GBox x={226} y={58} w={82} h={26} text={k4 ? '画素数 ×4' : '画素数 ×1'} fill={k4 ? 'var(--color-success-tint)' : TINT} stroke={k4 ? 'var(--color-success)' : ACCENT} ink={k4 ? OKINK : MUTED} />
         </svg>
       </View>
       <Calc
@@ -794,6 +805,11 @@ const SOC16 = {
 export function SocFig16() {
   const [kind, setKind] = useState<'lossless' | 'lossy'>('lossless')
   const v = SOC16[kind]
+  const compressedW = v.restored ? 170 : 148
+  const statusX = 16 + compressedW + 12
+  const statusW = 304 - statusX
+  const compressedCx = 16 + compressedW / 2
+  const statusCx = statusX + statusW / 2
   return (
     <FigShell
       title="図解: 圧縮の方式で、戻し方が変わる"
@@ -809,37 +825,47 @@ export function SocFig16() {
         onChange={setKind}
       />
       <View label="圧縮後のデータ量と、復元の可否">
-        <svg viewBox="0 0 320 122" className={styles.svg}>
-          <GBox x={16} y={8} w={130} h={26} text="圧縮前: 全部の情報" fs={9.5} />
-          <path d="M 66 36 L 96 46" stroke={MUTED} />
-          <GBox
-            x={98}
-            y={46}
-            w={(v.restored ? 120 : 92)}
-            h={26}
-            text={v.restored ? '圧縮後: 情報はまちがいないまま' : '圧縮後: 情報の一部を捨てた'}
-            fs={8.5}
+        <svg viewBox="0 0 320 154" className={styles.svg}>
+          <GBox x={16} y={8} w={288} h={28} text="圧縮前: 全部の情報" />
+          <path d="M 160 36 L 160 52" stroke={MUTED} />
+          <rect
+            x={16}
+            y={52}
+            width={compressedW}
+            height={46}
+            rx={8}
             fill="var(--color-warning-tint)"
             stroke="var(--color-warning)"
-            ink="var(--color-warning-ink)"
           />
+          <text x={compressedCx} y={72} fontSize={11} textAnchor="middle" fill="var(--color-warning-ink)" fontWeight={700}>
+            圧縮後:
+          </text>
+          <text x={compressedCx} y={89} fontSize={11} textAnchor="middle" fill="var(--color-warning-ink)" fontWeight={700}>
+            {v.restored ? '情報はまちがいないまま' : '情報の一部を捨てた'}
+          </text>
           <rect
-            x={200}
-            y={40}
-            width={104}
-            height={34}
+            x={statusX}
+            y={52}
+            width={statusW}
+            height={46}
             rx={8}
             fill={v.restored ? 'var(--color-success-tint)' : 'var(--color-error-tint)'}
             stroke={v.restored ? 'var(--color-success)' : 'var(--color-error)'}
           />
-          <text x={252} y={55} fontSize={10} textAnchor="middle" fill={v.restored ? OKINK : NGINK} fontWeight={700}>
-            {v.restored ? '完全復元 OK' : '完全には戻せない'}
+          <text x={statusCx} y={72} fontSize={11} textAnchor="middle" fill={v.restored ? OKINK : NGINK} fontWeight={700}>
+            {v.restored ? '完全復元' : '完全には'}
           </text>
-          <text x={252} y={68} fontSize={8} textAnchor="middle" fill={MUTED}>
+          <text x={statusCx} y={89} fontSize={11} textAnchor="middle" fill={v.restored ? OKINK : NGINK} fontWeight={700}>
+            {v.restored ? 'OK' : '戻せない'}
+          </text>
+          <text x={statusCx} y={114} fontSize={11} textAnchor="middle" fill={MUTED}>
             {v.ex}
           </text>
-          <text x={160} y={94} fontSize={10} textAnchor="middle" fill={LABEL} fontWeight={700}>
-            圧縮率は {v.rate}（保持する情報が多い → データ量が大きい）
+          <text x={160} y={134} fontSize={11} textAnchor="middle" fill={LABEL} fontWeight={700}>
+            圧縮率は {v.rate}
+          </text>
+          <text x={160} y={149} fontSize={11} textAnchor="middle" fill={LABEL} fontWeight={700}>
+            （保持する情報が多い → データ量が大きい）
           </text>
         </svg>
       </View>
@@ -862,14 +888,28 @@ export function SocFig17() {
         <svg viewBox="0 0 320 124" className={styles.svg}>
           <rect x={24} y={8} width={180} height={108} rx={10} fill="var(--color-card)" stroke={BORDER} />
           <rect x={40} y={24} width={148} height={40} rx={6} fill={cont ? 'var(--color-card)' : 'var(--color-warning-tint)'} stroke={BORDER} />
-          <text x={50} y={46} fontSize={big ? 13 : 10} fill={cont ? 'var(--color-label)' : 'var(--color-warning-ink)'} fontWeight={700}>
+          <text x={50} y={46} fontSize={big ? 13 : 11} fill={cont ? 'var(--color-label)' : 'var(--color-warning-ink)'} fontWeight={700}>
             ご注文へ進む
           </text>
-          <text x={50} y={82} fontSize={big ? 10 : 8} fill={MUTED}>
+          <text x={42} y={82} fontSize={big ? 12 : 11} fill={MUTED}>
             {cont ? '説明文字もはっきり見える' : '薄い色で読みにくい'}
           </text>
-          <GBox x={216} y={20} w={92} h={26} text={big ? '文字: 大きい' : '文字: 小さい'} fs={8.5} fill={TINT} />
-          <GBox x={216} y={56} w={92} h={26} text={cont ? 'コントラスト: 高い' : 'コントラスト: 低い'} fs={8} fill={cont ? TINT : 'var(--color-warning-tint)'} stroke={cont ? ACCENT : 'var(--color-warning)'} />
+          <GBox x={210} y={20} w={100} h={28} text={big ? '文字: 大きい' : '文字: 小さい'} fill={TINT} />
+          <rect
+            x={210}
+            y={56}
+            width={100}
+            height={38}
+            rx={6}
+            fill={cont ? TINT : 'var(--color-warning-tint)'}
+            stroke={cont ? ACCENT : 'var(--color-warning)'}
+          />
+          <text x={260} y={72} fontSize={11} textAnchor="middle" fill={LABEL}>
+            コントラスト:
+          </text>
+          <text x={260} y={87} fontSize={11} textAnchor="middle" fill={LABEL}>
+            {cont ? '高い' : '低い'}
+          </text>
         </svg>
       </View>
       <div className={styles.ctrl}>
@@ -909,11 +949,11 @@ export function SocFig18() {
       />
       <View label="計算の構成分解">
         <svg viewBox="0 0 320 104" className={styles.svg}>
-          <GBox x={16} y={14} w={130} h={28} text={`${(1920 * mul).toLocaleString()} × ${(1080 * mul).toLocaleString()} 画素`} fs={9} />
+          <GBox x={16} y={14} w={130} h={28} text={`${(1920 * mul).toLocaleString()} × ${(1080 * mul).toLocaleString()} 画素`} />
           <text x={156} y={33} fontSize={12} fill={MUTED}>
             ×
           </text>
-          <GBox x={170} y={14} w={134} h={28} text={`1画素 ${bits / 8} バイト`} fs={9} />
+          <GBox x={170} y={14} w={134} h={28} text={`1画素 ${bits / 8} バイト`} />
           <GBox x={80} y={56} w={160} h={30} text={`≈ ${mb.toFixed(1)} MB`} fs={12} bold rx={10} fill={ACCENT} ink="#fff" />
         </svg>
       </View>

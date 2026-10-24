@@ -24,7 +24,6 @@ import {
   Btn,
   Slider,
   GBox,
-  GCircle,
   GArrow,
 } from './parts'
 
@@ -190,13 +189,13 @@ export function DatFig2() {
         onChange={(v) => setFrom(Number(v) as 0 | 50)}
       />
       <View label={`${from === 0 ? '0点' : '50点'}始まりで描いた折れ線グラフ`}>
-        <svg viewBox="0 0 320 126" className={styles.svg}>
+        <svg viewBox="0 0 320 134" className={styles.svg}>
           <line x1={42} y1={8} x2={42} y2={106} stroke={BORDER} />
           <line x1={42} y1={106} x2={310} y2={106} stroke={BORDER} />
           {[from, (from + 100) / 2, 100].map((tk) => (
             <g key={tk}>
               <line x1={42} y1={y(tk)} x2={310} y2={y(tk)} stroke={BORDER} strokeDasharray="3 3" />
-              <text x={38} y={y(tk) + 3} fontSize={8.5} textAnchor="end" fill={MUTED}>
+              <text x={38} y={y(tk) + 3} fontSize={11} textAnchor="end" fill={MUTED}>
                 {tk}点
               </text>
             </g>
@@ -206,7 +205,7 @@ export function DatFig2() {
             <circle key={i} cx={x(i)} cy={y(v)} r={4.5} fill={ACCENT} />
           ))}
           {D2_SCORES.map((_, i) => (
-            <text key={`t${i}`} x={x(i)} y={116} fontSize={8} textAnchor="middle" fill={MUTED}>
+            <text key={`t${i}`} x={x(i)} y={124} fontSize={11} textAnchor="middle" fill={MUTED}>
               {i + 1}回
             </text>
           ))}
@@ -263,10 +262,10 @@ export function DatFig3() {
                   stroke={c.v === pick ? ACCENT : BORDER}
                   strokeWidth={c.v === pick ? 2 : 1}
                 />
-                <text x={cx} y={76 - h} fontSize={9.5} textAnchor="middle" fill={MUTED}>
+                <text x={cx} y={76 - h} fontSize={11} textAnchor="middle" fill={MUTED}>
                   {c.n}個
                 </text>
-                <text x={cx} y={92} fontSize={9.5} textAnchor="middle" fill={c.v === 5 ? OKINK : MUTED} fontWeight={c.v === 5 ? 700 : 400}>
+                <text x={cx} y={92} fontSize={11} textAnchor="middle" fill={c.v === 5 ? OKINK : MUTED} fontWeight={c.v === 5 ? 700 : 400}>
                   {c.v}
                 </text>
               </g>
@@ -323,14 +322,14 @@ export function DatFig4() {
             />
           ))}
           {D4_SUM.map((d, i) => (
-            <text key={`l${i}`} x={x(d.v)} y={74} fontSize={9} textAnchor="middle" fill={i === sel ? 'var(--color-warning-ink)' : MUTED} fontWeight={i === sel ? 700 : 400}>
+            <text key={`l${i}`} x={x(d.v)} y={82} fontSize={11} textAnchor="middle" fill={i === sel ? 'var(--color-warning-ink)' : MUTED} fontWeight={i === sel ? 700 : 400}>
               {d.v}
             </text>
           ))}
-          <text x={x(27)} y={26} fontSize={8.5} fill={MUTED}>
+          <text x={x(27)} y={26} fontSize={11} fill={MUTED}>
             箱 = 四分位範囲（Q1〜Q3）
           </text>
-          <text x={x(23)} y={62} fontSize={8} textAnchor="middle" fill="var(--color-warning-ink)">
+          <text x={x(23)} y={68} fontSize={11} textAnchor="middle" fill="var(--color-warning-ink)">
             中央値
           </text>
         </svg>
@@ -541,19 +540,19 @@ export function DatFig6() {
         onChange={(v) => setPick(Number(v))}
       />
       <View label={`散布図（${c.label}）`}>
-        <svg viewBox="0 0 320 112" className={styles.svg}>
+        <svg viewBox="0 0 320 120" className={styles.svg}>
           <line x1={40} y1={8} x2={40} y2={102} stroke={BORDER} />
           <line x1={40} y1={102} x2={310} y2={102} stroke={BORDER} />
-          <text x={38} y={16} fontSize={8} textAnchor="end" fill={MUTED}>
+          <text x={38} y={16} fontSize={11} textAnchor="end" fill={MUTED}>
             Y
           </text>
-          <text x={304} y={96} fontSize={8} fill={MUTED}>
+          <text x={304} y={96} fontSize={11} fill={MUTED}>
             X
           </text>
           {c.pts.map((p, i) => (
             <circle key={i} cx={px(p[0])} cy={py(p[1])} r={4.2} fill={c.id === 'none' ? NGINK : ACCENT} opacity={0.75} />
           ))}
-          <text x={172} y={109} fontSize={8.5} textAnchor="middle" fill={MUTED}>
+          <text x={172} y={116} fontSize={11} textAnchor="middle" fill={MUTED}>
             点の集まり方で「正・負・無相関」を読み取る
           </text>
         </svg>
@@ -596,7 +595,7 @@ export function DatFig7() {
         </Btn>
       </div>
       <View label="散布図（点）と回帰直線。点線は残差">
-        <svg viewBox="0 0 320 112" className={styles.svg}>
+        <svg viewBox="0 0 320 120" className={styles.svg}>
           <line x1={40} y1={8} x2={40} y2={102} stroke={BORDER} />
           <line x1={40} y1={102} x2={310} y2={102} stroke={BORDER} />
           <line x1={px(0)} y1={py(a)} x2={px(10)} y2={py(a + b * 10)} stroke="var(--color-warning)" strokeWidth={2} />
@@ -606,7 +605,7 @@ export function DatFig7() {
               <circle cx={px(p[0])} cy={py(p[1])} r={4} fill={ACCENT} />
             </g>
           ))}
-          <text x={176} y={110} fontSize={8.5} textAnchor="middle" fill={MUTED}>
+          <text x={176} y={116} fontSize={11} textAnchor="middle" fill={MUTED}>
             残差が小さいほど、直線がデータの傾向に合っている
           </text>
         </svg>
@@ -658,7 +657,7 @@ export function DatFig8() {
         onChange={setMode}
       />
       <View label="8個のデータ（G=10000が記入ミス、H=空欄）">
-        <svg viewBox="0 0 320 108" className={styles.svg}>
+        <svg viewBox="0 0 320 134" className={styles.svg}>
           {D8_ROWS.map((r, i) => {
             const v = r.v
             const isOut = r.tag === 'G'
@@ -668,17 +667,17 @@ export function DatFig8() {
             return (
               <g key={r.tag}>
                 {isNa ? (
-                  <text x={24 + i * 38} y={88} fontSize={7.5} textAnchor="middle" fill={MUTED}>
+                  <text x={24 + i * 38} y={88} fontSize={11} textAnchor="middle" fill={MUTED}>
                     欠損
                   </text>
                 ) : (
                   <rect x={12 + i * 38} y={92 - h} width={24} height={h} rx={2} fill={isOut ? 'var(--color-error-tint)' : TINT} stroke={isOut ? 'var(--color-error)' : BORDER} opacity={dim ? 0.35 : 1} />
                 )}
-                <text x={24 + i * 38} y={100} fontSize={9} textAnchor="middle" fill={MUTED}>
+                <text x={24 + i * 38} y={100} fontSize={11} textAnchor="middle" fill={MUTED}>
                   {r.tag}
                 </text>
                 {v != null && (
-                  <text x={24 + i * 38} y={90 - h} fontSize={7.5} textAnchor="middle" fill={isOut ? NGINK : MUTED}>
+                  <text x={24 + i * 38} y={90 - h} fontSize={11} textAnchor="middle" fill={isOut ? NGINK : MUTED}>
                     {v}
                   </text>
                 )}
@@ -686,8 +685,11 @@ export function DatFig8() {
             )
           })}
           <line x1={10} y1={92} x2={310} y2={92} stroke={BORDER} />
-          <text x={172} y={106} fontSize={8.5} textAnchor="middle" fill={MUTED}>
-            G（10000）は他の値とけた違いに大きい＝記入ミスの可能性が高い
+          <text x={172} y={116} fontSize={11} textAnchor="middle" fill={MUTED}>
+            G（10000）は他の値とけた違いに大きい
+          </text>
+          <text x={172} y={130} fontSize={11} textAnchor="middle" fill={MUTED}>
+            ＝記入ミスの可能性が高い
           </text>
         </svg>
       </View>
@@ -781,7 +783,7 @@ export function DatFig10() {
           <thead>
             <tr>
               {D10_COLS.map((c, i) => (
-                <th key={c} style={{ cursor: 'pointer', textAlign: 'left' }} onClick={() => setCol(i)}>
+                <th key={c} className={styles.clickableDot} style={{ textAlign: 'left' }} onClick={() => setCol(i)}>
                   {c}
                   <span aria-hidden="true">{i === col ? ' ▾' : ''}</span>
                 </th>
@@ -912,11 +914,11 @@ export function DatFig12() {
               <g key={b.from}>
                 <rect x={cx} y={90 - h} width={bw - 2} height={Math.max(1, h)} rx={1.5} fill={TINT} stroke={ACCENT} />
                 {i % step === 0 && (
-                  <text x={cx} y={102} fontSize={7.5} fill={MUTED}>
+                  <text x={cx} y={102} fontSize={11} fill={MUTED}>
                     {b.from}
                   </text>
                 )}
-                <text x={cx + (bw - 2) / 2} y={86 - h} fontSize={7.5} textAnchor="middle" fill={b.count === 0 ? MUTED : OKINK}>
+                <text x={cx + (bw - 2) / 2} y={86 - h} fontSize={11} textAnchor="middle" fill={b.count === 0 ? MUTED : OKINK}>
                   {b.count === 0 ? '' : b.count}
                 </text>
               </g>
@@ -932,7 +934,7 @@ export function DatFig12() {
 /* ---------- q-dat-13: 分析プロセスのループ ---------- */
 
 const D13_STEPS = ['仮説', '収集・整理', '分析', '考察']
-const D13_FULL = ['仮説を立てる', 'データを収集・整理する', '分析する', '考察（結論）を述べる']
+const D13_LINES = [['仮説を', '立てる'], ['データを収集', '・整理する'], ['分析する'], ['考察（結論）', 'を述べる']]
 
 export function DatFig13() {
   const [k, setK] = useState(0)
@@ -965,35 +967,51 @@ export function DatFig13() {
       />
       <View label="分析プロセスの流れ">
         <svg viewBox="0 0 320 104" className={styles.svg}>
-          {D13_STEPS.map((s, i) => (
-            <g key={s}>
-              <GBox
-                x={6 + i * 80}
-                y={40}
-                w={70}
-                h={30}
-                text={D13_FULL[i].length > 9 ? D13_FULL[i].slice(0, 9) : D13_FULL[i]}
-                fs={7.5}
-                bold={i >= k}
-                fill={i < k ? TINT : i === k ? ACCENT : 'var(--color-card)'}
-                stroke={i <= k ? ACCENT : BORDER}
-                ink={i < k ? MUTED : i === k ? '#fff' : MUTED}
-              />
-              <text x={41 + i * 80} y={84} fontSize={7.5} textAnchor="middle" fill={MUTED}>
-                {s}
-              </text>
-              {i < 3 && <GArrow x1={78 + i * 80} y1={55} x2={84 + i * 80} y2={55} stroke={k > i ? ACCENT : MUTED} />}
-            </g>
-          ))}
+          {D13_STEPS.map((s, i) => {
+            const lines = D13_LINES[i]
+            const ink = i < k ? MUTED : i === k ? '#fff' : MUTED
+            return (
+              <g key={s}>
+                <rect
+                  x={6 + i * 80}
+                  y={38}
+                  width={70}
+                  height={34}
+                  rx={6}
+                  fill={i < k ? TINT : i === k ? ACCENT : 'var(--color-card)'}
+                  stroke={i <= k ? ACCENT : BORDER}
+                />
+                <text
+                  x={41 + i * 80}
+                  y={lines.length === 1 ? 59 : 51}
+                  fontSize={11}
+                  textAnchor="middle"
+                  fill={ink}
+                  fontWeight={i >= k ? 700 : 400}
+                >
+                  <tspan x={41 + i * 80}>{lines[0]}</tspan>
+                  {lines[1] && (
+                    <tspan x={41 + i * 80} dy={13}>
+                      {lines[1]}
+                    </tspan>
+                  )}
+                </text>
+                <text x={41 + i * 80} y={84} fontSize={11} textAnchor="middle" fill={MUTED}>
+                  {s}
+                </text>
+                {i < 3 && <GArrow x1={78 + i * 80} y1={55} x2={84 + i * 80} y2={55} stroke={k > i ? ACCENT : MUTED} />}
+              </g>
+            )
+          })}
           {last && hit === 'no' && (
             <g>
               <path d="M 262 38 C 250 12 70 12 60 36" fill="none" stroke="var(--color-error)" strokeWidth={2} strokeDasharray="4 3" />
-              <text x={160} y={16} fontSize={9} textAnchor="middle" fill={NGINK} fontWeight={700}>
+              <text x={160} y={33} fontSize={11} textAnchor="middle" fill={NGINK} fontWeight={700}>
                 仮説（条件）を修正してもどる
               </text>
             </g>
           )}
-          <text x={160} y={98} fontSize={9} textAnchor="middle" fill={MUTED}>
+          <text x={160} y={98} fontSize={11} textAnchor="middle" fill={MUTED}>
             {last ? (hit === 'yes' ? '結論は過程とともに、他者にもわかるよう述べる' : '結果と仮説のずれも、考察の材料になる') : '順番どおりに進める'}
           </text>
         </svg>
@@ -1087,7 +1105,7 @@ export function DatFig14() {
               ))}
             </>
           )}
-          <text x={70} y={84} fontSize={9.5} textAnchor="middle" fill={OKINK} fontWeight={700}>
+          <text x={70} y={84} fontSize={11} textAnchor="middle" fill={OKINK} fontWeight={700}>
             {c.short}
           </text>
         </svg>
@@ -1117,22 +1135,28 @@ export function DatFig15() {
         onChange={setPick}
       />
       <View label="「学習時間」と「テスト得点」の関係のあり方">
-        <svg viewBox="0 0 320 110" className={styles.svg}>
-          <text x={160} y={16} fontSize={9} textAnchor="middle" fill={MUTED}>
+        <svg viewBox="0 0 320 132" className={styles.svg}>
+          <text x={160} y={16} fontSize={11} textAnchor="middle" fill={MUTED}>
             観測: 正の相関（2つの量が一緒に増える）
           </text>
-          <GBox x={18} y={34} w={104} h={30} text="学習時間" fs={10} />
-          <GBox x={212} y={34} w={90} h={30} text="テスト得点" fs={10} />
+          <GBox x={18} y={34} w={104} h={30} text="学習時間" fs={11} />
+          <GBox x={212} y={34} w={90} h={30} text="テスト得点" fs={11} />
           {pick === 'x2y' && <GArrow x1={126} y1={49} x2={208} y2={49} stroke={OK} w={2.5} />}
           {pick === 'y2x' && <GArrow x1={208} y1={49} x2={126} y2={49} stroke={ACCENT} w={2.5} />}
           {pick === 'other' && (
             <>
-              <GCircle cx={160} cy={90} r={19} text="第3の要因" fs={7.5} fill={TINT} ink={MUTED} />
-              <GArrow x1={146} y1={76} x2={100} y2={66} stroke={OK} />
-              <GArrow x1={174} y1={76} x2={220} y2={66} stroke={OK} />
+              <circle cx={160} cy={88} r={22} fill={TINT} />
+              <text x={160} y={85} fontSize={11} textAnchor="middle" fill={MUTED}>
+                第3の
+              </text>
+              <text x={160} y={98} fontSize={11} textAnchor="middle" fill={MUTED}>
+                要因
+              </text>
+              <GArrow x1={144} y1={72} x2={100} y2={66} stroke={OK} />
+              <GArrow x1={176} y1={72} x2={220} y2={66} stroke={OK} />
             </>
           )}
-          <text x={160} y={107} fontSize={9.5} textAnchor="middle" fill={OKINK} fontWeight={700}>
+          <text x={160} y={126} fontSize={11} textAnchor="middle" fill={OKINK} fontWeight={700}>
             相関は「関係がある」ことを示す。原因と結果は別の話
           </text>
         </svg>
@@ -1288,7 +1312,7 @@ export function DatFig17() {
     [w],
   )
   const X = (i: number) => 24 + i * 25
-  const Y = (v: number) => 96 - v
+  const Y = (v: number) => 102 - v
   const maPts = ma.map((v, i) => (v == null ? null : `${X(i)},${Y(v)}`)).filter((p) => p != null) as string[]
   return (
     <FigShell
@@ -1305,8 +1329,8 @@ export function DatFig17() {
         onChange={(v) => setW(Number(v) as 3 | 6)}
       />
       <View label="月別のエアコン売上 [台]（淡い線）と、移動平均（太い線）">
-        <svg viewBox="0 0 320 108" className={styles.svg}>
-          <line x1={14} y1={96} x2={308} y2={96} stroke={BORDER} />
+        <svg viewBox="0 0 320 118" className={styles.svg}>
+          <line x1={14} y1={102} x2={308} y2={102} stroke={BORDER} />
           <polyline points={D17_VALUES.map((v, i) => `${X(i)},${Y(v)}`).join(' ')} fill="none" stroke={BORDER} strokeWidth={1.5} />
           {D17_VALUES.map((v, i) => (
             <circle key={i} cx={X(i)} cy={Y(v)} r={2.5} fill={BORDER} />
@@ -1316,11 +1340,11 @@ export function DatFig17() {
             v == null ? null : <circle key={`m${i}`} cx={X(i)} cy={Y(v)} r={3.5} fill={ACCENT} />,
           )}
           {['1月', '4月', '7月', '10月'].map((m, i) => (
-            <text key={m} x={X(i * 3)} y={106} fontSize={8} textAnchor="middle" fill={MUTED}>
+            <text key={m} x={X(i * 3)} y={112} fontSize={11} textAnchor="middle" fill={MUTED}>
               {m}
             </text>
           ))}
-          <text x={160} y={14} fontSize={9} textAnchor="middle" fill={MUTED}>
+          <text x={160} y={14} fontSize={11} textAnchor="middle" fill={MUTED}>
             淡い線 = 月の値 ／ 太い線 = 直近{w}か月の平均（移動平均）
           </text>
         </svg>
@@ -1353,18 +1377,18 @@ export function DatFig18() {
         ))}
       </div>
       <View label="月別の観光客数 [千人] の折れ線グラフ。選んだ月が強調される">
-        <svg viewBox="0 0 320 112" className={styles.svg}>
+        <svg viewBox="0 0 320 120" className={styles.svg}>
           <line x1={14} y1={100} x2={308} y2={100} stroke={BORDER} />
           <polyline points={D18_VALUES.map((val, i) => `${X(i)},${Y(val)}`).join(' ')} fill="none" stroke={ACCENT} strokeWidth={2} />
           {D18_VALUES.map((val, i) => (
             <circle key={i} cx={X(i)} cy={Y(val)} r={i === m ? 5 : 3} fill={i === m ? 'var(--color-success)' : ACCENT} stroke={i === m ? 'var(--color-success)' : 'none'} strokeWidth={2} />
           ))}
           {['1月', '4月', '7月', '10月'].map((mm, i) => (
-            <text key={mm} x={X(i * 3)} y={110} fontSize={8} textAnchor="middle" fill={MUTED}>
+            <text key={mm} x={X(i * 3)} y={114} fontSize={11} textAnchor="middle" fill={MUTED}>
               {mm}
             </text>
           ))}
-          <text x={20} y={14} fontSize={9} fill={MUTED}>
+          <text x={20} y={14} fontSize={11} fill={MUTED}>
             月を選ぶと値と前月差
           </text>
         </svg>

@@ -26,6 +26,7 @@ import {
   GBox,
   GBitRow,
   GCircle,
+  svgButton,
 } from './parts'
 
 /* ---------- q-net-1: 8ビットで表せる状態の数 ---------- */
@@ -40,7 +41,7 @@ export function NetFig1() {
       title="図解: 8個のオン・オフはいくつの並びを作れる？"
       status={`1ビット=2通り。8ビットは 2^8 = 256通りのうちの一つの並び（今の並びは 10進で ${pattern}）。`}
     >
-      <View label="クリックして切り替えられる8ビットの列">
+      <Canvas label="クリックして切り替えられる8ビットの列" interactive>
         <svg viewBox="0 0 320 96" className={styles.svg}>
           <GBitRow x={86} y={18} bits={bits} tag="ビット" />
           {bits.map((_, i) => (
@@ -51,18 +52,17 @@ export function NetFig1() {
               width={26}
               height={26}
               fill="transparent"
-              onClick={() => toggle(i)}
-              style={{ cursor: 'pointer' }}
+              {...svgButton(`${i + 1}番目のビット ${bits[i]}。押すと反転`, () => toggle(i), bits[i] === 1)}
             />
           ))}
-          <text x={160} y={70} fontSize={11} textAnchor="middle" fill={LABEL} fontWeight={700}>
+          <text x={160} y={72} fontSize={12} textAnchor="middle" fill={LABEL} fontWeight={700}>
             並べ方の数: 2の8乗 = 256通り
           </text>
-          <text x={160} y={88} fontSize={9} textAnchor="middle" fill={MUTED}>
+          <text x={160} y={90} fontSize={11} textAnchor="middle" fill={MUTED}>
             どの1つを今の並びとして選んでも、全体では256通り
           </text>
         </svg>
-      </View>
+      </Canvas>
       <div className={styles.ctrl}>
         <Btn small onClick={() => setBits([0, 0, 0, 0, 0, 0, 0, 0])}>
           全部0
@@ -189,22 +189,30 @@ export function NetFig3() {
       status={ok ? `1×64 + 1×16 + 1×8 + 1×2 = 90 ✓（= 1011010）` : `今の並び 1011010 を変えると値は ${sum}。90になる並びを探そう。`}
       statusKind={ok ? 'ok' : 'plain'}
     >
-      <View label="2進数の7桁と、その各桁の重み">
+      <Canvas label="2進数の7桁と、その各桁の重み" interactive>
         <svg viewBox="0 0 320 100" className={styles.svg}>
           <GBitRow x={90} y={14} bits={bits} />
           {bits.map((_, i) => (
-            <rect key={i} x={86 + i * 22} y={10} width={26} height={26} fill="transparent" style={{ cursor: 'pointer' }} onClick={() => setBits((prev) => prev.map((b, j) => (j === i ? ((b ^ 1) as 0 | 1) : b)))} />
+            <rect
+              key={i}
+              x={86 + i * 22}
+              y={10}
+              width={26}
+              height={26}
+              fill="transparent"
+              {...svgButton(`${i + 1}桁目 ${bits[i]}。押すと反転`, () => setBits((prev) => prev.map((b, j) => (j === i ? ((b ^ 1) as 0 | 1) : b))), bits[i] === 1)}
+            />
           ))}
           {weights.map((w, i) => (
-            <text key={w} x={96 + i * 22} y={60} fontSize={9} textAnchor="middle" fill={MUTED}>
+            <text key={w} x={99 + i * 22} y={62} fontSize={11} textAnchor="middle" fill={MUTED}>
               {w}
             </text>
           ))}
-          <text x={160} y={84} fontSize={11} textAnchor="middle" fill={LABEL} fontWeight={700}>
+          <text x={160} y={86} fontSize={12} textAnchor="middle" fill={LABEL} fontWeight={700}>
             {terms.join(' + ') || '0'} = {sum}
           </text>
         </svg>
-      </View>
+      </Canvas>
       <div className={styles.ctrl}>
         <Btn small onClick={() => setBits([1, 0, 1, 1, 0, 1, 0])}>
           元の並びに戻す
@@ -230,7 +238,7 @@ export function NetFig4() {
       statusKind={is90 ? 'ok' : 'plain'}
     >
       <View label={`${n}を16進数に直す計算の様子`}>
-        <svg viewBox="0 0 320 108" className={styles.svg}>
+        <svg viewBox="0 0 320 118" className={styles.svg}>
           <GBox x={20} y={20} w={94} h={30} text={`${n} ÷ 16`} fs={12} />
           <GBox x={122} y={20} w={62} h={30} text={`商 ${hi}`} fs={11} />
           <GBox x={196} y={20} w={86} h={30} text={`余り ${lo}`} fs={11} />
@@ -269,19 +277,35 @@ export function NetFig5() {
   const desc = op === 'and' ? '両方とも1の桁だけが1' : op === 'or' ? 'どちらか一方でも1なら1' : '入力が違う桁だけが1'
   return (
     <FigShell title="図解: ビットごとの論理演算" status={`${op === 'and' ? 'AND' : op === 'or' ? 'OR' : 'XOR'}: ${desc} → 結果は ${r.join('')}。`}>
-      <View label="2つの8ビット列と演算結果">
+      <Canvas label="2つの8ビット列と演算結果" interactive>
         <svg viewBox="0 0 320 108" className={styles.svg}>
           <GBitRow x={100} y={8} bits={a} tag="A" />
           <GBitRow x={100} y={34} bits={b} tag="B" />
           <GBitRow x={100} y={70} bits={r} tag="結果" />
           {a.map((_, i) => (
-            <rect key={`ra${i}`} x={96 + i * 22} y={4} width={26} height={26} fill="transparent" style={{ cursor: 'pointer' }} onClick={() => flip('a', i)} />
+            <rect
+              key={`ra${i}`}
+              x={96 + i * 22}
+              y={4}
+              width={26}
+              height={26}
+              fill="transparent"
+              {...svgButton(`Aの${i + 1}ビット目 ${a[i]}。押すと反転`, () => flip('a', i), a[i] === 1)}
+            />
           ))}
           {b.map((_, i) => (
-            <rect key={`rb${i}`} x={96 + i * 22} y={30} width={26} height={26} fill="transparent" style={{ cursor: 'pointer' }} onClick={() => flip('b', i)} />
+            <rect
+              key={`rb${i}`}
+              x={96 + i * 22}
+              y={30}
+              width={26}
+              height={26}
+              fill="transparent"
+              {...svgButton(`Bの${i + 1}ビット目 ${b[i]}。押すと反転`, () => flip('b', i), b[i] === 1)}
+            />
           ))}
         </svg>
-      </View>
+      </Canvas>
       <Segmented
         label="演算の種類"
         value={op}
@@ -460,10 +484,10 @@ export function NetFig9() {
       />
       <View label={`${p.a} と ${p.b} を線でつないだ、正しい対応`}>
         <svg viewBox="0 0 320 86" className={styles.svg}>
-          <GBox x={12} y={16} w={150} h={30} text={p.a} fs={9} />
-          <GBox x={190} y={16} w={116} h={30} text={p.b} fs={11} bold fill="var(--color-success-tint)" stroke="var(--color-success)" ink={OKINK} />
+          <GBox x={12} y={16} w={150} h={30} text={p.a} fs={11} />
+          <GBox x={190} y={16} w={116} h={30} text={p.b} fs={12} bold fill="var(--color-success-tint)" stroke="var(--color-success)" ink={OKINK} />
           <path d="M 166 31 L 186 31" stroke="var(--color-success)" />
-          <text x={160} y={72} fontSize={9} textAnchor="middle" fill={MUTED}>
+          <text x={160} y={74} fontSize={11} textAnchor="middle" fill={MUTED}>
             ほか: ファイル転送=FTP ／ 通信の基本ルール=TCP・IP
           </text>
         </svg>
@@ -485,9 +509,9 @@ export function NetFig10() {
       <Slider label="ホスト部のビット数 [bit]" value={host} min={2} max={8} onChange={setHost} />
       <View label="ホスト部ビット数と、割り当てられるアドレス数">
         <svg viewBox="0 0 320 100" className={styles.svg}>
-          <GBox x={16} y={18} w={120} h={30} text="192.168.1.0/24" fs={11} />
-          <GBox x={148} y={18} w={62} h={30} text="+ 8ビット" fs={10} fill="var(--color-warning-tint)" stroke="var(--color-warning)" ink="var(--color-warning-ink)" />
-          <GBox x={218} y={18} w={88} h={30} text="→ 0〜255 = 256個" fs={9.5} />
+          <GBox x={8} y={18} w={112} h={30} text="192.168.1.0/24" fs={11} />
+          <GBox x={126} y={18} w={62} h={30} text="+ 8ビット" fs={11} fill="var(--color-warning-tint)" stroke="var(--color-warning)" ink="var(--color-warning-ink)" />
+          <GBox x={194} y={18} w={118} h={30} text="→ 0〜255 = 256個" fs={11} />
           <GBox x={84} y={62} w={152} h={28} rx={10} fill={host === 8 ? ACCENT : TINT} stroke={host === 8 ? ACCENT : BORDER} ink={host === 8 ? '#fff' : MUTED} text={host === 8 ? '最大数（設問の答え）= 256' : `${total} 個（ホスト部${host}bit）`} fs={11} bold />
         </svg>
       </View>
@@ -525,7 +549,7 @@ export function NetFig11() {
     >
       <Segmented label="送り方" value={mode} options={[{ value: 'packets' as const, label: '小分け（パケット）' }, { value: 'all' as const, label: '一括' }]} onChange={setMode} />
       <View label="データの送り方と、途中で一部が失われたときの再送範囲">
-        <svg viewBox="0 0 320 118" className={styles.svg}>
+        <svg viewBox="0 0 320 122" className={styles.svg}>
           {mode === 'packets' ? (
             dims.map((i) => (
               <g key={i}>
@@ -538,23 +562,26 @@ export function NetFig11() {
                   fill={i === lost ? 'var(--color-error-tint)' : TINT}
                   stroke={i === lost ? 'var(--color-error)' : ACCENT}
                 />
-                <text x={45 + i * 78} y={48} fontSize={9.5} textAnchor="middle" fill={i === lost ? NGINK : MUTED} fontWeight={i === lost ? 700 : 400}>
+                <text x={45 + i * 78} y={48} fontSize={11} textAnchor="middle" fill={i === lost ? NGINK : MUTED} fontWeight={i === lost ? 700 : 400}>
                   {i === lost ? `#${i + 1} 消失` : `#${i + 1}`}
                 </text>
-                <text x={45 + i * 78} y={72} fontSize={8} textAnchor="middle" fill={MUTED}>
-                  宛先・順番つき
+                <text x={45 + i * 78} y={74} fontSize={11} textAnchor="middle" fill={MUTED}>
+                  宛先・
+                </text>
+                <text x={45 + i * 78} y={86} fontSize={11} textAnchor="middle" fill={MUTED}>
+                  順番つき
                 </text>
               </g>
             ))
           ) : (
             <>
-              <rect x={14} y={26} width={292} height={34} rx={5} fill={broken ? 'var(--color-error-tint)' : TINT} stroke={broken ? 'var(--color-error)' : ACCENT} />
-              <text x={160} y={48} fontSize={10} textAnchor="middle" fill={broken ? NGINK : MUTED} fontWeight={700}>
+              <rect x={14} y={38} width={292} height={34} rx={5} fill={broken ? 'var(--color-error-tint)' : TINT} stroke={broken ? 'var(--color-error)' : ACCENT} />
+              <text x={160} y={60} fontSize={11} textAnchor="middle" fill={broken ? NGINK : MUTED} fontWeight={700}>
                 {broken ? '一つの塊のまま、一部分が消えると全体を送り直し' : '一つの塊として送る'}
               </text>
             </>
           )}
-          <text x={160} y={100} fontSize={9.5} textAnchor="middle" fill={LABEL} fontWeight={700}>
+          <text x={160} y={108} fontSize={11} textAnchor="middle" fill={LABEL} fontWeight={700}>
             {mode === 'packets' ? '複数人での共有・部分的な再送がしやすい' : '回線の共有がやりにくい'}
           </text>
         </svg>
@@ -593,27 +620,27 @@ export function NetFig12() {
       />
       <View label="送信者・受信者の間での鍵の使い分け">
         <svg viewBox="0 0 320 118" className={styles.svg}>
-          <GBox x={10} y={40} w={70} h={30} text="送信者" fs={9.5} />
-          <GBox x={240} y={40} w={70} h={30} text="受信者" fs={9.5} />
-          <path d="M 84 55 L 236 55" stroke={MUTED} strokeDasharray="5 3" />
-          <text x={160} y={46} fontSize={9} textAnchor="middle" fill={MUTED}>
+          <GBox x={10} y={42} w={70} h={30} text="送信者" fs={11} />
+          <GBox x={240} y={42} w={70} h={30} text="受信者" fs={11} />
+          <path d="M 84 57 L 236 57" stroke={MUTED} strokeDasharray="5 3" />
+          <text x={160} y={48} fontSize={11} textAnchor="middle" fill={MUTED}>
             暗号文 →
           </text>
           {common ? (
             <>
-              <GCircle cx={104} cy={20} r={13} text="鍵" fs={9} fill="var(--color-warning)" ink="var(--color-warning-ink)" />
-              <GCircle cx={216} cy={20} r={13} text="鍵" fs={9} fill="var(--color-warning)" ink="var(--color-warning-ink)" />
-              <path d="M 117 20 L 203 20" stroke="var(--color-warning)" strokeDasharray="3 3" />
-              <text x={160} y={92} fontSize={9.5} textAnchor="middle" fill={MUTED}>
+              <GCircle cx={104} cy={20} r={18} text="鍵" fs={11} fill="var(--color-warning)" ink="var(--color-warning-ink)" />
+              <GCircle cx={216} cy={20} r={18} text="鍵" fs={11} fill="var(--color-warning)" ink="var(--color-warning-ink)" />
+              <path d="M 122 20 L 198 20" stroke="var(--color-warning)" strokeDasharray="3 3" />
+              <text x={160} y={94} fontSize={11} textAnchor="middle" fill={MUTED}>
                 同じ鍵を、互いに持っておく。鍵を送る経路にも注意
               </text>
             </>
           ) : (
             <>
-              <GCircle cx={104} cy={20} r={13} text="公開鍵" fs={7.5} fill={ACCENT} />
-              <GCircle cx={216} cy={20} r={13} text="秘密鍵" fs={7.5} fill="var(--color-warning)" ink="var(--color-warning-ink)" />
-              <path d="M 117 20 L 203 20" stroke={MUTED} strokeDasharray="2 4" />
-              <text x={160} y={92} fontSize={9.5} textAnchor="middle" fill={MUTED}>
+              <GCircle cx={104} cy={20} r={18} text="公開鍵" fs={11} fill={ACCENT} />
+              <GCircle cx={216} cy={20} r={18} text="秘密鍵" fs={11} fill="var(--color-warning)" ink="var(--color-warning-ink)" />
+              <path d="M 122 20 L 198 20" stroke={MUTED} strokeDasharray="2 4" />
+              <text x={160} y={94} fontSize={11} textAnchor="middle" fill={MUTED}>
                 公開鍵は配布してよい鍵。秘密鍵は受信者だけが持つ
               </text>
             </>
@@ -649,19 +676,22 @@ export function NetFig13() {
         </Btn>
       </div>
       <View label="署名の作り方と検証の流れ">
-        <svg viewBox="0 0 320 118" className={styles.svg}>
+        <svg viewBox="0 0 320 142" className={styles.svg}>
           {[
             { t: '① 送信者の秘密鍵で署名', y: 12 },
             { t: '② データ＋署名を送る', y: 46 },
             { t: '③ 受信者の公開鍵で検証', y: 80 },
           ].map((r, i) => (
             <g key={r.t}>
-              <GBox x={26} y={r.y} w={268} h={28} rx={8} text={r.t} fs={9.5} bold={i === 2} fill={i === 2 ? (okSig ? 'var(--color-success-tint)' : 'var(--color-error-tint)') : TINT} stroke={i === 2 ? (okSig ? 'var(--color-success)' : 'var(--color-error)') : ACCENT} ink={i === 2 ? (okSig ? OKINK : NGINK) : LABEL} />
+              <GBox x={26} y={r.y} w={268} h={28} rx={8} text={r.t} fs={11} bold={i === 2} fill={i === 2 ? (okSig ? 'var(--color-success-tint)' : 'var(--color-error-tint)') : TINT} stroke={i === 2 ? (okSig ? 'var(--color-success)' : 'var(--color-error)') : ACCENT} ink={i === 2 ? (okSig ? OKINK : NGINK) : LABEL} />
               {i < 2 && <path d={`M 160 ${r.y + 30} L 160 ${r.y + 32}`} stroke={MUTED} />}
             </g>
           ))}
-          <text x={160} y={116} fontSize={8.5} textAnchor="middle" fill={MUTED}>
-            通信中のデータを「読めなくする」のはSSL/TLSなど、別の仕組み
+          <text x={160} y={122} fontSize={11} textAnchor="middle" fill={MUTED}>
+            通信中のデータを「読めなくする」のは
+          </text>
+          <text x={160} y={136} fontSize={11} textAnchor="middle" fill={MUTED}>
+            SSL/TLSなど、別の仕組み
           </text>
         </svg>
       </View>
@@ -686,13 +716,16 @@ export function NetFig14() {
         <svg viewBox="0 0 320 102" className={styles.svg}>
           {AUTH_EL.map((t, i) => (
             <g key={t}>
-              <rect x={12 + i * 104} y={14} width={96} height={40} rx={8} fill={used[i] ? ACCENT : TINT} stroke={used[i] ? ACCENT : BORDER} />
-              <text x={60 + i * 104} y={38} fontSize={7.5} textAnchor="middle" fill={used[i] ? '#fff' : MUTED} fontWeight={700}>
-                {t}
+              <rect x={6 + i * 104} y={8} width={100} height={50} rx={8} fill={used[i] ? ACCENT : TINT} stroke={used[i] ? ACCENT : BORDER} />
+              <text x={56 + i * 104} y={29} fontSize={12} textAnchor="middle" fill={used[i] ? '#fff' : MUTED} fontWeight={700}>
+                {t.slice(0, t.indexOf('（'))}
+              </text>
+              <text x={56 + i * 104} y={46} fontSize={11} textAnchor="middle" fill={used[i] ? '#fff' : MUTED} fontWeight={700}>
+                {t.slice(t.indexOf('（'))}
               </text>
             </g>
           ))}
-          <text x={160} y={84} fontSize={11} textAnchor="middle" fill={LABEL} fontWeight={700}>
+          <text x={160} y={88} fontSize={12} textAnchor="middle" fill={LABEL} fontWeight={700}>
             要素数 = {n}（異なる種類の数）
           </text>
         </svg>
@@ -713,10 +746,30 @@ export function NetFig14() {
 /* ---------- q-net-15: 脅威の対応づけ ---------- */
 
 const THREATS = [
-  { id: 'phishing', name: 'フィッシング', desc: '正規そっくりの偽サイト・偽メールでID/パスワードを盗む' },
-  { id: 'dos', name: 'DoS攻撃', desc: '大量のリクエストを送り、サービスを応答不能にする' },
-  { id: 'mitm', name: '中間者攻撃', desc: '通信の途中で盗聴・改ざんする' },
-  { id: 'brute', name: '総当たり攻撃', desc: 'パスワードを辞書から一つずつ試して当てる' },
+  {
+    id: 'phishing',
+    name: 'フィッシング',
+    desc: '正規そっくりの偽サイト・偽メールでID/パスワードを盗む',
+    lines: ['正規そっくりの偽サイト・偽メールで', 'ID/パスワードを盗む'],
+  },
+  {
+    id: 'dos',
+    name: 'DoS攻撃',
+    desc: '大量のリクエストを送り、サービスを応答不能にする',
+    lines: ['大量のリクエストを送り、', 'サービスを応答不能にする'],
+  },
+  {
+    id: 'mitm',
+    name: '中間者攻撃',
+    desc: '通信の途中で盗聴・改ざんする',
+    lines: ['通信の途中で盗聴・改ざんする'],
+  },
+  {
+    id: 'brute',
+    name: '総当たり攻撃',
+    desc: 'パスワードを辞書から一つずつ試して当てる',
+    lines: ['パスワードを辞書から一つずつ', '試して当てる'],
+  },
 ] as const
 
 export function NetFig15() {
@@ -731,22 +784,26 @@ export function NetFig15() {
         onChange={setPick}
       />
       <View label="4つの脅威の主な説明の対照">
-        <svg viewBox="0 0 320 108" className={styles.svg}>
+        <svg viewBox="0 0 320 168" className={styles.svg}>
           {THREATS.map((v, i) => (
             <g key={v.id}>
               <GBox
                 x={8}
-                y={8 + i * 26}
+                y={8 + i * 40}
                 w={76}
-                h={22}
+                h={30}
                 text={v.name}
-                fs={9}
+                fs={11}
                 fill={v.id === pick ? (pick === 'phishing' ? ACCENT : TINT) : TINT}
                 stroke={v.id === pick ? ACCENT : BORDER}
                 ink={v.id === pick && pick === 'phishing' ? '#fff' : MUTED}
               />
-              <text x={94} y={24 + i * 26} fontSize={9} fill={v.id === pick ? LABEL : MUTED} fontWeight={v.id === pick ? 700 : 400}>
-                {v.desc}
+              <text x={94} y={28 + i * 40} fontSize={11} fill={v.id === pick ? LABEL : MUTED} fontWeight={v.id === pick ? 700 : 400}>
+                {v.lines.map((line, j) => (
+                  <tspan key={line} x={94} dy={j === 0 ? 0 : 14}>
+                    {line}
+                  </tspan>
+                ))}
               </text>
             </g>
           ))}
@@ -774,13 +831,13 @@ export function NetFig16() {
     >
       <View label="外部からの4つの通信をファイアウォールで検査する様子">
         <svg viewBox="0 0 320 116" className={styles.svg}>
-          <text x={14} y={16} fontSize={9} fill={MUTED}>
+          <text x={14} y={16} fontSize={11} fill={MUTED}>
             外部からの通信
           </text>
           {packets.map((p, i) => (
             <g key={p.n}>
-              <circle cx={32 + i * 84} cy={38} r={11} fill={TINT} stroke={BORDER} />
-              <text x={32 + i * 84} y={42} fontSize={8.5} textAnchor="middle" fill={MUTED}>
+              <circle cx={32 + i * 84} cy={38} r={12} fill={TINT} stroke={BORDER} />
+              <text x={32 + i * 84} y={42} fontSize={11} textAnchor="middle" fill={MUTED}>
                 #{p.n}
               </text>
               <path
@@ -792,9 +849,9 @@ export function NetFig16() {
               />
             </g>
           ))}
-          <GBox x={12} y={66} w={296} h={24} text="ファイアウォール（規則に合うか検査）" fs={9.5} fill={ACCENT} ink="#fff" bold />
+          <GBox x={12} y={66} w={296} h={24} text="ファイアウォール（規則に合うか検査）" fs={11} fill={ACCENT} ink="#fff" bold />
           {flow ? (
-            <text x={160} y={108} fontSize={10} textAnchor="middle">
+            <text x={160} y={108} fontSize={11} textAnchor="middle">
               {packets.map((p) => (
                 <tspan key={p.n} fill={p.pass ? 'var(--color-success-ink)' : 'var(--color-error-ink)'} fontWeight={700}>
                   {`#${p.n} ${p.pass ? '通す' : '遮断'}　`}
@@ -802,7 +859,7 @@ export function NetFig16() {
               ))}
             </text>
           ) : (
-            <text x={160} y={108} fontSize={9} textAnchor="middle" fill={MUTED}>
+            <text x={160} y={108} fontSize={11} textAnchor="middle" fill={MUTED}>
               通過の可否はここに出る
             </text>
           )}
@@ -828,19 +885,19 @@ export function NetFig17() {
       status={nat ? 'NAT（ルータの番号変換）により、プライベートIPのまま外部と通信できる。' : 'NATがないと、内部の番号が同じ他の家の番号と重なってしまう。'}
     >
       <View label="家庭内LANの端末がルータを通じて外部と通信する様子">
-        <svg viewBox="0 0 320 116" className={styles.svg}>
-          <GBox x={10} y={38} w={110} h={28} text="端末 192.168.1.10" fs={8.5} fill={TINT} />
-          <GCircle cx={170} cy={52} r={20} text="ルータ" fs={9} fill={ACCENT} />
-          <GBox x={232} y={38} w={76} h={28} text="インターネット" fs={8} fill="var(--color-warning-tint)" stroke="var(--color-warning)" ink="var(--color-warning-ink)" />
-          <text x={252} y={30} fontSize={8} fill={MUTED}>
+        <svg viewBox="0 0 320 120" className={styles.svg}>
+          <GBox x={10} y={38} w={110} h={28} text="端末 192.168.1.10" fs={11} fill={TINT} />
+          <GCircle cx={170} cy={52} r={20} text="ルータ" fs={11} fill={ACCENT} />
+          <GBox x={226} y={38} w={88} h={28} text="インターネット" fs={11} fill="var(--color-warning-tint)" stroke="var(--color-warning)" ink="var(--color-warning-ink)" />
+          <text x={270} y={30} fontSize={11} textAnchor="middle" fill={MUTED}>
             {nat ? '203.0.113.7' : '（変換なし）'}
           </text>
           <path d="M 124 52 L 148 52" stroke="var(--color-success)" />
-          <path d="M 192 52 L 230 52" stroke={nat ? 'var(--color-success)' : 'var(--color-error)'} strokeDasharray={nat ? '' : '4 3'} />
-          <text x={160} y={92} fontSize={9} textAnchor="middle" fill={MUTED}>
+          <path d="M 192 52 L 224 52" stroke={nat ? 'var(--color-success)' : 'var(--color-error)'} strokeDasharray={nat ? '' : '4 3'} />
+          <text x={160} y={94} fontSize={11} textAnchor="middle" fill={MUTED}>
             192.168.x.x は「家庭内で重複してもよい内部用の番号」
           </text>
-          <text x={160} y={106} fontSize={9} textAnchor="middle" fill={MUTED}>
+          <text x={160} y={110} fontSize={11} textAnchor="middle" fill={MUTED}>
             通信の暗号化・速度とは別の話
           </text>
         </svg>
@@ -883,18 +940,21 @@ export function NetFig18() {
         onChange={setCase}
       />
       <View label="無線の通信と、盗み見の結果">
-        <svg viewBox="0 0 320 106" className={styles.svg}>
-          <GBox x={14} y={20} w={92} h={28} text="スマホの通信" fs={9} />
+        <svg viewBox="0 0 320 120" className={styles.svg}>
+          <GBox x={14} y={20} w={92} h={28} text="スマホの通信" fs={11} />
           <path d="M 116 34 q 9 -9 18 0 q 9 9 18 0 q 9 -9 18 0 q 9 9 18 0 q 9 -9 18 0" stroke={MUTED} strokeWidth={1.5} fill="none" />
-          <GBox x={224} y={20} w={84} h={28} text={c.enc ? '読めない文字列' : '生の本文'} fs={8.5} fill={c.enc ? TINT : 'var(--color-error-tint)'} stroke={c.enc ? ACCENT : 'var(--color-error)'} ink={c.enc ? MUTED : NGINK} />
-          <text x={160} y={20} fontSize={8.5} textAnchor="middle" fill={MUTED}>
+          <GBox x={220} y={20} w={88} h={28} text={c.enc ? '読めない文字列' : '生の本文'} fs={11} fill={c.enc ? TINT : 'var(--color-error-tint)'} stroke={c.enc ? ACCENT : 'var(--color-error)'} ink={c.enc ? MUTED : NGINK} />
+          <text x={160} y={18} fontSize={11} textAnchor="middle" fill={MUTED}>
             覗き見する人
           </text>
-          <text x={160} y={72} fontSize={10} textAnchor="middle" fill={c.enc ? OKINK : NGINK} fontWeight={700}>
+          <text x={160} y={70} fontSize={12} textAnchor="middle" fill={c.enc ? OKINK : NGINK} fontWeight={700}>
             {c.enc ? '→ 読み取れない' : '→ 読み取れる'}
           </text>
-          <text x={160} y={90} fontSize={8.5} textAnchor="middle" fill={MUTED}>
-            無線は有線と違い、電波が届く場所では読める。暗号化は必須。
+          <text x={160} y={92} fontSize={11} textAnchor="middle" fill={MUTED}>
+            無線は有線と違い、電波が届く場所では読める。
+          </text>
+          <text x={160} y={108} fontSize={11} textAnchor="middle" fill={MUTED}>
+            暗号化は必須。
           </text>
         </svg>
       </View>

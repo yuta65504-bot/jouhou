@@ -4,7 +4,7 @@
  * - 操作部品は44px以上、状態は色＋テキスト（アクセシビリティ §は README 参照）
  * - 解説の動きは「控えめ」: 100〜240ms。reduced motion では即時表示
  */
-import { useId, type CSSProperties, type FC, type ReactNode } from 'react'
+import { useId, type CSSProperties, type FC, type KeyboardEvent, type ReactNode } from 'react'
 import { useReducedMotion } from '@/lib/motion'
 import styles from './figures.module.css'
 
@@ -410,6 +410,25 @@ export const BitGrid: FC<{
 
 /* ---------- SVG ジオメトリ ---------- */
 
+/**
+ * SVG内の図形をキーボードでも押せるようにする。
+ * 図の都合で44pxの当たり判定を確保できない箇所の代替として使う。
+ */
+export const svgButton = (label: string, onActivate: () => void, pressed?: boolean) => ({
+  role: 'button' as const,
+  tabIndex: 0,
+  'aria-label': label,
+  'aria-pressed': pressed,
+  className: styles.clickableDot,
+  onClick: onActivate,
+  onKeyDown: (e: KeyboardEvent<SVGElement>) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault()
+      onActivate()
+    }
+  },
+})
+
 /** 角丸ボックス＋中央のラベル */
 export const GBox: FC<{
   x: number
@@ -489,7 +508,7 @@ export const GBit: FC<{ x: number; y: number; v: 0 | 1; size?: number; dim?: boo
     <text
       x={x + size / 2}
       y={y + size * 0.72}
-      fontSize={10}
+      fontSize={11}
       textAnchor="middle"
       fill={v ? '#fff' : LABEL}
       opacity={dim ? 0.45 : 1}
@@ -511,7 +530,7 @@ export const GBitRow: FC<{
 }> = ({ x, y, bits, tag, cell = 18, dim = false }) => (
   <g>
     {tag && (
-      <text x={x - 6} y={y + cell * 0.72} fontSize={10} textAnchor="end" fill={MUTED}>
+      <text x={x - 6} y={y + cell * 0.72} fontSize={11} textAnchor="end" fill={MUTED}>
         {tag}
       </text>
     )}
@@ -566,7 +585,7 @@ export const GArrayRow: FC<{
         <text
           x={x + i * cw + (cw - 2) / 2}
           y={y + ch + 12}
-          fontSize={9}
+          fontSize={11}
           textAnchor="middle"
           fill={MUTED}
         >
@@ -591,7 +610,7 @@ export const GDiamond: FC<{ cx: number; cy: number; w: number; h: number; text: 
       fill="var(--color-warning-tint)"
       stroke="var(--color-warning)"
     />
-    <text x={cx} y={cy + 4} fontSize={10} textAnchor="middle" fill={LABEL} fontWeight={700}>
+    <text x={cx} y={cy + 4} fontSize={11} textAnchor="middle" fill={LABEL} fontWeight={700}>
       {text}
     </text>
   </g>
@@ -606,7 +625,7 @@ export const GCircle: FC<{
   fill?: string
   ink?: string
   fs?: number
-}> = ({ cx, cy, r, text, fill = ACCENT, ink = '#fff', fs = 10 }) => (
+}> = ({ cx, cy, r, text, fill = ACCENT, ink = '#fff', fs = 11 }) => (
   <g>
     <circle cx={cx} cy={cy} r={r} fill={fill} />
     <text x={cx} y={cy + fs * 0.36} fontSize={fs} textAnchor="middle" fill={ink} fontWeight={700}>

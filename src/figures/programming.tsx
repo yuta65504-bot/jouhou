@@ -31,6 +31,7 @@ import {
   GCircle,
   GDiamond,
   GArrow,
+  svgButton,
 } from './parts'
 
 /* =========================================================
@@ -246,8 +247,8 @@ export function ProFig2() {
       <View label="配列の値と、仮の最大値が置かれている位置">
         <svg viewBox="0 0 320 106" className={styles.svg}>
           <GArrayRow x={20} y={14} values={P2_VALUES} cw={42} ch={26} marks={marks} />
-          <GBox x={20} y={74} w={110} h={24} rx={6} text={`仮の最大値 = ${cur}`} fs={9.5} bold />
-          <text x={150} y={90} fontSize={9.5} fill={MUTED}>
+          <GBox x={20} y={74} w={110} h={24} rx={6} text={`仮の最大値 = ${cur}`} fs={11} bold />
+          <text x={150} y={90} fontSize={11} fill={MUTED}>
             比較した回数: {k}回
           </text>
         </svg>
@@ -339,7 +340,7 @@ export function ProFig5() {
             marks={shownMarks}
             cw={40}
           />
-          <text x={20} y={84} fontSize={10} fill={MUTED}>
+          <text x={20} y={84} fontSize={11} fill={MUTED}>
             {k >= 3 ? 'i が4になる前に範囲(〜3)で終わる → 4は表示されない' : `表示する i → ${(shown.join(' ') || '（まだ）')}`}
           </text>
         </svg>
@@ -385,7 +386,7 @@ export function ProFig6() {
       <View label="配列のセルと添字（下の数字は位置、下段の式がその言語での添字）">
         <svg viewBox="0 0 320 92" className={styles.svg}>
           <GArrayRow x={20} y={14} values={P6_VALUES} cw={56} ch={26} marks={{ [sel - 1]: '選択中' }} />
-          <text x={20} y={86} fontSize={10} fill={ACCENT} fontWeight={700}>
+          <text x={20} y={86} fontSize={11} fill={ACCENT} fontWeight={700}>
             {lang === 'dncl' ? `a[${sel}]` : `a[${sel - 1}]`}
             <tspan fill={MUTED} fontWeight={400}>{` ← 同じ ${sel}番目のセル`}</tspan>
           </text>
@@ -423,15 +424,22 @@ export function ProFig7() {
       title="図解: a[行,列] の順に添字を書く"
       status={`選んだセルは a[${sel.r + 1},${sel.c + 1}] = ${cell}。1つ目の添字が「行」、2つ目が「列」。`}
     >
-      <View label="3行4列の二次元配列。セルを選ぶと a[行,列] の値を示す">
-        <svg viewBox="0 0 320 108" className={styles.svg}>
+      <Canvas label="3行4列の二次元配列。セルを選ぶと a[行,列] の値を示す" interactive>
+        <svg viewBox="0 0 320 122" className={styles.svg}>
           {P7_GRID.map((row, r) => (
             <g key={r}>
               {row.map((_, c) => (
-                <g key={c} onClick={() => setSel({ r, c })} style={{ cursor: 'pointer' }}>
+                <g
+                  key={c}
+                  {...svgButton(
+                    `${r + 1}行${c + 1}列、a[${r + 1},${c + 1}] = ${P7_GRID[r][c]}`,
+                    () => setSel({ r, c }),
+                    sel.r === r && sel.c === c,
+                  )}
+                >
                   <rect
                     x={28 + c * 62}
-                    y={16 + r * 30}
+                    y={18 + r * 30}
                     width={58}
                     height={26}
                     rx={3}
@@ -439,26 +447,26 @@ export function ProFig7() {
                     stroke={sel.r === r && sel.c === c ? ACCENT : BORDER}
                     strokeWidth={sel.r === r && sel.c === c ? 2 : 1}
                   />
-                  <text x={57 + c * 62} y={34 + r * 30} fontSize={11} textAnchor="middle" fill={sel.r === r && sel.c === c ? '#fff' : MUTED} fontWeight={sel.r === r && sel.c === c ? 700 : 400}>
+                  <text x={57 + c * 62} y={35 + r * 30} fontSize={11} textAnchor="middle" fill={sel.r === r && sel.c === c ? '#fff' : MUTED} fontWeight={sel.r === r && sel.c === c ? 700 : 400}>
                     {P7_GRID[r][c]}
                   </text>
                 </g>
               ))}
-              <text x={16} y={34 + r * 30} fontSize={9} textAnchor="middle" fill={MUTED}>
+              <text x={16} y={35 + r * 30} fontSize={11} textAnchor="middle" fill={MUTED}>
                 {r + 1}行
               </text>
             </g>
           ))}
           {P7_GRID[0].map((_, c) => (
-            <text key={c} x={57 + c * 62} y={14} fontSize={9} textAnchor="middle" fill={MUTED}>
+            <text key={c} x={57 + c * 62} y={13} fontSize={11} textAnchor="middle" fill={MUTED}>
               {c + 1}列
             </text>
           ))}
-          <text x={160} y={104} fontSize={9.5} textAnchor="middle" fill={MUTED}>
+          <text x={160} y={118} fontSize={11} textAnchor="middle" fill={MUTED}>
             a[{sel.r + 1},{sel.c + 1}]（選択中）
           </text>
         </svg>
-      </View>
+      </Canvas>
       <Note>二次元配列は表のデータに使いやすい。設問の「2行目2列目」は a[2,2]。</Note>
     </FigShell>
   )
@@ -491,7 +499,7 @@ export function ProFig8() {
       <View label="先頭から順に値を比較する様子">
         <svg viewBox="0 0 320 84" className={styles.svg}>
           <GArrayRow x={18} y={14} values={P8_VALUES} cw={42} ch={26} marks={marks} />
-          <text x={18} y={70} fontSize={9.5} fill={MUTED}>
+          <text x={18} y={70} fontSize={11} fill={MUTED}>
             探す値: {P8_TARGET} ／ 比較した回数: {k}
           </text>
         </svg>
@@ -568,16 +576,16 @@ export function ProFig9() {
                 stroke={marks[i] ? ACCENT : BORDER}
                 strokeWidth={marks[i] === '中央' ? 2 : 1}
               />
-              <text x={33 + i * 38} y={52} fontSize={10.5} textAnchor="middle" fill={marks[i] === '中央' ? '#fff' : MUTED} fontWeight={marks[i] === '中央' ? 700 : 400}>
+              <text x={33 + i * 38} y={52} fontSize={11} textAnchor="middle" fill={marks[i] === '中央' ? '#fff' : MUTED} fontWeight={marks[i] === '中央' ? 700 : 400}>
                 {v}
               </text>
-              <text x={33 + i * 38} y={72} fontSize={8.5} textAnchor="middle" fill={MUTED}>
+              <text x={33 + i * 38} y={72} fontSize={11} textAnchor="middle" fill={MUTED}>
                 a[{i + 1}]
               </text>
             </g>
           ))}
           <path d={`M ${16 + (f.lo - 1) * 38} 26 L ${16 + (f.hi - 1) * 38 + 34} 26`} stroke={ACCENT} strokeWidth={2} />
-          <text x={160} y={94} fontSize={9.5} textAnchor="middle" fill={MUTED}>
+          <text x={160} y={94} fontSize={11} textAnchor="middle" fill={MUTED}>
             今見る範囲: a[{f.lo}]〜a[{f.hi}]（残り{f.hi - f.lo + 1}個）
           </text>
         </svg>
@@ -658,7 +666,7 @@ export function ProFig10() {
       <View label="選択法1回目の工程">
         <svg viewBox="0 0 320 84" className={styles.svg}>
           <GArrayRow x={22} y={14} values={f.arr} cw={44} ch={26} marks={f.marks} />
-          <text x={22} y={72} fontSize={9.5} fill={MUTED}>
+          <text x={22} y={72} fontSize={11} fill={MUTED}>
             {k === P10_FRAMES.length - 1 ? `1回目の結果: ${f.arr.join(' ')}` : `手順 ${k}/${P10_FRAMES.length - 1}`}
           </text>
         </svg>
@@ -715,7 +723,7 @@ export function ProFig11() {
               </text>
             </g>
           ))}
-          <text x={22} y={72} fontSize={9.5} fill={MUTED}>
+          <text x={22} y={72} fontSize={11} fill={MUTED}>
             整列済み部分: {f.arr.slice(0, Object.values(f.marks).filter((m) => m === '整列済み').length).join(' ')}
           </text>
         </svg>
@@ -755,29 +763,32 @@ export function ProFig12() {
       <Segmented label="アルゴリズム" value={op} options={P12_OPS.map((v) => ({ value: v.id, label: v.label }))} onChange={setOp} />
       <Slider label="データの個数 n" value={n} min={10} max={1000} step={10} onChange={setN} />
       <View label={`n=${n} のときの、おおよその作業回数（対数目盛）`}>
-        <svg viewBox="0 0 320 112" className={styles.svg}>
+        <svg viewBox="0 0 320 128" className={styles.svg}>
           {P12_OPS.map((d, i) => (
             <g key={d.id}>
-              <text x={10} y={28 + i * 28} fontSize={9.5} fill={d.id === op ? LABEL : MUTED} fontWeight={d.id === op ? 700 : 400}>
+              <text x={10} y={28 + i * 28} fontSize={11} fill={d.id === op ? LABEL : MUTED} fontWeight={d.id === op ? 700 : 400}>
                 {d.label}
               </text>
               <rect
                 x={128}
                 y={18 + i * 28}
-                width={Math.max(4, Math.min(148, (Math.log10(Math.max(1, d.count(n))) / 5) * 148))}
+                width={Math.max(4, Math.min(100, (Math.log10(Math.max(1, d.count(n))) / 5) * 100))}
                 height={16}
                 rx={8}
                 fill={d.id === op ? ACCENT : TINT}
                 stroke={d.id === op ? ACCENT : BORDER}
               />
-              <text x={284} y={30 + i * 28} fontSize={9} textAnchor="end" fill={d.id === op ? ACCENT : MUTED} fontWeight={d.id === op ? 700 : 400}>
+              <text x={294} y={30 + i * 28} fontSize={11} textAnchor="end" fill={d.id === op ? ACCENT : MUTED} fontWeight={d.id === op ? 700 : 400}>
                 {fmt(d.count(n))}回
               </text>
             </g>
           ))}
-          <line x1={128} y1={14} x2={128} y2={100} stroke={BORDER} />
-          <text x={160} y={108} fontSize={9} textAnchor="middle" fill={MUTED}>
-            棒の長さは対数目盛。nが10倍になっても、二分探索はわずか数回しか増えない
+          <line x1={128} y1={14} x2={128} y2={94} stroke={BORDER} />
+          <text x={160} y={106} fontSize={11} textAnchor="middle" fill={MUTED}>
+            棒の長さは対数目盛。nが10倍になっても、
+          </text>
+          <text x={160} y={122} fontSize={11} textAnchor="middle" fill={MUTED}>
+            二分探索はわずか数回しか増えない
           </text>
         </svg>
       </View>
@@ -800,13 +811,13 @@ export function ProFig13() {
   const [sel, setSel] = useState(2)
   return (
     <FigShell title="図解: コンピュータは 5つの装置でできている" status={`${DEV5[sel].k} の役割: ${DEV5[sel].ex}`}>
-      <View label="入力 → 記憶（演算・制御）→ 出力。四角を選ぶと役割がわかる">
+      <Canvas label="入力 → 記憶（演算・制御）→ 出力。四角を選ぶと役割がわかる" interactive>
         <svg viewBox="0 0 320 134" className={styles.svg}>
-          <GBox x={10} y={56} w={62} h={30} text="入力装置" fs={9} bold={sel === 0} fill={sel === 0 ? ACCENT : TINT} ink={sel === 0 ? '#fff' : MUTED} />
-          <GBox x={122} y={56} w={76} h={30} text="記憶装置" fs={9} bold={sel === 1} fill={sel === 1 ? ACCENT : TINT} ink={sel === 1 ? '#fff' : MUTED} />
-          <GBox x={122} y={12} w={76} h={26} text="演算装置" fs={9} bold={sel === 2} fill={sel === 2 ? ACCENT : TINT} ink={sel === 2 ? '#fff' : MUTED} />
-          <GBox x={122} y={100} w={76} h={26} text="制御装置" fs={9} bold={sel === 3} fill={sel === 3 ? ACCENT : TINT} ink={sel === 3 ? '#fff' : MUTED} />
-          <GBox x={248} y={56} w={62} h={30} text="出力装置" fs={9} bold={sel === 4} fill={sel === 4 ? ACCENT : TINT} ink={sel === 4 ? '#fff' : MUTED} />
+          <GBox x={10} y={56} w={62} h={30} text="入力装置" fs={11} bold={sel === 0} fill={sel === 0 ? ACCENT : TINT} ink={sel === 0 ? '#fff' : MUTED} />
+          <GBox x={122} y={56} w={76} h={30} text="記憶装置" fs={11} bold={sel === 1} fill={sel === 1 ? ACCENT : TINT} ink={sel === 1 ? '#fff' : MUTED} />
+          <GBox x={122} y={12} w={76} h={26} text="演算装置" fs={11} bold={sel === 2} fill={sel === 2 ? ACCENT : TINT} ink={sel === 2 ? '#fff' : MUTED} />
+          <GBox x={122} y={100} w={76} h={26} text="制御装置" fs={11} bold={sel === 3} fill={sel === 3 ? ACCENT : TINT} ink={sel === 3 ? '#fff' : MUTED} />
+          <GBox x={248} y={56} w={62} h={30} text="出力装置" fs={11} bold={sel === 4} fill={sel === 4 ? ACCENT : TINT} ink={sel === 4 ? '#fff' : MUTED} />
           <GArrow x1={74} y1={71} x2={120} y2={71} stroke={MUTED} />
           <GArrow x1={194} y1={71} x2={246} y2={71} stroke={MUTED} />
           <GArrow x1={160} y1={54} x2={160} y2={40} stroke={MUTED} />
@@ -818,10 +829,17 @@ export function ProFig13() {
             { i: 3, cx: 160, cy: 113 },
             { i: 4, cx: 279, cy: 71 },
           ].map((h) => (
-            <circle key={h.i} cx={h.cx} cy={h.cy} r={19} fill="transparent" style={{ cursor: 'pointer' }} onClick={() => setSel(h.i)} />
+            <circle
+              key={h.i}
+              cx={h.cx}
+              cy={h.cy}
+              r={22}
+              fill="transparent"
+              {...svgButton(`${DEV5[h.i].k}を選ぶ`, () => setSel(h.i), sel === h.i)}
+            />
           ))}
         </svg>
-      </View>
+      </Canvas>
       <Note>演算装置と制御装置を合わせたものがCPU。矢印はデータの流れを表す。情報システムの「5要素」とは別の概念。</Note>
     </FigShell>
   )
@@ -910,14 +928,17 @@ export function ProFig15() {
         </Btn>
       </div>
       <View label="関数 f に値を入れて、戻り値を受け取る流れ">
-        <svg viewBox="0 0 320 92" className={styles.svg}>
+        <svg viewBox="0 0 320 104" className={styles.svg}>
           <GBox x={12} y={30} w={70} h={30} text={`x = ${x}`} fs={11} bold fill={TINT} />
           <GArrow x1={86} y1={45} x2={118} y2={45} />
           <GBox x={122} y={28} w={92} h={34} text="f:" fs={12} bold fill={ACCENT} ink="#fff" />
           <GArrow x1={218} y1={45} x2={250} y2={45} />
-          <GBox x={252} y={30} w={60} h={30} text={calls.length > 0 ? `f(x)=${calls[calls.length - 1].r}` : 'f(x)'} fs={10.5} bold fill={TINT} />
-          <text x={168} y={80} fontSize={8.5} textAnchor="middle" fill={MUTED}>
-            呼び出しのたびに値（実引数）を渡し、処理の中身を書くのは一度だけでよい
+          <GBox x={252} y={30} w={60} h={30} text={calls.length > 0 ? `f(x)=${calls[calls.length - 1].r}` : 'f(x)'} fs={11} bold fill={TINT} />
+          <text x={168} y={80} fontSize={11} textAnchor="middle" fill={MUTED}>
+            呼び出しのたびに値（実引数）を渡し、
+          </text>
+          <text x={168} y={96} fontSize={11} textAnchor="middle" fill={MUTED}>
+            処理の中身を書くのは一度だけでよい
           </text>
         </svg>
       </View>
@@ -1009,10 +1030,10 @@ export function ProFig16() {
                 return (
                   <g key={v}>
                     <rect x={24 + v * 34} y={96 - (c / maxCount) * 62} width={24} height={(c / maxCount) * 62} rx={3} fill={TINT} stroke={ACCENT} />
-                    <text x={36 + v * 34} y={92 - (c / maxCount) * 62} fontSize={9} textAnchor="middle" fill={MUTED}>
+                    <text x={36 + v * 34} y={92 - (c / maxCount) * 62} fontSize={11} textAnchor="middle" fill={MUTED}>
                       {c === 0 ? '' : `${c}回`}
                     </text>
-                    <text x={36 + v * 34} y={112} fontSize={8.5} textAnchor="middle" fill={MUTED}>
+                    <text x={36 + v * 34} y={112} fontSize={11} textAnchor="middle" fill={MUTED}>
                       {v}分
                     </text>
                   </g>
@@ -1020,7 +1041,7 @@ export function ProFig16() {
               })
             : [
                 <g key="x">
-                  <text x={160} y={64} fontSize={10} textAnchor="middle" fill={MUTED}>
+                  <text x={160} y={64} fontSize={11} textAnchor="middle" fill={MUTED}>
                     まだ試していない。「1回試す」を押そう
                   </text>
                 </g>,
@@ -1063,11 +1084,11 @@ export function ProFig17() {
       <View label="100回のシミュレーションで、平均待ち時間の分布を比べる">
         <svg viewBox="0 0 320 110" className={styles.svg}>
           <rect x={226} y={2} width={8} height={8} rx={2} fill={TINT} stroke={ACCENT} />
-          <text x={238} y={9.5} fontSize={8} fill={MUTED}>
+          <text x={238} y={11} fontSize={11} fill={MUTED}>
             4分
           </text>
           <rect x={262} y={2} width={8} height={8} rx={2} fill="var(--color-success-tint)" stroke="var(--color-success)" />
-          <text x={274} y={9.5} fontSize={8} fill={MUTED}>
+          <text x={274} y={11} fontSize={11} fill={MUTED}>
             3分
           </text>
           <line x1={12} y1={88} x2={308} y2={88} stroke={BORDER} />
@@ -1075,7 +1096,7 @@ export function ProFig17() {
             <g key={x}>
               <rect x={14 + x * 42} y={88 - ((h4.get(x) ?? 0) / maxC) * 66} width={15} height={((h4.get(x) ?? 0) / maxC) * 66} rx={2} fill={TINT} stroke={ACCENT} />
               <rect x={32 + x * 42} y={88 - ((h3.get(x) ?? 0) / maxC) * 66} width={15} height={((h3.get(x) ?? 0) / maxC) * 66} rx={2} fill="var(--color-success-tint)" stroke="var(--color-success)" />
-              <text x={30 + x * 42} y={100} fontSize={8.5} textAnchor="middle" fill={MUTED}>
+              <text x={30 + x * 42} y={100} fontSize={11} textAnchor="middle" fill={MUTED}>
                 {x}分
               </text>
             </g>
@@ -1122,13 +1143,13 @@ export function ProFig18() {
         <svg viewBox="0 0 320 112" className={styles.svg}>
           {kind === 'chart' && (
             <>
-              <GBox x={130} y={6} w={60} h={22} text="開始" fs={9} rx={11} />
+              <GBox x={130} y={6} w={60} h={22} text="開始" fs={11} rx={11} />
               <GArrow x1={160} y1={30} x2={160} y2={40} />
-              <GBox x={118} y={40} w={84} h={22} text="データを読む" fs={8.5} />
+              <GBox x={118} y={40} w={84} h={22} text="データを読む" fs={11} />
               <GArrow x1={160} y1={62} x2={160} y2={72} />
               <GDiamond cx={160} cy={84} w={72} h={28} text="条件?" />
-              <GArrow x1={196} y1={84} x2={250} y2={84} />
-              <text x={256} y={88} fontSize={9} fill={MUTED}>
+              <GArrow x1={196} y1={84} x2={232} y2={84} />
+              <text x={238} y={88} fontSize={11} fill={MUTED}>
                 はい → 処理A
               </text>
             </>
@@ -1151,10 +1172,10 @@ export function ProFig18() {
           )}
           {kind === 'dncl' && (
             <>
-              <text x={20} y={30} fontSize={9.5} fill={LABEL} fontFamily="var(--font-mono)">
+              <text x={20} y={30} fontSize={11} fill={LABEL} fontFamily="var(--font-mono)">
                 n を 1 から 5 まで 1 ずつ増やしながら繰り返す:
               </text>
-              <text x={36} y={56} fontSize={10.5} fill={LABEL} fontFamily="var(--font-mono)">
+              <text x={36} y={56} fontSize={11} fill={LABEL} fontFamily="var(--font-mono)">
                 表示する(n)
               </text>
             </>
@@ -1163,13 +1184,13 @@ export function ProFig18() {
             <>
               <GBox x={24} y={10} w={272} h={66} text="" fill="var(--color-warning-tint)" stroke="var(--color-warning)" rx={6} />
               {['日付｜内容｜金額', '10月｜売上の記録｜△△円', '（処理の手順は書かれていない）'].map((t, i) => (
-                <text key={i} x={38} y={32 + i * 18} fontSize={9.5} fill="var(--color-warning-ink)">
+                <text key={i} x={38} y={32 + i * 18} fontSize={11} fill="var(--color-warning-ink)">
                   {t}
                 </text>
               ))}
             </>
           )}
-          <text x={160} y={108} fontSize={9.5} textAnchor="middle" fill={c.ok ? OKINK : NGINK} fontWeight={700}>
+          <text x={160} y={108} fontSize={11} textAnchor="middle" fill={c.ok ? OKINK : NGINK} fontWeight={700}>
             {c.ok ? '→ 処理の手順を表せる（アルゴリズムの記述に向く）' : '→ 手順を表していない（記録の報告書）'}
           </text>
         </svg>
