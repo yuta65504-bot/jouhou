@@ -104,7 +104,6 @@ export default function SettingsPage() {
           </h2>
           <p className={ui.lead}>
             jouhou は、情報Ⅰの共通テスト対策を「操作して理解する図解」で学べる学習サイトです。
-            テキストと図解は、作者と高校教諭の共同執筆・監修により作成しています。
             図表はすべて自作で、過去問の図表は転載していません。
           </p>
           <p className={s.version}>Version 0.1.0（初期リリース目標: 2027年1月の共通テスト）</p>
