@@ -369,8 +369,7 @@ button.cell:active {
   font-weight: 600;
   line-height: 1.25;
   color: var(--color-secondary-label);
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow-wrap: anywhere;
 }
 
 .cellCurrent {
@@ -459,6 +458,17 @@ button.cell:active {
 .tbl th {
   background: var(--color-surface);
   color: var(--color-secondary-label);
+  font-weight: 600;
+  padding: 0;
+}
+
+/* 見出しセル全体を押せるようにする（44px・キーボード操作） */
+.thBtn {
+  display: block;
+  width: 100%;
+  min-height: var(--tap-min);
+  padding: 4px 10px;
+  text-align: left;
   font-weight: 600;
 }
 

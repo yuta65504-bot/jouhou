@@ -783,9 +783,11 @@ export function DatFig10() {
           <thead>
             <tr>
               {D10_COLS.map((c, i) => (
-                <th key={c} className={styles.clickableDot} style={{ textAlign: 'left' }} onClick={() => setCol(i)}>
-                  {c}
-                  <span aria-hidden="true">{i === col ? ' ▾' : ''}</span>
+                <th key={c}>
+                  <button type="button" className={styles.thBtn} aria-pressed={i === col} onClick={() => setCol(i)}>
+                    {c}
+                    <span aria-hidden="true">{i === col ? ' ▾' : ''}</span>
+                  </button>
                 </th>
               ))}
             </tr>

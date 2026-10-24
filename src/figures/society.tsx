@@ -22,6 +22,7 @@ import {
   Btn,
   Slider,
   GBox,
+  svgButton,
 } from './parts'
 
 /** 縦並びの操作ブロック */
@@ -461,12 +462,12 @@ export function SocFig9() {
         options={SYS5.map((v, i) => ({ value: String(i), label: v.k }))}
         onChange={(v) => setSel(Number(v))}
       />
-      <View label="情報システムは人・機器・技術・手順・法規の要素からなる">
+      <Canvas label="情報システムは人・機器・技術・手順・法規の要素からなる" interactive>
         <svg viewBox="0 0 320 120" className={styles.svg}>
           <GBox x={98} y={8} w={124} h={28} text="情報システム" fill={TINT} />
           <path d="M 160 36 L 160 52" stroke={MUTED} />
           {SYS5.map((v, i) => (
-            <g key={v.k} onClick={() => setSel(i)} className={styles.clickableDot}>
+            <g key={v.k} {...svgButton(`${v.k}を選ぶ`, () => setSel(i), i === sel)}>
               <rect
                 x={8 + i * 62}
                 y={54}
@@ -485,7 +486,7 @@ export function SocFig9() {
             選択肢1の「五大装置」はコンピュータ本体の構成
           </text>
         </svg>
-      </View>
+      </Canvas>
       <Note>「人・機器・技術・手順・法規」が情報システム全体の要素。五つの装置（ハードウェア構成）や通信の構成、開発工程とは別物。</Note>
     </FigShell>
   )

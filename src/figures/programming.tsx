@@ -1083,12 +1083,12 @@ export function ProFig17() {
     >
       <View label="100回のシミュレーションで、平均待ち時間の分布を比べる">
         <svg viewBox="0 0 320 110" className={styles.svg}>
-          <rect x={226} y={2} width={8} height={8} rx={2} fill={TINT} stroke={ACCENT} />
-          <text x={238} y={11} fontSize={11} fill={MUTED}>
+          <rect x={226} y={4} width={8} height={8} rx={2} fill={TINT} stroke={ACCENT} />
+          <text x={238} y={14} fontSize={11} fill={MUTED}>
             4分
           </text>
-          <rect x={262} y={2} width={8} height={8} rx={2} fill="var(--color-success-tint)" stroke="var(--color-success)" />
-          <text x={274} y={11} fontSize={11} fill={MUTED}>
+          <rect x={262} y={4} width={8} height={8} rx={2} fill="var(--color-success-tint)" stroke="var(--color-success)" />
+          <text x={274} y={14} fontSize={11} fill={MUTED}>
             3分
           </text>
           <line x1={12} y1={88} x2={308} y2={88} stroke={BORDER} />
