@@ -59,16 +59,23 @@ const print = (label: string, items: Warning[], limit = 8) => {
     return
   }
   console.log(`  ${label}: ${items.length}`)
-  for (const item of items.slice(0, limit)) {
+  const shown = printAll ? items : items.slice(0, limit)
+  for (const item of shown) {
     console.log(`    ${item.file}:${item.line}  ${item.text}`)
   }
-  if (items.length > limit) console.log(`    … ほか ${items.length - limit} 件`)
+  if (!printAll && items.length > limit) console.log(`    … ほか ${items.length - limit} 件`)
 }
 
+/* 移行作業用: --file=society.tsx で対象を絞り、--all で全件表示する */
+const fileArg = process.argv.find((a) => a.startsWith('--file='))?.slice('--file='.length)
+const printAll = process.argv.includes('--all')
+const normalize = (f: string) => (f.endsWith('.tsx') ? f : `${f}.tsx`)
+const scoped = fileArg ? (items: Warning[]) => items.filter((i) => i.file === normalize(fileArg)) : (items: Warning[]) => items
+
 console.log('図解チェック')
-print('SVG内のHTML（失敗）', invalid)
-print('fontSize < 11（移行中の警告）', smallFonts)
-print('インラインstyle（移行中の警告）', inlineStyles)
+print('SVG内のHTML（失敗）', scoped(invalid))
+print('fontSize < 11（移行中の警告）', scoped(smallFonts))
+print('インラインstyle（移行中の警告）', scoped(inlineStyles))
 
 if (invalid.length > 0) {
   console.error('\nSVG内のHTMLを修正してください。')

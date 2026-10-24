@@ -289,6 +289,8 @@ const D4_SUM = [
   { name: '最大値', v: 46, expl: 'いちばん大きい値で、ひげの右端。' },
 ]
 
+const D4_SHORT = ['最小', 'Q1', '中央', 'Q3', '最大'] as const
+
 export function DatFig4() {
   const [sel, setSel] = useState(2)
   const p = D4_SUM[sel]
@@ -298,7 +300,7 @@ export function DatFig4() {
       title="図解: 箱ひげ図は5つの数を1本で見せる"
       status={`${p.name} = ${p.v}。${p.expl}`}
     >
-      <View label="箱ひげ図（最小・Q1・中央値・Q3・最大）。の印はクリックできる">
+      <Canvas label="箱ひげ図（最小・Q1・中央値・Q3・最大）。下のボタンで選ぶ" interactive>
         <svg viewBox="0 0 320 100" className={styles.svg}>
           <line x1={36} y1={46} x2={296} y2={46} stroke={BORDER} />
           <line x1={x(8)} y1={46} x2={x(12)} y2={46} stroke={MUTED} strokeWidth={1.5} />
@@ -316,7 +318,7 @@ export function DatFig4() {
               fill={i === sel ? 'var(--color-warning)' : TINT}
               stroke={i === sel ? 'var(--color-warning)' : BORDER}
               strokeWidth={i === sel ? 2 : 1}
-              style={{ cursor: 'pointer' }}
+              className={styles.clickableDot}
               onClick={() => setSel(i)}
             />
           ))}
@@ -332,7 +334,22 @@ export function DatFig4() {
             中央値
           </text>
         </svg>
-      </View>
+        <div className={styles.dotBtns} role="group" aria-label="見たい数を選ぶ">
+          {D4_SUM.map((d, i) => (
+            <button
+              key={d.name}
+              type="button"
+              className={styles.dotBtn}
+              aria-pressed={i === sel}
+              aria-label={`${d.name} ${d.v}`}
+              onClick={() => setSel(i)}
+            >
+              <span aria-hidden="true">{D4_SHORT[i]}</span>
+              <span className={styles.dotBtnValue}>{d.v}</span>
+            </button>
+          ))}
+        </div>
+      </Canvas>
       <div className={styles.ctrl}>
         <Btn small onClick={() => setSel((s) => (s + 4) % 5)}>
           ◀ 左側の部分
@@ -705,32 +722,23 @@ export function DatFig9() {
       statusKind={allOk ? 'ok' : 'plain'}
     >
       <div className={styles.tbl}>
-        {D9_ITEMS.map((it, i) => (
-          <div
-            key={it.id}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 10,
-              borderBottom: i < D9_ITEMS.length - 1 ? '1px solid var(--color-border)' : 'none',
-              paddingBottom: i < D9_ITEMS.length - 1 ? 8 : 0,
-              marginBottom: i < D9_ITEMS.length - 1 ? 8 : 0,
-            }}
-          >
-            <span style={{ minWidth: 112, fontWeight: 600, fontSize: '0.85rem' }}>{it.label}</span>
-            <span style={{ flex: 1 }}>
+        {D9_ITEMS.map((it) => (
+          <div key={it.id} className={styles.d9Row}>
+            <span className={styles.d9Label}>{it.label}</span>
+            <span
+              className={`${styles.d9Mark} ${
+                st[it.id] === it.correct ? styles.d9MarkOk : st[it.id] ? styles.d9MarkNg : ''
+              }`}
+            >
+              {st[it.id] === it.correct ? '✓' : st[it.id] ? '✕' : '—'}
+            </span>
+            <span className={styles.d9Select}>
               <Segmented
                 label={`${it.label}の尺度水準`}
                 value={st[it.id] ?? ''}
                 options={D9_LEVELS.map((lv) => ({ value: lv.id, label: lv.label }))}
                 onChange={(v) => setSt((s) => ({ ...s, [it.id]: v as D9Level | '' }))}
               />
-            </span>
-            <span
-              className={st[it.id] === it.correct ? styles.statusOk : undefined}
-              style={{ minWidth: 20, textAlign: 'center', fontWeight: 700 }}
-            >
-              {st[it.id] === it.correct ? '✓' : st[it.id] ? '✕' : '—'}
             </span>
           </div>
         ))}

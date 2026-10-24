@@ -98,6 +98,7 @@
   justify-content: center;
   gap: 6px;
   min-height: var(--tap-min);
+  min-width: var(--tap-min);
   padding: 8px 14px;
   border-radius: 10px;
   border: 1px solid var(--color-border);
@@ -253,6 +254,7 @@
   display: flex;
   flex-direction: column;
   gap: 6px;
+  container-type: inline-size;
 }
 
 .stepDots {
@@ -275,9 +277,26 @@
 }
 
 .stepBar {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 8px;
+}
+
+/* 幅が足りないときは2×2に組み替える（3+1の不揃いな折返しを避ける） */
+@container (max-width: 419px) {
+  .stepBar {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@container (max-width: 199px) {
+  .stepBar {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.stepBar .btn {
+  padding-inline: 10px;
 }
 
 /* --- HTMLのセル列（配列・ビット） --- */
@@ -460,6 +479,94 @@ button.cell:active {
   color: var(--color-secondary-label);
 }
 
+/* 尺度水準の選択行。狭い幅ではラベル→選択の2段に組み替える */
+.d9Row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 4px 10px;
+  align-items: center;
+  padding-bottom: 8px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.d9Row:last-child {
+  padding-bottom: 0;
+  margin-bottom: 0;
+  border-bottom: 0;
+}
+
+.d9Label {
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.d9Select {
+  grid-column: 1 / -1;
+  min-width: 0;
+}
+
+.d9Mark {
+  min-width: 20px;
+  text-align: center;
+  font-weight: 700;
+}
+
+.d9MarkOk {
+  color: var(--color-success-ink);
+}
+
+.d9MarkNg {
+  color: var(--color-error-ink);
+}
+
+/* 箱ひげ図の5つの数を選ぶボタン（44px・キーボード操作） */
+.dotBtns {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(var(--tap-min), 1fr));
+  gap: 4px;
+  width: 100%;
+  max-width: 440px;
+  margin: 0 auto;
+}
+
+.dotBtn {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  min-width: var(--tap-min);
+  min-height: var(--tap-min);
+  padding: 4px 2px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-card);
+  color: var(--color-secondary-label);
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.2;
+  transition:
+    background var(--motion-base) var(--ease-standard),
+    box-shadow var(--motion-base) var(--ease-standard);
+}
+
+.dotBtn[aria-pressed='true'] {
+  background: var(--color-warning-tint);
+  box-shadow: inset 0 0 0 2px var(--color-warning);
+  color: var(--color-warning-ink);
+  font-weight: 700;
+}
+
+.dotBtnValue {
+  font-size: 0.8125rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.clickableDot {
+  cursor: pointer;
+}
+
 /* --- 行ごとの小型チャート --- */
 .barRow {
   display: flex;
@@ -604,7 +711,8 @@ button.cell:active {
   gap: 8px;
   padding: 1px 6px;
   border-radius: 6px;
-  white-space: pre;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
   scroll-margin: 32px;
   transition:
     background var(--motion-base) var(--ease-standard),
