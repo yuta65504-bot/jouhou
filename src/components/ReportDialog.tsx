@@ -5,6 +5,7 @@
  * - テーマ（ライト／ダーク）に合わせて CAPTCHA の見た目を切り替える
  */
 import { useEffect, useRef, useState } from 'react'
+import { REPORTS_ENABLED } from '@/lib/features'
 import { REPORT_CATEGORIES, submitReport, type ReportCategory } from '@/lib/report'
 import ui from '@/styles/ui.module.css'
 import s from './ReportDialog.module.css'
@@ -80,7 +81,7 @@ export function ReportDialog({ questionId, open, onClose }: Props) {
 
   /* 開いたときに hCaptcha ウィジェットを遅延読込して表示 */
   useEffect(() => {
-    if (!open || !SITEKEY) return
+    if (!open || !REPORTS_ENABLED || !SITEKEY) return
     let cancelled = false
     loadHcaptcha()
       .then(() => {
@@ -136,6 +137,23 @@ export function ReportDialog({ questionId, open, onClose }: Props) {
   }
 
   const canSend = SITEKEY != null && !captchaError && token !== '' && !!message.trim() && !sending && result?.type !== 'done'
+
+  /* GitHub Pages など通報APIが無い公開では案内だけ表示する */
+  if (!REPORTS_ENABLED) {
+    return (
+      <dialog ref={dialogRef} className={s.dialog} aria-label="この問題を報告する">
+        <div className={s.inner}>
+          <p className={s.title}>この問題を報告する</p>
+          <p className={ui.lead}>この公開版では通報機能を利用できません。</p>
+          <div className={s.btnRow}>
+            <button type="button" className={`${ui.subtleBtn} ${s.btn}`} onClick={onClose}>
+              閉じる
+            </button>
+          </div>
+        </div>
+      </dialog>
+    )
+  }
 
   return (
     <dialog ref={dialogRef} className={s.dialog} aria-label="この問題を報告する">

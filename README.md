@@ -9,8 +9,8 @@
 - 状態管理は React 標準 + Context。入力保存は **localStorage**（JSON エクスポート／インポート必須実装）
 - スタイルは **CSS カスタムプロパティ + CSS Modules**、図解は **SVG + DOM**（Canvas不使用）
 - コンテンツは zod でスキーマ検証（`npm test` / CI で必須項目の欠落を検出）
-- ホスティングは **Cloudflare Pages**（PRごとのプレビューURLを監修に利用）。PWA は `manifest.json` のみ、Service Worker は未導入
-- 報告機能は **Pages Functions + D1**（ボット対策に **hCaptcha**。詳細は「報告APIの仕様」）
+- ホスティングは **Cloudflare Pages**（PRごとのプレビューURLを監修に利用）と **GitHub Pages**（暫定公開。通報機能なし）。PWA は `manifest.json` のみ、Service Worker は未導入
+- 報告機能は **Pages Functions + D1**（Cloudflare Pages のみ。ボット対策に **hCaptcha**。詳細は「報告APIの仕様」）
 
 ## セットアップ
 
@@ -53,6 +53,19 @@ npx wrangler pages dev dist                                    # Functions + 静
 - `public/_routes.json` により Functions の起動範囲を `/api/*` に限定している（静的ページのリクエストでFunctionsを消費しない）
 - 管理者ページは `/admin` をURL直打ちで開き、`ADMIN_TOKEN` と一致するトークンを入力すると報告一覧を取得・更新できる。トークン値は端末の sessionStorage に保存する（タブを閉じると消える。報告データ自体はD1のみ）
 
+## GitHub Pages での公開（通報機能なし）
+
+`main` への push で GitHub Actions が静的ビルドを GitHub Pages に公開します（`.github/workflows/deploy-pages.yml`）。
+
+- 公開URL: `https://yuta65504-bot.github.io/jouhou/`（プロジェクトページ。base は `/jouhou/`）
+- 初回のみ **Settings → Pages → Build and deployment → Source** を **GitHub Actions** に設定する
+- GitHub Pages ビルドでは `VITE_REPORTS_ENABLED=false` を指定する。問題画面の報告ボタンは残るが、開くと「この公開版では通報機能を利用できません。」と表示され、`/admin` の報告一覧も同じ案内になる
+- `/api/*`（Pages Functions）・D1・hCaptcha は GitHub Pages では動かない。報告機能を使う場合は Cloudflare Pages のデプロイを使う
+- `_headers` は GitHub Pages では適用されないため、CSP などのセキュリティヘッダは付かない
+- SPA の直リンクは `dist/404.html` 経由で表示される（HTTPステータスは404）。独自ドメインを使う場合も `actions/configure-pages` の `base_path` に追従する
+- Cloudflare Pages と GitHub Pages は別オリジンなので、localStorage の学習記録は引き継がれない。設定画面のエクスポート／インポートで移行する
+- ローカル確認: `PAGES_BASE_PATH=/jouhou/ VITE_REPORTS_ENABLED=false npm run build` のあと `cp dist/index.html dist/404.html` し、`PAGES_BASE_PATH=/jouhou/ npm run preview` で `/jouhou/` を開く
+
 ## ディレクトリ構成
 
 ```
@@ -67,6 +80,7 @@ src/
     today.ts      「今日の1問」の選択
     nextQuestion.ts  「すぐに次の問題を解く」の翌問題ID（末尾は先頭へ戻る）
     report.ts     報告の種別・APIクライアント（Functionsと共通の型/ガード）
+    features.ts   ビルド時の機能フラグ（GitHub Pages では通報を無効化）
     fields.ts     4分野の定義
     dncl-engine.ts  DNCL風サンプルのステップ実行エンジン（図解で利用）
   components/     共通UI（レイアウト・下部タブ/サイドバー・カード・SVG図解レジストリ）
@@ -86,6 +100,7 @@ functions/
 scripts/
   build-questions.ts  question.md → src/content/questions.ts の生成/一致確認
 d1/schema.sql      報告テーブル（reports）のDDL
+.github/workflows/deploy-pages.yml  GitHub Pages へのデプロイ（通報機能なし）
 public/_headers    セキュリティヘッダ（CSP など。Cloudflare Pages が dist/ 直下へ反映）
 question.md        問題の一次ソース（問題バンク。下記「問題バンクの編集」参照）
 ```

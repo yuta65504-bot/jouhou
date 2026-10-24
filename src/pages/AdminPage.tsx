@@ -4,6 +4,7 @@
  */
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { REPORTS_ENABLED } from '@/lib/features'
 import { FIELDS, getField } from '@/lib/fields'
 import {
   ApiError,
@@ -84,79 +85,85 @@ export default function AdminPage() {
         <h2 className={ui.sectionTitle} id="admin-reports">
           報告の一覧
         </h2>
-        <form
-          className={s.tokenRow}
-          onSubmit={(e) => {
-            e.preventDefault()
-            void loadReports(token)
-          }}
-        >
-          <label className={ui.rowSub} htmlFor="admin-token">
-            管理トークン（ADMIN_TOKEN）
-          </label>
-          <div className={s.tokenInputs}>
-            <input
-              id="admin-token"
-              type="password"
-              className={s.tokenInput}
-              value={token}
-              onChange={(e) => setToken(e.target.value)}
-              autoComplete="off"
-              placeholder="ADMIN_TOKEN"
-            />
-            <button type="submit" className={ui.subtleBtn} disabled={loading || token === ''}>
-              {loading ? '取得中…' : '取得'}
-            </button>
-          </div>
-        </form>
-        {error && (
-          <p className={s.error} role="alert">
-            {error}
-          </p>
-        )}
-        {reports != null && (
+        {REPORTS_ENABLED ? (
           <>
-            <p className={ui.lead} aria-live="polite">
-              {reports.length}件
-            </p>
-            <div className={ui.stack}>
-              {reports.length === 0 && <p className={ui.empty}>報告はまだありません。</p>}
-              {reports.map((r) => {
-                const q = questions.find((x) => x.id === r.questionId)
-                return (
-                  <div key={r.id} className={s.report}>
-                    <div className={s.reportHead}>
-                      <span className={`${ui.chip} ${r.status === 'open' ? s.open : s.resolved}`}>
-                        {r.status === 'open' ? '未対応' : '対応済み'}
-                      </span>
-                      <span className={ui.chip}>{reportCategoryLabel(r.category)}</span>
-                      <span className={s.at}>{formatAt(r.createdAt)}</span>
-                    </div>
-                    <p className={s.reportMsg}>{r.message}</p>
-                    <div className={s.reportMeta}>
-                      {q ? (
-                        <Link to={`/quiz/${q.id}`} className={s.qLink}>
-                          対象: {q.id}（問題を開く）
-                        </Link>
-                      ) : (
-                        <span className={s.qLink}>対象: {r.questionId}（存在しない問題ID）</span>
-                      )}
-                    </div>
-                    {r.status === 'open' && (
-                      <button
-                        type="button"
-                        className={`${ui.subtleBtn} ${s.resolveBtn}`}
-                        onClick={() => void resolve(r.id)}
-                        disabled={working === r.id}
-                      >
-                        {working === r.id ? '更新中…' : '対応済みにする'}
-                      </button>
-                    )}
-                  </div>
-                )
-              })}
-            </div>
+            <form
+              className={s.tokenRow}
+              onSubmit={(e) => {
+                e.preventDefault()
+                void loadReports(token)
+              }}
+            >
+              <label className={ui.rowSub} htmlFor="admin-token">
+                管理トークン（ADMIN_TOKEN）
+              </label>
+              <div className={s.tokenInputs}>
+                <input
+                  id="admin-token"
+                  type="password"
+                  className={s.tokenInput}
+                  value={token}
+                  onChange={(e) => setToken(e.target.value)}
+                  autoComplete="off"
+                  placeholder="ADMIN_TOKEN"
+                />
+                <button type="submit" className={ui.subtleBtn} disabled={loading || token === ''}>
+                  {loading ? '取得中…' : '取得'}
+                </button>
+              </div>
+            </form>
+            {error && (
+              <p className={s.error} role="alert">
+                {error}
+              </p>
+            )}
+            {reports != null && (
+              <>
+                <p className={ui.lead} aria-live="polite">
+                  {reports.length}件
+                </p>
+                <div className={ui.stack}>
+                  {reports.length === 0 && <p className={ui.empty}>報告はまだありません。</p>}
+                  {reports.map((r) => {
+                    const q = questions.find((x) => x.id === r.questionId)
+                    return (
+                      <div key={r.id} className={s.report}>
+                        <div className={s.reportHead}>
+                          <span className={`${ui.chip} ${r.status === 'open' ? s.open : s.resolved}`}>
+                            {r.status === 'open' ? '未対応' : '対応済み'}
+                          </span>
+                          <span className={ui.chip}>{reportCategoryLabel(r.category)}</span>
+                          <span className={s.at}>{formatAt(r.createdAt)}</span>
+                        </div>
+                        <p className={s.reportMsg}>{r.message}</p>
+                        <div className={s.reportMeta}>
+                          {q ? (
+                            <Link to={`/quiz/${q.id}`} className={s.qLink}>
+                              対象: {q.id}（問題を開く）
+                            </Link>
+                          ) : (
+                            <span className={s.qLink}>対象: {r.questionId}（存在しない問題ID）</span>
+                          )}
+                        </div>
+                        {r.status === 'open' && (
+                          <button
+                            type="button"
+                            className={`${ui.subtleBtn} ${s.resolveBtn}`}
+                            onClick={() => void resolve(r.id)}
+                            disabled={working === r.id}
+                          >
+                            {working === r.id ? '更新中…' : '対応済みにする'}
+                          </button>
+                        )}
+                      </div>
+                    )
+                  })}
+                </div>
+              </>
+            )}
           </>
+        ) : (
+          <p className={ui.note}>この公開版では通報機能を利用できません。</p>
         )}
       </section>
 
