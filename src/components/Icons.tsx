@@ -36,6 +36,16 @@ export const PencilIcon = ({ size = 22 }: IconProps) => (
   </svg>
 )
 
+/** 実験（スライダーを動かすイメージ） */
+export const LabIcon = ({ size = 22 }: IconProps) => (
+  <svg {...base(size)}>
+    <path d="M4 7h9M17 7h3" />
+    <path d="M4 17h3M11 17h9" />
+    <circle cx="15" cy="7" r="2" />
+    <circle cx="9" cy="17" r="2" />
+  </svg>
+)
+
 export const BookIcon = ({ size = 22 }: IconProps) => (
   <svg {...base(size)}>
     <path d="M4 5a2 2 0 0 1 2-2h13v18H6a2 2 0 0 0-2 2z" />

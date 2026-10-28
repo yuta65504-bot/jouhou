@@ -1,0 +1,406 @@
+/* 実験ページ共通（操作の結果を図や数値で見せる部分） */
+
+/* --- パケット --- */
+.packets {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(82px, 1fr));
+  gap: 6px;
+}
+
+.packet {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  align-items: center;
+  padding: 5px 2px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  font-size: 0.75rem;
+  line-height: 1.4;
+  background: var(--color-card);
+}
+
+.packetOk {
+  background: var(--color-success-tint);
+  border-color: var(--color-success);
+  color: var(--color-success-ink);
+}
+
+.packetRetry {
+  background: var(--color-warning-tint);
+  border-color: var(--color-warning);
+  color: var(--color-warning-ink);
+}
+
+.packetNg {
+  background: var(--color-error-tint);
+  border-color: var(--color-error);
+  color: var(--color-error-ink);
+}
+
+.packetId {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.packetMeta {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+/* --- 暗号 --- */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.fieldLabel {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-secondary-label);
+}
+
+.input {
+  width: 100%;
+  min-height: var(--tap-min);
+  padding: 8px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: var(--color-card);
+  color: var(--color-label);
+  font: inherit;
+  font-family: var(--font-mono);
+  letter-spacing: 0.08em;
+}
+
+.input:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.cipherGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.cipherLabel {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--color-secondary-label);
+}
+
+.cipherBox {
+  margin: 2px 0 0;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: var(--color-surface);
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  letter-spacing: 0.12em;
+  overflow-wrap: anywhere;
+}
+
+.cipherOut {
+  background: var(--color-accent-tint);
+  font-weight: 700;
+}
+
+.cipherArrow {
+  margin: 0;
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--color-secondary-label);
+}
+
+.decoded {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--color-secondary-label);
+}
+
+/* --- 引用チェック --- */
+.checks {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.check {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: var(--tap-min);
+  padding: 8px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: var(--color-card);
+  color: var(--color-label);
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-align: left;
+  line-height: 1.45;
+}
+
+.checkOn {
+  border-color: var(--color-success);
+  background: var(--color-success-tint);
+}
+
+.checkMark {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  color: var(--color-secondary-label);
+}
+
+.checkOn .checkMark {
+  color: var(--color-success-ink);
+}
+
+.verdict {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid;
+  font-size: 0.875rem;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.verdictOk {
+  border-color: var(--color-success);
+  background: var(--color-success-tint);
+  color: var(--color-success-ink);
+}
+
+.verdictNg {
+  border-color: var(--color-error);
+  background: var(--color-error-tint);
+  color: var(--color-error-ink);
+}
+
+.verdictMark {
+  display: inline-flex;
+  flex: none;
+  padding-top: 1px;
+}
+
+.verdictReason {
+  display: block;
+  font-weight: 400;
+  font-size: 0.8125rem;
+  color: var(--color-label);
+}
+
+/* --- 比較バー --- */
+.bars {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 4px 0;
+}
+
+.barRow {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.barHead {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 0.8125rem;
+}
+
+.barHead strong {
+  font-variant-numeric: tabular-nums;
+}
+
+.barTrack {
+  height: 14px;
+  border-radius: 7px;
+  background: var(--color-surface);
+  overflow: hidden;
+}
+
+.barFill {
+  height: 100%;
+  border-radius: 7px;
+  transition: width var(--motion-step) var(--ease-standard);
+}
+
+.barLinear {
+  background: var(--color-warning);
+}
+
+.barBinary {
+  background: var(--color-success);
+}
+
+/* --- データ分布 --- */
+.valueList {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--color-label);
+  overflow-wrap: anywhere;
+}
+
+.legend {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  font-size: 0.75rem;
+  color: var(--color-secondary-label);
+}
+
+.legendMean::before {
+  content: "";
+  display: inline-block;
+  width: 14px;
+  height: 2px;
+  margin-right: 4px;
+  vertical-align: middle;
+  background: var(--color-accent);
+}
+
+.legendMedian::before {
+  content: "";
+  display: inline-block;
+  width: 14px;
+  height: 0;
+  margin-right: 4px;
+  vertical-align: middle;
+  border-top: 2px dashed var(--color-success);
+}
+
+/* --- 色のコントラスト --- */
+.colorRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.colorField {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.colorInput {
+  width: var(--tap-min);
+  height: var(--tap-min);
+  padding: 2px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-card);
+  cursor: pointer;
+}
+
+.preview {
+  margin: 0;
+  padding: 20px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  text-align: center;
+  font-size: 1.125rem;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+/* --- 強さ・進捗のメーター --- */
+.meter {
+  height: 14px;
+  border-radius: 7px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  overflow: hidden;
+}
+
+.meterFill {
+  height: 100%;
+  border-radius: 7px;
+  background: var(--color-accent);
+  transition: width var(--motion-step) var(--ease-standard);
+}
+
+.meterOk {
+  background: var(--color-success);
+}
+
+.meterNg {
+  background: var(--color-error);
+}
+
+/* --- サイコロの棒グラフ --- */
+.diceChart {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 6px;
+  align-items: end;
+}
+
+.diceCol {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-width: 0;
+}
+
+.diceCount {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: var(--color-secondary-label);
+  font-variant-numeric: tabular-nums;
+}
+
+.diceBarWrap {
+  display: flex;
+  align-items: flex-end;
+  width: 100%;
+  height: 84px;
+}
+
+.diceBar {
+  width: 100%;
+  border-radius: 5px 5px 0 0;
+  background: var(--color-accent);
+  transition: height var(--motion-step) var(--ease-standard);
+}
+
+.diceFace {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--color-label);
+}
+
+/* --- 二次元配列の3×3グリッド --- */
+.matrix {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .barFill,
+  .meterFill,
+  .diceBar {
+    transition: none;
+  }
+}

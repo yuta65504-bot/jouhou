@@ -366,20 +366,20 @@ export function ProFig5() {
 const P6_VALUES = ['りんご', 'みかん', 'ぶどう', 'なし', 'いちご']
 
 export function ProFig6() {
-  const [lang, setLang] = useState<'dncl' | 'other'>('other')
+  const [lang, setLang] = useState<'one' | 'zero'>('zero')
   const [sel, setSel] = useState(1) /* 1始まりの位置 */
-  const shift = lang === 'other' ? 1 : 0
+  const shift = lang === 'zero' ? 1 : 0
   return (
     <FigShell
-      title="図解: 添字の始まりは、問題文の指定で変わる"
-      status={`${lang === 'dncl' ? '1始まり（問題文で指定）' : '0始まり（指定なし）'}: ${sel}番目のデータ（${P6_VALUES[sel - 1]}）は a[${sel - shift}]。`}
+      title="図解: 添字の始まりは、言語や定義で変わる"
+      status={`${lang === 'one' ? '1始まり' : '0始まり'}: ${sel}番目のデータ（${P6_VALUES[sel - 1]}）は a[${sel - shift}]。`}
     >
       <Segmented
         label="添字の付け方"
         value={lang}
         options={[
-          { value: 'dncl' as const, label: '1始まり（指定あり）' },
-          { value: 'other' as const, label: '0始まり（既定）' },
+          { value: 'one' as const, label: '1始まり' },
+          { value: 'zero' as const, label: '0始まり' },
         ]}
         onChange={setLang}
       />
@@ -387,7 +387,7 @@ export function ProFig6() {
         <svg viewBox="0 0 320 92" className={styles.svg}>
           <GArrayRow x={20} y={14} values={P6_VALUES} cw={56} ch={26} marks={{ [sel - 1]: '選択中' }} />
           <text x={20} y={86} fontSize={11} fill={ACCENT} fontWeight={700}>
-            {lang === 'dncl' ? `a[${sel}]` : `a[${sel - 1}]`}
+            {lang === 'one' ? `a[${sel}]` : `a[${sel - 1}]`}
             <tspan fill={MUTED} fontWeight={400}>{` ← 同じ ${sel}番目のセル`}</tspan>
           </text>
         </svg>
@@ -400,10 +400,10 @@ export function ProFig6() {
           先頭のセルへ
         </Btn>
         <span className={styles.note}>
-          {lang === 'dncl' ? '問題文で「1から始まる」と指定された場合' : '特に指定がない場合の共通テスト用プログラム表記は0始まり'}
+          {lang === 'one' ? '問題文や言語の定義で「1から始まる」とされている場合' : '「0から始まる」と定義されている場合'}
         </span>
       </div>
-      <Note>問題文で a[3] と書かれていたら、添字の指定を確認する。0始まりなら4番目、1始まりなら3番目のデータ。</Note>
+      <Note>問題文で a[3] と書かれていたら、添字の定義を確認する。0始まりなら4番目、1始まりなら3番目のデータ。</Note>
     </FigShell>
   )
 }
@@ -970,14 +970,14 @@ function makeRng(seed: number): () => number {
 
 type SimRes = { waits: number[]; maxWait: number; meanWait: number }
 
-/** 8人の客が来店し、先頭の客の対応時間を serviceMin として待ち時間を記録していく */
+/** 8人の来館者が訪れ、先頭の来館者の対応時間を serviceMin として待ち時間を記録していく */
 function simulateLine(seed: number, serviceMin: number): SimRes {
   const rng = makeRng(seed + 7)
   let arrive = 0
   let finish = -1
   const waits: number[] = []
   for (let i = 0; i < 8; i++) {
-    if (i > 0) arrive += 2 + Math.floor(rng() * 5) /* 客の間隔は2〜6分（乱数） */
+    if (i > 0) arrive += 2 + Math.floor(rng() * 5) /* 来館者の間隔は2〜6分（乱数） */
     const start = Math.max(arrive, finish)
     waits.push(start - arrive)
     finish = start + serviceMin
@@ -1006,7 +1006,7 @@ export function ProFig16() {
       status={
         latest
           ? `最新の1回: 最長待ち ${latest.maxWait}分・平均 ${latest.meanWait.toFixed(1)}分。${seeds.length >= 100 ? '100回以上試したので傾向が見えてきた。' : '回数を重ねると結果の分布が安定してくる。'}`
-          : '「1回試す」を押すと、乱数による来店パターンを1つ再現する。'
+          : '「1回試す」を押すと、乱数による来館パターンを1つ再現する。'
       }
     >
       <div className={styles.ctrl}>

@@ -209,7 +209,7 @@ export function SocFig4() {
         label="権利の種類"
         value={kind}
         options={[
-          { value: 'tokkyo' as const, label: '特許権（二次元コード）' },
+          { value: 'tokkyo' as const, label: '特許権' },
           { value: 'chosaku' as const, label: '著作権' },
         ]}
         onChange={setKind}

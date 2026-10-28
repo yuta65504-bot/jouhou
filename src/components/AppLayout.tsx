@@ -1,11 +1,11 @@
 import { NavLink, Outlet } from 'react-router-dom'
 import { FIELDS, FIELD_IDS } from '@/lib/fields'
-import { GridIcon, BookIcon, PencilIcon, ChartIcon, HomeIcon, GearIcon } from './Icons'
+import { BookIcon, PencilIcon, ChartIcon, HomeIcon, GearIcon, LabIcon } from './Icons'
 import styles from './AppLayout.module.css'
 
 const tabs = [
   { to: '/', label: 'ホーム', Icon: HomeIcon },
-  { to: '/fields', label: '分野', Icon: GridIcon },
+  { to: '/labs', label: '実験', Icon: LabIcon },
   { to: '/quiz', label: '演習', Icon: PencilIcon },
   { to: '/terms', label: '用語', Icon: BookIcon },
   { to: '/records', label: '記録', Icon: ChartIcon },
@@ -32,6 +32,10 @@ export function AppLayout() {
         <div className={styles.sideGroup}>
           <NavLink to="/" end className={sideCls}>
             ホーム
+          </NavLink>
+          <NavLink to="/labs" className={sideCls}>
+            <LabIcon size={16} />
+            実験
           </NavLink>
         </div>
         <div className={styles.sideGroup}>
@@ -73,6 +77,9 @@ export function AppLayout() {
         <main className={styles.content} id="content">
           <Outlet />
         </main>
+        <footer className={styles.footer}>
+          <p>本サイトは非公式の学習サイトです。大学入試センターとは関係ありません。</p>
+        </footer>
       </div>
 
       <nav className={styles.tabbar} aria-label="メインナビゲーション">

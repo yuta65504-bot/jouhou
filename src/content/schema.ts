@@ -21,7 +21,7 @@ export const questionSchema = z.object({
   difficulty: z.union([z.literal(1), z.literal(2), z.literal(3)]),
   /** 学習テーマ（question.md の「テーマ」欄。演習一覧の絞り込み，表示用） */
   topic: z.string().min(1).optional(),
-  /** 共通テストのどの出題に対応するか（question.md の「出典」欄） */
+  /** 問題が扱う学習テーマや背景（question.md の「参考」欄） */
   source: z.string().min(1).optional(),
   text: z.string().min(1),
   choices: z.array(z.string()).length(4),

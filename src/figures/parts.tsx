@@ -105,6 +105,8 @@ export const FigureFrame: FC<{
   children: ReactNode
   status?: ReactNode
   statusKind?: 'ok' | 'ng' | 'plain'
+  /** 見出し横のバッジ。実験ページでは「実験」 */
+  badge?: string
   step?: number
   total?: number
   playing?: boolean
@@ -118,6 +120,7 @@ export const FigureFrame: FC<{
   children,
   status,
   statusKind = 'plain',
+  badge = '図解',
   step,
   total,
   playing,
@@ -133,7 +136,7 @@ export const FigureFrame: FC<{
     <section className={`${styles.fig} ${className ?? ''}`} aria-labelledby={headingId}>
       <header className={styles.figHead}>
         <span className={styles.figBadge} aria-hidden="true">
-          図解
+          {badge}
         </span>
         <h3 className={styles.figTitle} id={headingId}>
           {cleanTitle(title)}

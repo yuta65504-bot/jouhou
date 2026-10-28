@@ -196,7 +196,7 @@ export default function AdminPage() {
                   ))}
                 </ol>
                 <p className={s.qExp}>{q.explanation}</p>
-                {q.source && <p className={s.qMeta}>出典: {q.source}</p>}
+                {q.source && <p className={s.qMeta}>参考: {q.source}</p>}
               </div>
             )
           })}

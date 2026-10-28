@@ -1,0 +1,49 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 14px;
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-top: 4px solid var(--color-accent);
+  border-radius: var(--radius-card);
+  color: var(--color-label);
+  text-decoration: none;
+  transition: background 0.15s ease;
+}
+
+.card:active {
+  background: var(--color-surface);
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.today {
+  border-color: var(--color-accent);
+  background: var(--color-accent-tint);
+  color: var(--color-accent);
+}
+
+.title {
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.45;
+}
+
+.summary {
+  font-size: 0.8125rem;
+  color: var(--color-secondary-label);
+  line-height: 1.55;
+}
+
+.cta {
+  margin-top: auto;
+  padding-top: 4px;
+  color: var(--color-accent);
+  font-size: 0.8125rem;
+  font-weight: 700;
+}

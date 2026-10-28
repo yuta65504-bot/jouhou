@@ -15,7 +15,7 @@ export default function FieldsPage() {
       <TopAppBar title="分野" />
       <div className={`${ui.page} ${s.page}`}>
         <p className={ui.lead}>
-          情報Ⅰの4分野。問題の解説にある図解で、仕組みを動かしながら理解を深めましょう。
+          情報Ⅰの4分野。実験で仕組みを動かして確かめ、問題の解説と用語で定着させましょう。
         </p>
         <div className={`${ui.stack} ${s.grid}`}>
           {FIELDS.map((f) => (

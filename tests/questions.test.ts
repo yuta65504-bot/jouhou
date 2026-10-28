@@ -39,8 +39,10 @@ describe('question bank', () => {
     }
   })
 
-  it('共通テストの出題に対応する「出典」が大半の問に付いている', () => {
-    const withSource = questions.filter((q) => q.source && q.source.includes('共通テスト'))
-    expect(withSource.length / questions.length).toBeGreaterThan(0.5)
+  it('全問に参考情報が付き、特定の試験問題への依存を示す表現を含まない', () => {
+    for (const q of questions) {
+      expect(q.source, q.id).toBeTruthy()
+      expect(q.source, q.id).not.toMatch(/共通テスト|同型|出典|定番|参考にした設問/)
+    }
   })
 })

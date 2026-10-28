@@ -6,6 +6,8 @@ import FieldsPage from './pages/FieldsPage'
 import FieldDetailPage from './pages/FieldDetailPage'
 import QuizPage from './pages/QuizPage'
 import QuizQuestionPage from './pages/QuizQuestionPage'
+import LabsPage from './pages/LabsPage'
+import LabDetailPage from './pages/LabDetailPage'
 import TermsPage from './pages/TermsPage'
 import TermDetailPage from './pages/TermDetailPage'
 import RecordsPage from './pages/RecordsPage'
@@ -27,6 +29,8 @@ export default function App() {
           <Route path="/fields/:fieldId" element={<FieldDetailPage />} />
           <Route path="/quiz" element={<QuizPage />} />
           <Route path="/quiz/:id" element={<QuizQuestionPage />} />
+          <Route path="/labs" element={<LabsPage />} />
+          <Route path="/labs/:labId" element={<LabDetailPage />} />
           <Route path="/terms" element={<TermsPage />} />
           <Route path="/terms/:termId" element={<TermDetailPage />} />
           <Route path="/records" element={<RecordsPage />} />

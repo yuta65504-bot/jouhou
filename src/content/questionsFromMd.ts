@@ -14,7 +14,7 @@
  * - 分野: society
  * - 難易度: 1
  * - テーマ: 情報デザイン・操作のしやすさ
- * - 出典: 共通テスト試作問題 第1問問4（GUIのユーザビリティ）と同型の設問
+ * - 参考: 配列の添字（問題文・図表は本サイトの独自作成）
  *
  * **問題文**
  *
@@ -121,7 +121,7 @@ function parseBlock(id: string, body: string): ParsedQuestion {
     fieldId,
     difficulty: difficultyRaw as 1 | 2 | 3,
     topic,
-    source: meta['出典'] || undefined,
+    source: meta['参考'] || undefined,
     text,
     choices,
     answerIndex: answerRaw - 1,

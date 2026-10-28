@@ -226,7 +226,9 @@ export default function QuizQuestionPage() {
                   </Suspense>
                 </div>
               )}
-              {q.source && <p className={s.source}>出典: {q.source}</p>}
+              {q.source && (
+                <p className={s.source}>参考: {q.source}（問題文・図表は本サイトの独自作成）</p>
+              )}
             </div>
           </section>
         )}

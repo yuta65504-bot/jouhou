@@ -70,7 +70,7 @@ describe('question schema', () => {
         ...base,
         fieldId: 'programming',
         topic: 'アルゴリズム・繰り返し',
-        source: '共通テスト試作問題 第3問（アルゴリズム）と同型の設問',
+        source: 'アルゴリズム・繰り返し',
       }).success,
     ).toBe(true)
   })

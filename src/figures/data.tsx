@@ -1330,7 +1330,7 @@ export function DatFig17() {
         ]}
         onChange={(v) => setW(Number(v) as 3 | 6)}
       />
-      <View label="月別のエアコン売上 [台]（淡い線）と、移動平均（太い線）">
+      <View label="月別の来館者数 [人]（淡い線）と、移動平均（太い線）">
         <svg viewBox="0 0 320 118" className={styles.svg}>
           <line x1={14} y1={102} x2={308} y2={102} stroke={BORDER} />
           <polyline points={D17_VALUES.map((v, i) => `${X(i)},${Y(v)}`).join(' ')} fill="none" stroke={BORDER} strokeWidth={1.5} />
