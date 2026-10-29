@@ -15,7 +15,7 @@ const COPYRIGHT_YEARS = 70
 
 export function CopyrightTermLab() {
   const [years, setYears] = useState(40)
-  const protectedNow = years < COPYRIGHT_YEARS
+  const protectedNow = years <= COPYRIGHT_YEARS
   const x = (y: number) => 16 + (y / 100) * 288
 
   return (

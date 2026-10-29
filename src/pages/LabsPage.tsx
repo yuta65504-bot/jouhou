@@ -25,7 +25,7 @@ export default function LabsPage() {
               <h2 className={ui.sectionTitle} id={`labs-${field.id}`}>
                 {field.name}
               </h2>
-              <div className={s.grid}>
+              <div className={ui.labGrid}>
                 {labs.map((lab) => (
                   <LabCard key={lab.id} lab={lab} today={lab.id === todays.id} />
                 ))}

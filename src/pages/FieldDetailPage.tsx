@@ -29,7 +29,7 @@ export default function FieldDetailPage() {
             <h2 className={ui.sectionTitle} id="field-labs">
               この分野の実験
             </h2>
-            <div className={s.labGrid}>
+            <div className={ui.labGrid}>
               {fieldLabs.map((lab) => (
                 <LabCard key={lab.id} lab={lab} />
               ))}

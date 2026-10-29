@@ -48,7 +48,7 @@ export default function HomePage() {
           <p className={`${ui.lead} ${s.lead}`}>
             スライダーやボタンを動かすと、結果がその場で変わります。まず仕組みを触ってから、問題で確かめましょう。全{LABS.length}本の実験があります。
           </p>
-          <div className={s.labGrid}>
+          <div className={ui.labGrid}>
             {homeLabs.map((lab) => (
               <LabCard key={lab.id} lab={lab} today={lab.id === todaysLab.id} />
             ))}
@@ -75,9 +75,14 @@ export default function HomePage() {
         </section>
 
         <section aria-labelledby="home-fields">
-          <h2 className={ui.sectionTitle} id="home-fields">
-            分野から学ぶ
-          </h2>
+          <div className={ui.titleRow}>
+            <h2 className={ui.sectionTitle} id="home-fields">
+              分野から学ぶ
+            </h2>
+            <Link to="/fields" className={s.more}>
+              すべて見る →
+            </Link>
+          </div>
           <div className={`${ui.stack} ${s.grid}`}>
             {FIELDS.map((f) => (
               <FieldCard

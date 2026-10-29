@@ -7,7 +7,6 @@ import FieldDetailPage from './pages/FieldDetailPage'
 import QuizPage from './pages/QuizPage'
 import QuizQuestionPage from './pages/QuizQuestionPage'
 import LabsPage from './pages/LabsPage'
-import LabDetailPage from './pages/LabDetailPage'
 import TermsPage from './pages/TermsPage'
 import TermDetailPage from './pages/TermDetailPage'
 import RecordsPage from './pages/RecordsPage'
@@ -16,6 +15,9 @@ import AdminPage from './pages/AdminPage'
 
 /** 開発時だけ使う図解ギャラリー。本番ビルドではルートごと無効化する */
 const DevFiguresPage = lazy(() => import('./pages/DevFiguresPage'))
+
+/** 実験本体のコードは、実験ページを開いたときだけ読み込む */
+const LabDetailPage = lazy(() => import('./pages/LabDetailPage'))
 
 export default function App() {
   return (

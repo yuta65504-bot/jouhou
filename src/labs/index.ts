@@ -1,71 +1,5 @@
-import type { FC } from 'react'
 import { dateHash, todayJst } from '@/lib/dates'
 import type { FieldId } from '@/lib/fields'
-import {
-  CaesarLab,
-  CitationLab,
-  MeanMedianLab,
-  PacketLossLab,
-  SearchRaceLab,
-} from './experiments'
-import {
-  CopyrightTermLab,
-  ContrastLab,
-  CredibilityLab,
-  PersonalInfoLab,
-  PrivacyScopeLab,
-  QuantizationLab,
-  ResolutionLab,
-  RleLab,
-  SamplingRateLab,
-  SamplingSizeLab,
-  PatentTermLab,
-  SurveyDesignLab,
-  TapTargetLab,
-} from './societyLabs'
-import {
-  BinaryConvertLab,
-  BitOpsLab,
-  BitStatesLab,
-  DigitalSignatureLab,
-  EffectiveSpeedLab,
-  HexConvertLab,
-  MfaLab,
-  NatLab,
-  ParityCheckLab,
-  PasswordLab,
-  ProtocolStackLab,
-  SubnetLab,
-  TransferTimeLab,
-} from './networkLabs'
-import {
-  ArrayIndexLab,
-  BinarySearchStepsLab,
-  BranchLab,
-  DiceSimLab,
-  FilterLab,
-  LogicGatesLab,
-  MatrixLab,
-  MaxValueLab,
-  RecursionLab,
-  SelectionSortLab,
-  SumLoopLab,
-  SwapLab,
-} from './programmingLabs'
-import {
-  BoxPlotLab,
-  ChartChoiceLab,
-  CorrelationLab,
-  HistogramLab,
-  MissingDataLab,
-  ModeRangeLab,
-  MovingAverageLab,
-  PrimaryKeyLab,
-  RegressionLab,
-  ScaleLevelLab,
-  SqlLab,
-  StandardDeviationLab,
-} from './dataLabs'
 
 export type Lab = {
   id: string
@@ -76,7 +10,6 @@ export type Lab = {
   takeaway: string
   /** 関連する演習問題 */
   questionId: string
-  Component: FC
 }
 
 export const LABS: Lab[] = [
@@ -89,7 +22,6 @@ export const LABS: Lab[] = [
     takeaway:
       '引用は「出所の明示」「公正な慣行」「必要な範囲」がそろって成立する。1つでも欠けると、著作権侵害になりうる。',
     questionId: 'q-soc-3',
-    Component: CitationLab,
   },
   {
     id: 'copyright-term',
@@ -98,7 +30,6 @@ export const LABS: Lab[] = [
     summary: '作者の死後の年数を動かして、保護が続く範囲を見る',
     takeaway: '日本では原則、作者の死後70年まで著作権が保護される。期間が終わると、作品は広く利用できる。',
     questionId: 'q-soc-5',
-    Component: CopyrightTermLab,
   },
   {
     id: 'sampling-size',
@@ -107,7 +38,6 @@ export const LABS: Lab[] = [
     summary: '標本化周波数・ビット数・長さから、音の容量を出す',
     takeaway: '音のデータ量は「標本化周波数 × 量子化ビット数 × 長さ ÷ 8」で求める。品質を上げるほど容量が増える。',
     questionId: 'q-soc-18',
-    Component: SamplingSizeLab,
   },
   {
     id: 'rle',
@@ -116,7 +46,6 @@ export const LABS: Lab[] = [
     summary: '同じ文字が続く文字列を、回数＋文字に置き換える',
     takeaway: '同じ値が続くデータは短くできる。逆に変化が激しいデータでは、元より長くなることがある。',
     questionId: 'q-soc-16',
-    Component: RleLab,
   },
   {
     id: 'contrast',
@@ -125,7 +54,6 @@ export const LABS: Lab[] = [
     summary: '2色の組み合わせを変えて、読みやすさの基準と比べる',
     takeaway: '通常の文字はコントラスト比4.5:1以上が目安。色だけで情報を伝えないことも大切。',
     questionId: 'q-soc-17',
-    Component: ContrastLab,
   },
   {
     id: 'quantization',
@@ -134,7 +62,6 @@ export const LABS: Lab[] = [
     summary: 'ビット数を変えて、波形が何段階で表されるか見る',
     takeaway: '量子化ビット数が増えるほど段階が細かくなり、元の波形に近づく。その分データ量も増える。',
     questionId: 'q-soc-14',
-    Component: QuantizationLab,
   },
   {
     id: 'tap-target',
@@ -143,7 +70,6 @@ export const LABS: Lab[] = [
     summary: 'タップ領域を動かして、44pxの目安と比べる',
     takeaway: 'タップ領域は44px以上が目安。小さすぎると誤タップが増える。',
     questionId: 'q-soc-1',
-    Component: TapTargetLab,
   },
   {
     id: 'privacy-scope',
@@ -153,7 +79,6 @@ export const LABS: Lab[] = [
     takeaway:
       '肖像権は本人の許可が基本。写っているのが自分だけ、顔を隠す、公開範囲を絞ることもリスクを下げる。',
     questionId: 'q-soc-6',
-    Component: PrivacyScopeLab,
   },
   {
     id: 'personal-info',
@@ -163,7 +88,6 @@ export const LABS: Lab[] = [
     takeaway:
       '氏名や学籍番号など、特定の個人を識別できる情報は個人情報。単独で分からなくても、組合せで個人情報になりうる。',
     questionId: 'q-soc-7',
-    Component: PersonalInfoLab,
   },
   {
     id: 'credibility',
@@ -172,7 +96,6 @@ export const LABS: Lab[] = [
     summary: '発信者・根拠・新しさ・裏づけを切り替えて、確かめる',
     takeaway: '発信者・根拠・更新日・複数の情報源を確かめる。1つだけを信じず、照らし合わせる。',
     questionId: 'q-soc-8',
-    Component: CredibilityLab,
   },
   {
     id: 'sampling-rate',
@@ -181,7 +104,6 @@ export const LABS: Lab[] = [
     summary: '1秒あたりの標本数を変えて、元の波を再現できるか見る',
     takeaway: '元の波を再現するには、波の周波数の2倍を超える標本化周波数が必要（標本化定理）。',
     questionId: 'q-soc-13',
-    Component: SamplingRateLab,
   },
   {
     id: 'resolution',
@@ -190,7 +112,6 @@ export const LABS: Lab[] = [
     summary: '縦横の画素数と色の深さから、画像の容量を出す',
     takeaway: '画素数×1画素のビット数÷8が画像のデータ量。解像度を上げるほど容量が増える。',
     questionId: 'q-soc-15',
-    Component: ResolutionLab,
   },
   {
     id: 'patent-term',
@@ -199,7 +120,6 @@ export const LABS: Lab[] = [
     summary: '出願からの年数を動かして、特許が切れる位置を見る',
     takeaway: '特許権は原則、出願から20年。著作権（死後70年）とは保護の考え方が違う。',
     questionId: 'q-soc-4',
-    Component: PatentTermLab,
   },
   {
     id: 'survey-design',
@@ -208,7 +128,6 @@ export const LABS: Lab[] = [
     summary: '選択肢や聞き方の問題を切り替えて、使える調査か判定する',
     takeaway: '選択肢は重ならず漏れなく、中立な聞き方で、偏りのない相手に聞く。1つでも欠けると結果がゆがむ。',
     questionId: 'q-soc-11',
-    Component: SurveyDesignLab,
   },
 
   /* ---------- ネットワーク ---------- */
@@ -220,7 +139,6 @@ export const LABS: Lab[] = [
     takeaway:
       'パケットは小さく分けて送るので、一部が失われてもその分だけ再送できる。損失率が上がると、再送の回数と遅れが増える。',
     questionId: 'q-net-11',
-    Component: PacketLossLab,
   },
   {
     id: 'caesar',
@@ -230,7 +148,6 @@ export const LABS: Lab[] = [
     takeaway:
       'ずらす文字数（鍵）を知っていれば元に戻せる。ただし鍵の候補が少ないと、総当たりで破られやすい。',
     questionId: 'q-net-12',
-    Component: CaesarLab,
   },
   {
     id: 'bit-states',
@@ -239,7 +156,6 @@ export const LABS: Lab[] = [
     summary: 'ビットを増やして、表せる状態が2倍ずつ増えるのを見る',
     takeaway: 'nビットで2のn乗通りの状態を表せる。1ビット増えるだけで、表現できる数は2倍になる。',
     questionId: 'q-net-1',
-    Component: BitStatesLab,
   },
   {
     id: 'binary-convert',
@@ -248,7 +164,6 @@ export const LABS: Lab[] = [
     summary: '8ビットの0と1を押して、10進数と16進数に変換する',
     takeaway: '2進数の各桁は、128・64・32…の重みを持つ。1が立っている桁の重みを足すと10進数になる。',
     questionId: 'q-net-3',
-    Component: BinaryConvertLab,
   },
   {
     id: 'bit-ops',
@@ -257,7 +172,6 @@ export const LABS: Lab[] = [
     summary: '2つのビット列をAND・OR・XORで計算する',
     takeaway: 'ビット演算は桁ごとに計算し、繰り上がりはない。ANDは両方1、ORはどちらか1、XORは違うときだけ1。',
     questionId: 'q-net-5',
-    Component: BitOpsLab,
   },
   {
     id: 'transfer-time',
@@ -266,7 +180,6 @@ export const LABS: Lab[] = [
     summary: 'データ量と回線速度を変えて、送信にかかる時間を見る',
     takeaway: '時間 = データ量（Mbit）÷ 回線速度（Mbps）。MBとMbitを混ぜないよう、8倍して単位をそろえる。',
     questionId: 'q-net-7',
-    Component: TransferTimeLab,
   },
   {
     id: 'password-strength',
@@ -275,7 +188,6 @@ export const LABS: Lab[] = [
     summary: '長さと使う文字の種類から、組み合わせ数を比べる',
     takeaway: '長さを1文字増やすと、組み合わせは文字の種類の数だけ増える。長さと種類の両方が効く。',
     questionId: 'q-net-14',
-    Component: PasswordLab,
   },
   {
     id: 'protocol-stack',
@@ -285,7 +197,6 @@ export const LABS: Lab[] = [
     takeaway:
       '通信はアプリ・トランスポート・インターネット・リンクの層に分かれる。用途ごとにアプリ層のプロトコルが変わる。',
     questionId: 'q-net-2',
-    Component: ProtocolStackLab,
   },
   {
     id: 'hex-convert',
@@ -294,7 +205,6 @@ export const LABS: Lab[] = [
     summary: '値を動かして、16進数と2進数の表し方を見る',
     takeaway: '16進数の1桁は4ビット。2桁で8ビット（0〜255）を表せる。',
     questionId: 'q-net-4',
-    Component: HexConvertLab,
   },
   {
     id: 'parity-check',
@@ -304,7 +214,6 @@ export const LABS: Lab[] = [
     takeaway:
       'パリティビットで1の個数をそろえると、1ビットの誤りを検出できる。2ビット以上だと見逃すことがある。',
     questionId: 'q-net-6',
-    Component: ParityCheckLab,
   },
   {
     id: 'effective-speed',
@@ -313,7 +222,6 @@ export const LABS: Lab[] = [
     summary: '利用率とオーバーヘッドを変えて、実際の速さを見る',
     takeaway: '実効速度は回線速度より小さい。利用率やヘッダの分だけ、実際に運べるデータは減る。',
     questionId: 'q-net-8',
-    Component: EffectiveSpeedLab,
   },
   {
     id: 'subnet',
@@ -322,7 +230,6 @@ export const LABS: Lab[] = [
     summary: 'プレフィックス長を変えて、ネットワーク部とホスト数を見る',
     takeaway: '/n のマスクは先頭nビットをネットワーク部にする。ホスト数は 2^(32-n)-2。',
     questionId: 'q-net-10',
-    Component: SubnetLab,
   },
   {
     id: 'digital-signature',
@@ -332,7 +239,6 @@ export const LABS: Lab[] = [
     takeaway:
       'デジタル署名は、文書のダイジェストを本人の秘密鍵で暗号化したもの。改ざんすると検証に失敗する。',
     questionId: 'q-net-13',
-    Component: DigitalSignatureLab,
   },
   {
     id: 'mfa',
@@ -341,7 +247,6 @@ export const LABS: Lab[] = [
     summary: '認証の要素を組み合わせて、突破される確率を見る',
     takeaway: '知識・所持・生体のうち複数の要素を組み合わせると、1つ破られても突破されにくい。',
     questionId: 'q-net-16',
-    Component: MfaLab,
   },
   {
     id: 'nat',
@@ -351,7 +256,6 @@ export const LABS: Lab[] = [
     takeaway:
       'NAT（NAPT）は、プライベートIPとポートをグローバルIPのポートに対応づけ、1つのIPを複数台で共有する。',
     questionId: 'q-net-17',
-    Component: NatLab,
   },
 
   /* ---------- プログラミング ---------- */
@@ -363,7 +267,6 @@ export const LABS: Lab[] = [
     takeaway:
       '二分探索は整列済みのデータが前提だが、1回の比較で候補が半分になる。データが増えても、比較回数はゆっくりしか増えない。',
     questionId: 'q-pro-12',
-    Component: SearchRaceLab,
   },
   {
     id: 'sum-loop',
@@ -372,7 +275,6 @@ export const LABS: Lab[] = [
     summary: 'nを変えて、1からnまでの合計と繰り返し回数を見る',
     takeaway: '繰り返しは、同じ処理を決まった回数だけ行う。回数が増えると、計算にかかる時間も増える。',
     questionId: 'q-pro-5',
-    Component: SumLoopLab,
   },
   {
     id: 'branch-grade',
@@ -381,7 +283,6 @@ export const LABS: Lab[] = [
     summary: '点数を動かして、どの条件に当てはまるか確認する',
     takeaway: '条件分岐は上から順に評価され、最初に当てはまった枝だけが実行される。条件の順番が結果を変える。',
     questionId: 'q-pro-4',
-    Component: BranchLab,
   },
   {
     id: 'recursion-calls',
@@ -390,7 +291,6 @@ export const LABS: Lab[] = [
     summary: 'nを変えて、同じ計算が何回呼ばれるか見る',
     takeaway: '素朴な再帰は同じ計算を何度も繰り返す。メモ化すると呼び出し回数を大きく減らせる。',
     questionId: 'q-pro-15',
-    Component: RecursionLab,
   },
   {
     id: 'logic-gates',
@@ -399,7 +299,6 @@ export const LABS: Lab[] = [
     summary: 'AとBを切り替えて、AND・OR・XORの出力を見る',
     takeaway: '論理演算は0と1の組み合わせで決まる。ANDは両方1、ORはどちらか1、XORは違うときだけ1。',
     questionId: 'q-pro-14',
-    Component: LogicGatesLab,
   },
   {
     id: 'dice-sim',
@@ -408,7 +307,6 @@ export const LABS: Lab[] = [
     summary: '試行回数を変えて、平均が期待値3.5に近づくか見る',
     takeaway: '乱数を使ったシミュレーションでは、試行回数を増やすほど結果が期待値に近づきやすくなる。',
     questionId: 'q-pro-16',
-    Component: DiceSimLab,
   },
   {
     id: 'filter',
@@ -417,7 +315,6 @@ export const LABS: Lab[] = [
     summary: 'しきい値を動かして、条件に合う件数を見る',
     takeaway: '条件に合うデータだけを取り出すには、1件ずつ条件を比べ、合うものだけを残す。',
     questionId: 'q-pro-1',
-    Component: FilterLab,
   },
   {
     id: 'max-value',
@@ -426,7 +323,6 @@ export const LABS: Lab[] = [
     summary: 'どこまで見たかを動かして、最大値と比較回数を見る',
     takeaway: '最大値は、先頭を仮の最大にして、残りと1件ずつ比べて更新する。n件なら最大n-1回比べる。',
     questionId: 'q-pro-2',
-    Component: MaxValueLab,
   },
   {
     id: 'swap',
@@ -435,7 +331,6 @@ export const LABS: Lab[] = [
     summary: '一時変数あり・なしで、代入の結果を比べる',
     takeaway: '2つの値を入れ替えるには、一時変数に1つを退避する。直接代入すると、片方の値が失われる。',
     questionId: 'q-pro-3',
-    Component: SwapLab,
   },
   {
     id: 'array-index',
@@ -444,7 +339,6 @@ export const LABS: Lab[] = [
     summary: '添字を選んで、値の読み出しと代入を試す',
     takeaway: '配列は添字で要素を指定する。多くの言語では添字は0から始まる。',
     questionId: 'q-pro-6',
-    Component: ArrayIndexLab,
   },
   {
     id: 'matrix',
@@ -453,7 +347,6 @@ export const LABS: Lab[] = [
     summary: '行と列を選んで、値と合計を見る',
     takeaway: '二次元配列は行と列の2つの添字で要素を指定する。表のマス目として扱える。',
     questionId: 'q-pro-7',
-    Component: MatrixLab,
   },
   {
     id: 'binary-search-steps',
@@ -462,7 +355,6 @@ export const LABS: Lab[] = [
     summary: '探す値を変えて、候補が半分ずつ絞られる様子を見る',
     takeaway: '二分探索は中央と比べるたびに候補を半分にする。整列済みのデータが必要。',
     questionId: 'q-pro-9',
-    Component: BinarySearchStepsLab,
   },
   {
     id: 'selection-sort',
@@ -471,7 +363,6 @@ export const LABS: Lab[] = [
     summary: 'パスを進めて、最小値が先頭に集まる様子を見る',
     takeaway: '選択ソートは、残りの範囲から最小値を選んで先頭と交換する。パスごとに整列済みの部分が増える。',
     questionId: 'q-pro-10',
-    Component: SelectionSortLab,
   },
 
   /* ---------- データ活用 ---------- */
@@ -483,7 +374,6 @@ export const LABS: Lab[] = [
     takeaway:
       '平均値はすべての値を使って計算するので外れ値に引っ張られる。中央値は真ん中の値なので、外れ値が1件あってもほとんど動かない。',
     questionId: 'q-dat-1',
-    Component: MeanMedianLab,
   },
   {
     id: 'histogram',
@@ -492,7 +382,6 @@ export const LABS: Lab[] = [
     summary: '階級の幅を変えて、分布の形の見え方を比べる',
     takeaway: '同じデータでも、階級の幅を変えると山の見え方が変わる。幅を決めてから分布を読む。',
     questionId: 'q-dat-2',
-    Component: HistogramLab,
   },
   {
     id: 'correlation',
@@ -501,7 +390,6 @@ export const LABS: Lab[] = [
     summary: '正・負・なしの散布図を切り替えて、rを確かめる',
     takeaway: '相関係数は直線的な関係の強さを表す。相関があっても因果関係があるとは限らない。',
     questionId: 'q-dat-6',
-    Component: CorrelationLab,
   },
   {
     id: 'boxplot',
@@ -510,7 +398,6 @@ export const LABS: Lab[] = [
     summary: '100点を1人足して、箱とひげがどう変わるか見る',
     takeaway: '箱ひげ図は中央値と散らばりをまとめて示す。極端な値は外れ値として、ひげの外に示す。',
     questionId: 'q-dat-4',
-    Component: BoxPlotLab,
   },
   {
     id: 'moving-average',
@@ -519,7 +406,6 @@ export const LABS: Lab[] = [
     summary: '平均をとる期間を変えて、折れ線の滑らかさを見る',
     takeaway: '移動平均は短い周期の変動をならし、長い傾向を見やすくする。期間を長くすると反応は遅れる。',
     questionId: 'q-dat-17',
-    Component: MovingAverageLab,
   },
   {
     id: 'missing-data',
@@ -528,7 +414,6 @@ export const LABS: Lab[] = [
     summary: '除外・0で補う・平均で補うを切り替えて、結果を見る',
     takeaway: '欠損値の扱い方で平均は変わる。勝手に埋めず、どう扱ったかを記録する必要がある。',
     questionId: 'q-dat-8',
-    Component: MissingDataLab,
   },
   {
     id: 'mode-range',
@@ -537,7 +422,6 @@ export const LABS: Lab[] = [
     summary: '外れ値を足して、最頻値と値域の動きを見る',
     takeaway: '最頻値は最も多く出る値、値域は最大と最小の差。外れ値1つで値域は大きく変わる。',
     questionId: 'q-dat-3',
-    Component: ModeRangeLab,
   },
   {
     id: 'stddev',
@@ -546,7 +430,6 @@ export const LABS: Lab[] = [
     summary: '値の散らばりを変えて、標準偏差と帯を見る',
     takeaway: '標準偏差は平均からのずれの大きさを表す。大きいほどデータが散らばっている。',
     questionId: 'q-dat-5',
-    Component: StandardDeviationLab,
   },
   {
     id: 'regression',
@@ -555,7 +438,6 @@ export const LABS: Lab[] = [
     summary: '散布図に最小二乗の直線を重ね、外れ値の影響を見る',
     takeaway: '回帰直線は点とのずれが小さくなるように引く。外れ値1点で傾きが大きく変わることがある。',
     questionId: 'q-dat-7',
-    Component: RegressionLab,
   },
   {
     id: 'scale-level',
@@ -564,7 +446,6 @@ export const LABS: Lab[] = [
     summary: 'データの例を切り替えて、できる比較を確かめる',
     takeaway: '名義・順序・間隔・比例の4つの尺度。尺度によって、平均や比を使ってよいかが変わる。',
     questionId: 'q-dat-9',
-    Component: ScaleLevelLab,
   },
   {
     id: 'primary-key',
@@ -573,7 +454,6 @@ export const LABS: Lab[] = [
     summary: '重複する主キーを足して、表の決まりを壊してみる',
     takeaway: '主キーは行を一意に識別する。外部キーは他の表の主キーを参照し、表どうしをつなぐ。',
     questionId: 'q-dat-10',
-    Component: PrimaryKeyLab,
   },
   {
     id: 'sql',
@@ -582,7 +462,6 @@ export const LABS: Lab[] = [
     summary: '条件・並べ替え・集計を変えて、取り出される行を見る',
     takeaway: 'SQLはSELECTで列、FROMで表、WHEREで条件、ORDER BYで並び順を指定する。',
     questionId: 'q-dat-11',
-    Component: SqlLab,
   },
   {
     id: 'chart-choice',
@@ -591,7 +470,6 @@ export const LABS: Lab[] = [
     summary: '伝えたいことを切り替えて、向くグラフを確かめる',
     takeaway: '割合は円・帯、時系列は折れ線、分布はヒストグラム、2変数の関係は散布図。目的に合う形を選ぶ。',
     questionId: 'q-dat-14',
-    Component: ChartChoiceLab,
   },
 ]
 

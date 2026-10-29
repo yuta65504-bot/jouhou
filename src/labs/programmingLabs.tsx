@@ -3,7 +3,7 @@
  */
 import { useState } from 'react'
 import { Segmented } from '@/components/Segmented'
-import { Btn, Canvas, CellTrack, FigureFrame, GArrow, GBox, GCircle, Note, Readout, Slider } from '@/figures/parts'
+import { Btn, Canvas, CellTrack, FigureFrame, GArrow, GBox, GCircle, MUTED, Note, Readout, Slider, TINT } from '@/figures/parts'
 import fig from '@/figures/figures.module.css'
 import { fibCalls, grade, rollDice, seededRng, sumTo, binarySearchTrace, selectionSortPasses } from './sim'
 import s from './labs.module.css'
@@ -139,7 +139,7 @@ export function LogicGatesLab() {
           <GArrow x1={72} y1={74} x2={128} y2={60} />
           <GBox x={130} y={34} w={76} h={32} text={gate.toUpperCase()} bold />
           <GArrow x1={208} y1={50} x2={244} y2={50} stroke={out ? 'var(--color-success)' : 'var(--color-border)'} />
-          <GCircle cx={266} cy={50} r={20} text={out ? '1' : '0'} fill={out ? 'var(--color-success)' : 'var(--color-secondary-label)'} />
+          <GCircle cx={266} cy={50} r={20} text={out ? '1' : '0'} fill={out ? 'var(--color-success)' : TINT} ink={out ? '#fff' : MUTED} />
         </svg>
       </Canvas>
       <div className={fig.ctrl}>

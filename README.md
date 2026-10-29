@@ -91,9 +91,10 @@ src/
     parts.tsx     共通パーツ（FigShell / Btn / Slider / SVG部品）
     society.tsx / network.tsx / programming.tsx / data.tsx  分野ごとの18本
   labs/           動かして学ぶ実験（問題から独立したシミュレーション）
-    index.ts      実験の一覧・関連問題・「今日の実験」の選択
+    index.ts      実験の一覧（ID・分野・関連問題）と「今日の実験」の選択
+    components.tsx  実験ID → 本体の対応（実験ページでのみ読み込む）
     experiments.tsx  最初の5本（パケットロス／シーザー暗号／引用チェック／探索比較／平均と中央値）
-    societyLabs.tsx / networkLabs.tsx / programmingLabs.tsx / dataLabs.tsx  追加50本を分野別に配置
+    societyLabs.tsx / networkLabs.tsx / programmingLabs.tsx / dataLabs.tsx  分野別の実験
     sim.ts        実験の計算部分（乱数は差し替え可能。テストは決定的な乱数を使う）
   pages/          画面（ホーム／実験／分野／演習／用語／記録／設定／管理者）
   styles/
@@ -127,7 +128,7 @@ question.md        問題の一次ソース（問題バンク。下記「問題�
 
 ## 実験（動かして学ぶ）
 
-- `/labs` に、問題から独立した実験を置く（全55本）。ホームと下部タブ（モバイル）／サイドバー（デスクトップ）から直接開ける
+- `/labs` に、問題から独立した実験を置く。ホームと下部タブ（モバイル）／サイドバー（デスクトップ）から直接開ける
 - 実験は「値を変える・押す・入力する」と、その場で図や数値が変わる。初回表示は決定的な乱数を使い、再送ボタンを押したときだけ結果が変わる
 - 各実験には関連する演習問題を1問紐づけ、実験のあとに問題で確かめられる
 - 一覧は分野ごとに表示し、ホームでは「今日の実験」と他3分野の代表1本ずつを並べる

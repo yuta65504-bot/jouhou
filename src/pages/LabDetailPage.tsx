@@ -3,6 +3,7 @@ import { TopAppBar } from '@/components/TopAppBar'
 import { getField } from '@/lib/fields'
 import { questionById } from '@/content/questions'
 import { labById } from '@/labs'
+import { LAB_COMPONENTS } from '@/labs/components'
 import { usePageTitle } from '@/lib/usePageTitle'
 import ui from '@/styles/ui.module.css'
 import s from './LabDetailPage.module.css'
@@ -13,9 +14,10 @@ export default function LabDetailPage() {
   usePageTitle(lab?.title ?? '実験')
 
   if (!lab) return <Navigate to="/labs" replace />
+  const LabBody = LAB_COMPONENTS[lab.id]
+  if (!LabBody) return <Navigate to="/labs" replace />
   const field = getField(lab.fieldId)
   const question = questionById(lab.questionId)
-  const LabBody = lab.Component
 
   return (
     <>

@@ -260,6 +260,14 @@
   gap: 8px;
 }
 
+/* --- 実験カードの並び（ホーム／分野／実験一覧で共用） --- */
+.labGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 10px;
+  margin-top: 8px;
+}
+
 /* --- 星評価 --- */
 .stars {
   color: var(--color-warning-ink);

@@ -17,7 +17,7 @@ export function LabCard({ lab, today = false }: Props) {
       to={`/labs/${lab.id}`}
       className={styles.card}
       style={{ borderTopColor: field.colorVar }}
-      aria-label={`${lab.title}（${field.name}の実験）`}
+      aria-label={`${lab.title}（${field.name}の実験${today ? '、今日の実験' : ''}）`}
     >
       <span className={styles.meta}>
         <span className={ui.chip} style={{ background: field.tintVar }}>

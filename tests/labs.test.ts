@@ -2,6 +2,7 @@ import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 import { LABS, labById, labsByField, pickTodaysLab } from '../src/labs'
+import { LAB_COMPONENTS } from '../src/labs/components'
 import {
   binarySearchTrace,
   bitOp,
@@ -205,7 +206,7 @@ describe('データの集計', () => {
   })
 })
 
-describe('追加30本の計算', () => {
+describe('追加分の計算', () => {
   it('標本化定理の条件を返す', () => {
     expect(nyquistOk(44100, 20000)).toBe(true)
     expect(nyquistOk(8000, 3000)).toBe(true)
@@ -264,7 +265,6 @@ describe('追加30本の計算', () => {
 
 describe('実験の一覧', () => {
   it('IDが重複せず、関連する問題と分野が一致する', () => {
-    expect(LABS.length).toBe(55)
     expect(new Set(LABS.map((lab) => lab.id)).size).toBe(LABS.length)
     for (const lab of LABS) {
       const question = questionById(lab.questionId)
@@ -275,9 +275,13 @@ describe('実験の一覧', () => {
     }
   })
 
+  it('すべての実験に本体があり、余分な本体がない', () => {
+    expect(Object.keys(LAB_COMPONENTS).sort()).toEqual(LABS.map((lab) => lab.id).sort())
+  })
+
   it('どの実験もSSRで描画できる', () => {
     for (const lab of LABS) {
-      const html = renderToStaticMarkup(createElement(lab.Component))
+      const html = renderToStaticMarkup(createElement(LAB_COMPONENTS[lab.id]!))
       expect(html.length, `${lab.id} が空`).toBeGreaterThan(0)
       expect(html, `${lab.id} に実験タイトルがない`).toContain('<h3')
       expect(html, `${lab.id} に結果表示がない`).toContain('role="status"')
