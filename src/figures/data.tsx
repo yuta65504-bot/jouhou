@@ -365,8 +365,8 @@ export function DatFig4() {
 /* ---------- q-dat-5: 標準偏差の比較 ---------- */
 
 const D5_SETS: { label: string; values: number[] }[] = [
-  { label: '前者: 50, 60, 70, 80, 90', values: [50, 60, 70, 80, 90] },
-  { label: '後者: 50, 50, 70, 90, 90', values: [50, 50, 70, 90, 90] },
+  { label: '1組目: 50, 60, 70, 80, 90', values: [50, 60, 70, 80, 90] },
+  { label: '2組目: 50, 50, 70, 90, 90', values: [50, 50, 70, 90, 90] },
 ]
 
 function d5Sigma(values: number[]): number {
@@ -383,7 +383,7 @@ export function DatFig5() {
   return (
     <FigureFrame
       title="図解: 平均からのずれが大きいほど標準偏差は大きい"
-      status={`${pick === 1 ? '後者' : '前者'}は平均70、σ ≈ ${s.sigma.toFixed(1)}。${pick === 1 ? '後者の方が大きく散らばっている。' : '前者は70の周りにまとまっている。'}`}
+      status={`${pick === 1 ? '2組目' : '1組目'}は平均70、σ ≈ ${s.sigma.toFixed(1)}。${pick === 1 ? '2組目の方が大きく散らばっている。' : '1組目は70の周りにまとまっている。'}`}
     >
       <div className={styles.controlRow}>
         <Segmented
@@ -441,8 +441,8 @@ export function DatFig5() {
         <Readout
           items={[
             { k: '今回の σ', v: sigma.toFixed(1), strong: true },
-            { k: '前者 σ', v: rows[0].sigma.toFixed(1) },
-            { k: '後者 σ', v: rows[1].sigma.toFixed(1) },
+            { k: '1組目 σ', v: rows[0].sigma.toFixed(1) },
+            { k: '2組目 σ', v: rows[1].sigma.toFixed(1) },
             { k: '平均', v: 'どちらも 70' },
           ]}
         />

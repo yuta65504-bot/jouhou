@@ -1118,7 +1118,7 @@ export function ProFig18() {
   const info: Record<P18Kind, { ok: boolean; title: string; body: string }> = {
     chart: { ok: true, title: 'フローチャート', body: '処理・判断・矢印で流れと分かれ道を示す。プログラムへ直しやすい。' },
     pseudo: { ok: true, title: '疑似言語', body: '日本語に近い文法で、処理の手順を文章のように表す。' },
-    dncl: { ok: true, title: '共通テスト用プログラム表記', body: '共通テストで使われるプログラム表記。代入・繰り返し・条件分岐で手順を書く。' },
+    dncl: { ok: true, title: 'プログラム言語', body: 'Python や JavaScript などで、代入・繰り返し・条件分岐を使って手順を書く。' },
     book: { ok: false, title: '会計の帳簿', body: '金銭や工程の記録を整えるための表。手順（処理の流れ）を表すものではない。' },
   }
   const c = info[kind]
@@ -1195,7 +1195,7 @@ export function ProFig18() {
           </text>
         </svg>
       </View>
-      <Note>アルゴリズムとは「処理の手順の明確な表現」。フローチャート・疑似言語・共通テスト用プログラム表記・プログラム言語のどれでも書ける。</Note>
+      <Note>アルゴリズムとは「処理の手順の明確な表現」。フローチャート・疑似言語・プログラム言語のどれでも書ける。</Note>
     </FigShell>
   )
 }
